@@ -1,0 +1,17 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  color: #fff8;
+  height: 100vh;
+  background-color: #000f;
+}
+
+body {
+  display: grid;
+  place-items: center;
+  height: 100%;
+}
