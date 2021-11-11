@@ -1,19 +1,20 @@
+import { useState } from "react";
+
 import { getTestSequence } from "./lib/notes";
 import Grid from "./ui/Grid";
 
 import "./App.scss";
-import { useState } from "react";
 
 function App() {
-  const [notes, setNotes ] = useState(getTestSequence(16));
+  const [notes, setNotes] = useState(getTestSequence(16));
 
   const toggleNote = (step: number, note: number) => {
-    const theNotes = notes;
-    theNotes[step] = notes[step] ^ note;
+    const theNotes = [...notes];
+    theNotes[step] = notes[step] ^ (1 << note);
     setNotes(theNotes);
-  }
+  };
 
-  return <Grid notes={notes} onToggleNote={toggleNote} ></Grid>;
+  return <Grid notes={notes} onToggleNote={toggleNote} />;
 }
 
 export default App;

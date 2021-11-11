@@ -1,0 +1,46 @@
+.gs-grid {
+  --columns: 16;
+  --rows: 7;
+  display: grid;
+  grid-template-columns: repeat(var(--columns), 1fr);
+  grid-template-rows: repeat(var(--rows), 1fr);
+  grid-auto-flow: column;
+  gap: 0.1em;
+}
+
+.gs-key {
+  --size: 3em;
+  --button-face: #444f;
+
+  background-color: var(--button-face);
+  display: grid;
+  grid-column: calc(var(--step) + 1);
+  grid-row: calc(var(--rows) - var(--note) + 1);
+  grid-template-areas: "main";
+  height: var(--size);
+  padding: 0.1em;
+  place-items: center;
+  user-select: none;;
+  width: var(--size);
+
+  &:before {
+    content: "";
+    grid-area: main;
+    padding-top: 100%;
+  }
+
+  & > * {
+    grid-area: main;
+  }
+
+  &--is-active {
+    color: #ffff;
+    --button-face: rgb(255, 251, 0);
+  }
+
+  &__label {
+    font-family: "Red Hat Mono";
+    font-weight: 100;
+    font-size: 0.625em;
+  }
+}
