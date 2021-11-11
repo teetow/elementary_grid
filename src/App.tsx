@@ -14,7 +14,13 @@ function App() {
     setNotes(theNotes);
   };
 
-  return <Grid notes={notes} onToggleNote={toggleNote} />;
+  return (
+    <Grid
+      notes={notes}
+      onToggleNote={toggleNote}
+      onClear={() => setNotes(getTestSequence(16))}
+    />
+  );
 }
 
 export default App;

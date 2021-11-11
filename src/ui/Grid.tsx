@@ -1,5 +1,5 @@
 import classnames from "classnames";
-import { CSSProperties } from "react";
+import { CSSProperties, useEffect, useState } from "react";
 
 import "./Grid.scss";
 
@@ -36,6 +36,7 @@ const Key = ({ step, note, label, state, onToggle }: KeyProps) => {
 type Props = {
   notes: number[];
   onToggleNote: (step: number, note: number) => void;
+  onClear: () => void;
 };
 
 const range = (n: number, start: number = 0) => [
@@ -64,21 +65,69 @@ const makeGridNotes = (notes: number[]) => {
   return newNotes;
 };
 
-const Grid = ({ notes, onToggleNote }: Props) => {
+type PaintMode = "none" | "fill" | "clear";
+
+const Grid = ({ notes, onToggleNote, onClear }: Props) => {
+  const [paintMode, setPaintMode] = useState<PaintMode>("none");
+
+  const handleMouseUp = () => setPaintMode("none");
+
+  const handleMouseDown = (step: number, note: number) => {
+    const notePos = 1 << note;
+
+    if ((notes[step] & notePos) === notePos) {
+      setPaintMode("clear");
+    } else {
+      setPaintMode("fill");
+    }
+
+    onToggleNote(step, note);
+  };
+
+  const handlePaint = (step: number, note: number) => {
+    const notePos = 1 << note;
+
+    if (paintMode === "fill" && (notes[step] & notePos) !== notePos) {
+      onToggleNote(step, note);
+    }
+
+    if (paintMode === "clear" && (notes[step] & notePos) === notePos)
+      onToggleNote(step, note);
+  };
+
+  useEffect(() => {
+    document.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  });
+
   return (
     <div className="gs-grid">
-      {makeGridNotes(notes).map(
-        ({ key, step, note, state, label }: StepNote) => (
-          <Key
-            key={key}
-            note={note}
-            step={step}
-            onToggle={() => onToggleNote(step, note)}
-            state={state}
-            label={label}
-          />
-        )
-      )}
+      <div className="gs-grid__field">
+        {makeGridNotes(notes).map(
+          ({ key, step, note, state, label }: StepNote) => (
+            <div
+              key={key}
+              className="gs-grid__trigger"
+              onMouseEnter={() => paintMode !== "none" && handlePaint(step, note)}
+              onMouseDown={() => handleMouseDown(step, note)}
+            >
+              <Key
+                note={note}
+                step={step}
+                onToggle={() => onToggleNote(step, note)}
+                state={state}
+                label={label}
+              />
+            </div>
+          )
+        )}
+      </div>
+      <div className="gs-grid__toolbar">
+        <button onClick={onClear}>Clear</button>
+      </div>
     </div>
   );
 };

@@ -1,4 +1,9 @@
 .gs-grid {
+  display: grid;
+  gap: 2em;
+}
+
+.gs-grid__field {
   --columns: 16;
   --rows: 7;
   display: grid;
