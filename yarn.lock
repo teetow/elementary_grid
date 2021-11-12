@@ -1389,6 +1389,11 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
+"@nick-thompson/elementary@^0.10.4":
+  version "0.10.4"
+  resolved "https://registry.yarnpkg.com/@nick-thompson/elementary/-/elementary-0.10.4.tgz#7a40b3821c0091e7dec2e8cc6de5587aa27e16f3"
+  integrity sha512-Ne5yiWq6bya1rarkdj6Novbq3JWGTe37kZUod7MKhrA5Cupoxo01ALwqE7dX3EzksyD33FOePEkWIKtJeieFOw==
+
 "@nodelib/fs.scandir@2.1.4":
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.4.tgz#d4b3549a5db5de2683e0c1071ab4f140904bbf69"
@@ -1699,6 +1704,11 @@
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-3.0.3.tgz#3dca0e3f33b200fc7d1139c0cd96c1268cadfd9d"
   integrity sha512-tHq6qdbT9U1IRSGf14CL0pUlULksvY9OZ+5eEgl1N7t+OA3tGvNpxJCzuKQlsNgCVwbAs670L1vcVQi8j9HjnA==
+
+"@types/nick-thompson__elementary@^0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@types/nick-thompson__elementary/-/nick-thompson__elementary-0.9.0.tgz#7018e1976ea4275ba81c2d654543a77df602f452"
+  integrity sha512-WLpL7RBvFhp52DFnd+8mcTUqb7I7V6Dze82tSC0emxuu6+HxxoIUVPP6SdZjwWY/hUsukytYn39Y9H6hGGT3EQ==
 
 "@types/node@*":
   version "14.14.31"

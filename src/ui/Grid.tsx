@@ -1,5 +1,5 @@
 import classnames from "classnames";
-import { CSSProperties, useEffect, useState } from "react";
+import { CSSProperties, HTMLAttributes, useEffect, useState } from "react";
 
 import "./Grid.scss";
 
@@ -11,11 +11,12 @@ type StepNote = {
   label?: string;
 };
 
-type KeyProps = StepNote & {
-  onToggle: (note: number) => void;
-};
+type KeyProps = StepNote &
+  HTMLAttributes<HTMLDivElement> & {
+    onToggle: (note: number) => void;
+  };
 
-const Key = ({ step, note, label, state, onToggle }: KeyProps) => {
+const Key = ({ step, note, label, state, onToggle, ...rest }: KeyProps) => {
   const keyClasses = classnames({
     "gs-key": true,
     "gs-key--is-active": state,
@@ -27,7 +28,12 @@ const Key = ({ step, note, label, state, onToggle }: KeyProps) => {
   } as CSSProperties;
 
   return (
-    <div className={keyClasses} style={keyStyle} onClick={() => onToggle(note)}>
+    <div
+      className={keyClasses}
+      style={keyStyle}
+      onClick={() => onToggle(note)}
+      {...rest}
+    >
       <div className="gs-key__label">{label}</div>
     </div>
   );
@@ -108,20 +114,18 @@ const Grid = ({ notes, onToggleNote, onClear }: Props) => {
       <div className="gs-grid__field">
         {makeGridNotes(notes).map(
           ({ key, step, note, state, label }: StepNote) => (
-            <div
+            <Key
               key={key}
-              className="gs-grid__trigger"
-              onMouseEnter={() => paintMode !== "none" && handlePaint(step, note)}
+              note={note}
+              step={step}
+              state={state}
+              label={label}
+              onToggle={() => onToggleNote(step, note)}
+              onMouseEnter={() =>
+                paintMode !== "none" && handlePaint(step, note)
+              }
               onMouseDown={() => handleMouseDown(step, note)}
-            >
-              <Key
-                note={note}
-                step={step}
-                onToggle={() => onToggleNote(step, note)}
-                state={state}
-                label={label}
-              />
-            </div>
+            />
           )
         )}
       </div>

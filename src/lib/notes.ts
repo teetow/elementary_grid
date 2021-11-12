@@ -5,7 +5,7 @@ export type Note = {
 };
 
 export const getTestSequence = (length: 16) => {
-  const steps: Array<number> = new Array(length).fill(8);
+  const steps: Array<number> = new Array(length).fill(0);
 
   return steps;
 };

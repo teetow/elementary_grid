@@ -25,8 +25,9 @@
   height: var(--size);
   padding: 0.1em;
   place-items: center;
-  user-select: none;;
+  user-select: none;
   width: var(--size);
+  transition: background-color 200ms, color 100ms;
 
   &:before {
     content: "";
@@ -39,7 +40,7 @@
   }
 
   &--is-active {
-    color: #ffff;
+    color: #000c;
     --button-face: rgb(255, 251, 0);
   }
 
