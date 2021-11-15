@@ -1,19 +1,22 @@
-import React, { useEffect, useState } from "react";
-import { midiToFrequency, noteToMidi, useElementary } from "../lib/hooks";
+import { useEffect, useState } from "react";
+import { useElementary } from "../lib/hooks";
+import { midiToFrequency, noteToMidi } from "../lib/utils";
 
 type Props = {
-  notes: string[];
+  sequence: string[][];
 };
 
-function Synth({ notes }: Props) {
-  const [freqs, setFreqs] = useState<number[]>();
+function Synth({ sequence }: Props) {
+  const [freqs, setFreqs] = useState<number[][]>();
 
   useEffect(() => {
-    const midiNotes = notes.map(noteToMidi);
-    setFreqs(midiNotes.map(midiToFrequency));
-  }, [notes]);
+    const midiNotes = sequence.map((step) =>
+      step.map((n) => midiToFrequency(noteToMidi(n)) * 4)
+    );
+    setFreqs(midiNotes);
+  }, [sequence]);
 
-  useElementary(freqs);
+  useElementary(freqs || []);
 
   return <h1>Elementary is alive!</h1>;
 }

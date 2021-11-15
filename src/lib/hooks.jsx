@@ -1,10 +1,12 @@
 import {
   el,
-  ElementaryWebAudioRenderer as core,
+  ElementaryWebAudioRenderer as core
 } from "@nick-thompson/elementary";
 import { useCallback, useEffect, useState } from "react";
+import { beatLenFromTempo } from "./utils";
 
 let ctx;
+
 function getAudioCtx() {
   if (ctx) return ctx;
   console.log("creating a new AudioContext");
@@ -13,57 +15,20 @@ function getAudioCtx() {
 getAudioCtx();
 
 /**
- * Calculate the length, in ms, of one given subdivision at the specificed BPM
- * @param {*} tempo tempo in Beats Per Minute
- * @param {*} div subdivision for which the length is sought, defaults to 16:th note
- * @returns the length of one subdivision in ms
+ * @typedef {Object} Voice
+ * @property {number} key
+ * @property {number} gate
+ * @property {number} freq
  */
-const beatLenFromTempo = (tempo, div = 16) => {
-  const beatLen = 1 / (tempo / 60);
-  return ((beatLen * 4) / div) * 1000;
-};
 
-export function noteToMidi(n) {
-  let notes = ["c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"];
-  let [name, octave] = n.split("");
-
-  if (notes.indexOf(name) < 0) return -1;
-
-  return 12 * octave + notes.indexOf(name);
-}
-
-export function midiToFrequency(m) {
-  if (m < 0) {
-    return 0;
-  }
-  return 440 * Math.pow(2, (m - 69) / 12);
-}
-
-const generateSeq = (notes) => {
-  let train = el.train(10.0);
-  // let train = el.metro(bpm);
-  let env = el.adsr(0.01, 0.25, 0.0, 0.1, train);
-
-  let modulate = (x, rate, amount) => el.add(x, el.mul(amount, el.cycle(rate)));
-
-  let synth = el.mul(
-    0.2,
-    env,
-    el.lowpass(
-      modulate(900, 0.1, 300),
-      1.0,
-      el.add(
-        el.blepsaw(el.mul(0.99, el.seq({ seq: notes, hold: true }, train))),
-        el.blepsaw(el.mul(1.01, el.seq({ seq: notes, hold: true }, train)))
-      )
-    )
-  );
-  return synth;
-};
-
+/**
+ *
+ * @param {Voice} voice
+ * @returns
+ */
 function synthVoice(voice) {
-  let gate = el.const({ key: `${voice.key}:gate`, value: 0.2 * voice.gate });
-  let env = el.adsr(4.0, 1.0, 0.4, 2.0, gate);
+  let gate = el.const({ key: `${voice.key}:gate`, value: voice.gate });
+  let env = el.adsr(0.00001, 0.3, 0.1, 2.0, gate);
 
   return el.mul(
     env,
@@ -71,21 +36,21 @@ function synthVoice(voice) {
   );
 }
 
-export const useElementary = (notes, bpm = 120) => {
-  const [seq, setSeq] = useState(generateSeq(notes));
+/**
+ *
+ * @param {number[][]} freqseq
+ * @param {number} bpm
+ */
+export const useElementary = (freqseq, bpm = 120) => {
   const [step, setStep] = useState(0);
+  const [voices, setVoices] = useState(null);
 
   const stepForward = () => {
     setStep((prev) => {
-      console.log("step was", prev);
-      return prev + 1;
+      const nextStep = (prev + 1) % 16;
+      return nextStep;
     });
-    // setStep(step + 1);
   };
-
-  useEffect(() => {
-    console.log(step);
-  }, [step]);
 
   useEffect(() => {
     let node;
@@ -99,32 +64,63 @@ export const useElementary = (notes, bpm = 120) => {
     };
     load();
 
+    core.on("load", () => {});
+
     core.on("metro", () => {
-      console.log("tick");
       stepForward();
     });
-  }, []);
+  }, [bpm]);
 
   useEffect(() => {
-    setSeq(generateSeq(notes));
-  }, [notes]);
+    const newNotes = freqseq[step];
+    if (newNotes) {
+      const newVoices = newNotes.map((note, index) => ({
+        key: index,
+        gate: 1,
+        freq: note,
+      }));
+      setVoices(newVoices);
+    }
+  }, [step, freqseq]);
 
   const doRender = useCallback(async () => {
     if (ctx.state === "suspended") {
       await ctx.resume();
     }
 
-    if (seq && ctx.state === "running") {
+    if (ctx.state === "running") {
+      const pulseLen = beatLenFromTempo(bpm, 16);
       try {
-        core.render(synthVoice(0), seq);
-        // core.render(seq, seq);
+        if (voices?.length > 0) {
+          window.setTimeout(() => {
+            const newVoices = voices.map(synthVoice);
+            const stack = el.add(
+              newVoices,
+              el.mul(0.0, el.metro({ interval: pulseLen }))
+            );
+
+            core.render(stack, stack);
+          }, 1);
+          window.setTimeout(() => {
+            const newVoices = voices
+              .map((v) => ({ ...v, gate: 0 }))
+              .map(synthVoice);
+            const stack = el.add(
+              newVoices,
+              el.mul(0.0, el.metro({ interval: pulseLen }))
+            );
+            core.render(stack, stack);
+          }, pulseLen / 2);
+
+          // core.render(el.add(newVoices), el.add(newVoices));
+        }
       } catch (e) {
         console.log(e);
       }
     }
-  }, [seq]);
+  }, [bpm, voices]);
 
   useEffect(() => {
     doRender();
-  }, [doRender, seq]);
+  }, [doRender, voices]);
 };
