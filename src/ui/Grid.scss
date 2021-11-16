@@ -10,11 +10,11 @@
   grid-template-columns: repeat(var(--columns), 1fr);
   grid-template-rows: repeat(var(--rows), 1fr);
   grid-auto-flow: column;
-  gap: 0.1em;
+  gap: 2px;
 }
 
 .gs-key {
-  --size: 3em;
+  --size: 2.2em;
   --button-face: #444f;
 
   background-color: var(--button-face);
@@ -23,11 +23,11 @@
   grid-row: calc(var(--rows) - var(--note) + 1);
   grid-template-areas: "main";
   height: var(--size);
-  padding: 0.1em;
+  padding: 2px;
   place-items: center;
   user-select: none;
   width: var(--size);
-  transition: background-color 200ms, color 100ms;
+  transition: background-color 100ms, color 100ms;
 
   &:before {
     content: "";
@@ -39,12 +39,24 @@
     grid-area: main;
   }
 
+  &--has-hilight {
+    --button-face: rgb(99, 89, 36);
+    transition: none;
+  }
+
   &--is-active {
+    --button-face: rgb(255, 196, 0);
     color: #000c;
-    --button-face: rgb(255, 251, 0);
+    transition: background-color 800ms, color 100ms;
+  }
+
+  &--is-active.gs-key--has-hilight {
+    --button-face: rgb(255, 248, 147);
+    transition: none;
   }
 
   &__label {
+    display: none;
     font-family: "Red Hat Mono";
     font-weight: 100;
     font-size: 0.625em;

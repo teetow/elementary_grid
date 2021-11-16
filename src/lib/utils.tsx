@@ -9,6 +9,11 @@ export const beatLenFromTempo = (tempo: number, div = 16) => {
   return ((beatLen * 4) / div) * 1000;
 };
 
+export const freqFromTempo = (tempo: number, div = 16) => {
+  const beatsPerSec = tempo / 60;
+  return (beatsPerSec / 4) * div;
+};
+
 export const noteToMidi = (n: string) => {
   let notes = ["c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"];
   let [name, octave] = n.split("");
@@ -33,3 +38,7 @@ export const highestNote = (n: number) => {
   }
   return c;
 };
+
+export const range = (n: number, start: number = 0) => [
+  ...Array.from(Array(n).keys()).map((k) => k + start),
+];

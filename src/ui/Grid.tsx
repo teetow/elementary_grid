@@ -1,14 +1,16 @@
 import classnames from "classnames";
 import { CSSProperties, HTMLAttributes, useEffect, useState } from "react";
+import { range } from "../lib/utils";
 
 import "./Grid.scss";
 
 type StepNote = {
-  step: number;
-  note: number;
-  state: boolean;
+  hasHilight?: boolean;
   key?: string;
   label?: string;
+  note: number;
+  state: boolean;
+  step: number;
 };
 
 type KeyProps = StepNote &
@@ -16,10 +18,19 @@ type KeyProps = StepNote &
     onToggle: (note: number) => void;
   };
 
-const Key = ({ step, note, label, state, onToggle, ...rest }: KeyProps) => {
+const Key = ({
+  hasHilight,
+  label,
+  note,
+  onToggle,
+  state,
+  step,
+  ...rest
+}: KeyProps) => {
   const keyClasses = classnames({
     "gs-key": true,
     "gs-key--is-active": state,
+    "gs-key--has-hilight": hasHilight,
   });
 
   const keyStyle = {
@@ -39,32 +50,19 @@ const Key = ({ step, note, label, state, onToggle, ...rest }: KeyProps) => {
   );
 };
 
-type Props = {
-  notes: number[];
-  onToggleNote: (step: number, note: number) => void;
-  onClear: () => void;
-};
-
-const range = (n: number, start: number = 0) => [
-  ...Array.from(Array(n).keys()).map((k) => k + start),
-];
-
-const makeGridNotes = (notes: number[]) => {
+const makeGridNotes = (notes: number[][]) => {
   const newNotes: StepNote[] = [];
 
-  range(16).forEach((step) => {
-    range(7).forEach((note) => {
-      const notePos = 1 << note;
-      const state = (notes[step] & notePos) === notePos;
-
+  range(notes.length).forEach((note) => {
+    range(notes[0].length).forEach((step) => {
+      const state = notes[note][step] === 1;
+      const key = `${note}_${step}_${state ? "on" : "off"}`;
       newNotes.push({
-        key: `${step}${note}${state ? "on" : "off"}`,
+        key: key,
         note: note,
         step: step,
         state: state,
-        label: `s${step.toString().padStart(2, "0")}n${note
-          .toString()
-          .padStart(2, "0")}`,
+        label: `s${step}n${note}`,
       });
     });
   });
@@ -73,32 +71,35 @@ const makeGridNotes = (notes: number[]) => {
 
 type PaintMode = "none" | "fill" | "clear";
 
-const Grid = ({ notes, onToggleNote, onClear }: Props) => {
+type Props = {
+  notes: number[][];
+  keyrange?: number;
+  hilightStep?: number;
+  onToggleNote: (note: number, step: number, mode: number) => void;
+  onClear: () => void;
+};
+
+const Grid = ({ notes, hilightStep, onToggleNote, onClear }: Props) => {
   const [paintMode, setPaintMode] = useState<PaintMode>("none");
 
   const handleMouseUp = () => setPaintMode("none");
 
-  const handleMouseDown = (step: number, note: number) => {
-    const notePos = 1 << note;
-
-    if ((notes[step] & notePos) === notePos) {
+  const handleMouseDown = (note: number, step: number) => {
+    if (notes[note][step] === 1) {
       setPaintMode("clear");
     } else {
       setPaintMode("fill");
     }
-
-    onToggleNote(step, note);
+    handlePaint(note, step);
   };
 
-  const handlePaint = (step: number, note: number) => {
-    const notePos = 1 << note;
-
-    if (paintMode === "fill" && (notes[step] & notePos) !== notePos) {
-      onToggleNote(step, note);
+  const handlePaint = (note: number, step: number) => {
+    if (paintMode === "fill" && notes[note][step] === 0) {
+      onToggleNote(note, step, 1);
     }
 
-    if (paintMode === "clear" && (notes[step] & notePos) === notePos)
-      onToggleNote(step, note);
+    if (paintMode === "clear" && notes[note][step] === 1)
+      onToggleNote(note, step, 0);
   };
 
   useEffect(() => {
@@ -109,22 +110,28 @@ const Grid = ({ notes, onToggleNote, onClear }: Props) => {
     };
   });
 
+  const fieldStyle = {
+    "--columns": notes[0].length,
+    "--rows": notes.length,
+  } as CSSProperties;
+
   return (
     <div className="gs-grid">
-      <div className="gs-grid__field">
+      <div className="gs-grid__field" style={fieldStyle}>
         {makeGridNotes(notes).map(
-          ({ key, step, note, state, label }: StepNote) => (
+          ({ key, note, step, state, label }: StepNote) => (
             <Key
               key={key}
               note={note}
               step={step}
               state={state}
               label={label}
-              onToggle={() => onToggleNote(step, note)}
+              hasHilight={step === hilightStep}
+              onToggle={() => onToggleNote(note, step, state ? 0 : 1)}
               onMouseEnter={() =>
-                paintMode !== "none" && handlePaint(step, note)
+                paintMode !== "none" && handlePaint(note, step)
               }
-              onMouseDown={() => handleMouseDown(step, note)}
+              onMouseDown={() => handleMouseDown(note, step)}
             />
           )
         )}
