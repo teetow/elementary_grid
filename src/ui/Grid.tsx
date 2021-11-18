@@ -85,12 +85,13 @@ const Grid = ({ notes, hilightStep, onToggleNote, onClear }: Props) => {
   const handleMouseUp = () => setPaintMode("none");
 
   const handleMouseDown = (note: number, step: number) => {
-    if (notes[note][step] === 1) {
-      setPaintMode("clear");
-    } else {
+    if (notes[note][step] === 0) {
+      onToggleNote(note, step, 1);
       setPaintMode("fill");
+    } else {
+      onToggleNote(note, step, 0);
+      setPaintMode("clear");
     }
-    handlePaint(note, step);
   };
 
   const handlePaint = (note: number, step: number) => {
@@ -115,6 +116,10 @@ const Grid = ({ notes, hilightStep, onToggleNote, onClear }: Props) => {
     "--rows": notes.length,
   } as CSSProperties;
 
+  const cursorStyle = {
+    "--cursor": hilightStep,
+  } as CSSProperties;
+
   return (
     <div className="gs-grid">
       <div className="gs-grid__field" style={fieldStyle}>
@@ -126,7 +131,6 @@ const Grid = ({ notes, hilightStep, onToggleNote, onClear }: Props) => {
               step={step}
               state={state}
               label={label}
-              hasHilight={step === hilightStep}
               onToggle={() => onToggleNote(note, step, state ? 0 : 1)}
               onMouseEnter={() =>
                 paintMode !== "none" && handlePaint(note, step)
@@ -135,6 +139,7 @@ const Grid = ({ notes, hilightStep, onToggleNote, onClear }: Props) => {
             />
           )
         )}
+        <div className="gs-grid__cursor" style={cursorStyle} />
       </div>
       <div className="gs-grid__toolbar">
         <button onClick={onClear}>Clear</button>

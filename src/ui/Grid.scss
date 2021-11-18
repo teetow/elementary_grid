@@ -1,4 +1,5 @@
 .gs-grid {
+  --cellSize: 2.2em;
   display: grid;
   gap: 2em;
 }
@@ -10,24 +11,32 @@
   grid-template-columns: repeat(var(--columns), 1fr);
   grid-template-rows: repeat(var(--rows), 1fr);
   grid-auto-flow: column;
-  gap: 2px;
+}
+
+.gs-grid__cursor {
+  background-color: hsla(46, 100%, 50%, 0.178);
+  grid-column: calc(var(--cursor) + 1);
+  grid-row: 2 / span var(--rows);
+  width: var(--cellSize);
+  pointer-events: none;
 }
 
 .gs-key {
-  --size: 2.2em;
   --button-face: #444f;
 
   background-color: var(--button-face);
+  border: 1px solid black;
+  border-width: 1px 1px 0 0;
+  box-sizing: border-box;
   display: grid;
   grid-column: calc(var(--step) + 1);
   grid-row: calc(var(--rows) - var(--note) + 1);
   grid-template-areas: "main";
-  height: var(--size);
-  padding: 2px;
+  height: var(--cellSize);
   place-items: center;
-  user-select: none;
-  width: var(--size);
   transition: background-color 100ms, color 100ms;
+  user-select: none;
+  width: var(--cellSize);
 
   &:before {
     content: "";

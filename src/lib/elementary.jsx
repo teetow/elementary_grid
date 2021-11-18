@@ -4,7 +4,7 @@ import {
 } from "@nick-thompson/elementary";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { beatLenFromTempo, freqFromTempo, range } from "./utils";
+import { beatLenFromTempo, range } from "./utils";
 
 let ctx;
 
@@ -31,14 +31,19 @@ function tone(t, gain = 1.0) {
  * @param {number[][]} tracks
  * @param {number[]} scale
  * @param {number} bpm
- * @param {function} onMetro
+ * @param {function} onTick
  */
 
-export const useElementary = (tracks, scale, bpm = 120, onMetro) => {
+export const useElementary = (tracks, scale, bpm = 120, onTick) => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const train = useRef(el.train(freqFromTempo(bpm, 16)));
-  const sync = useRef(el.train(freqFromTempo(bpm, 1)));
-  const metro = useRef(el.metro({ interval: beatLenFromTempo(bpm, 16) }));
+
+  const tick = useRef(
+    el.metro({ name: "tick", interval: beatLenFromTempo(bpm, 16) })
+  );
+  const sync = useRef(
+    el.metro({ name: "sync", interval: beatLenFromTempo(bpm, 1) })
+  );
+
   const metroStep = useRef(0);
 
   useEffect(() => {
@@ -47,16 +52,24 @@ export const useElementary = (tracks, scale, bpm = 120, onMetro) => {
       node = await core.initialize(ctx, {
         numberOfInputs: 0,
         numberOfOutputs: 1,
-        outputChannelCount: [3],
+        outputChannelCount: [4],
       });
       node.connect(ctx.destination);
       setIsLoaded(true);
     };
     load();
+  }, []);
 
-    core.on("metro", () => {
-      metroStep.current = (metroStep.current + 1) % tracks[0].length;
-      onMetro(metroStep.current);
+  useEffect(() => {
+    core.on("metro", (e) => {
+      if (e.source === "sync") {
+        metroStep.current = -1;
+      }
+
+      if (e.source === "tick") {
+        metroStep.current = metroStep.current + 1;
+        onTick(metroStep.current);
+      }
     });
   }, []);
 
@@ -70,7 +83,7 @@ export const useElementary = (tracks, scale, bpm = 120, onMetro) => {
         const detune = 0.005;
 
         const seq = (i) =>
-          el.seq({ seq: tracks[i], loop: false }, train.current, sync.current);
+          el.seq({ seq: tracks[i], loop: false }, tick.current, sync.current);
         const env = (i) => el.adsr(0.01, 0.3, 0.1, 1.0, seq(i));
         const syn = (i) =>
           el.add(
@@ -86,8 +99,6 @@ export const useElementary = (tracks, scale, bpm = 120, onMetro) => {
           el.add(range(4, 12).map(trk))
         );
 
-        // out = el.mul(out, 0.5);
-
         let dly = el.delay(
           { size: 44100 },
           el.ms2samps(3 * beatLenFromTempo(bpm, 16)),
@@ -96,7 +107,7 @@ export const useElementary = (tracks, scale, bpm = 120, onMetro) => {
         );
         out = el.add(el.mul(0.5, out), el.mul(0.15, dly));
 
-        core.render(out, out, metro.current);
+        core.render(out, out, el.mul(0, tick.current), el.mul(0, sync.current));
       } catch (e) {
         console.log(e);
       }
