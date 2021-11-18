@@ -8,10 +8,8 @@ type Props = {
 };
 
 function Synth({ scale, sequence, onMetro }: Props) {
-
   useElementary(sequence, scale.map(midiToFrequency), 120, onMetro);
-
-  return <h1>Elementary is alive!</h1>;
+  return <></>;
 }
 
 export default Synth;

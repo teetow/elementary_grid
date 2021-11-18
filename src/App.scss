@@ -2,6 +2,7 @@
 
 html,
 body {
+  font-family: "Red Hat Mono";
   margin: 0;
   padding: 0;
 }
@@ -16,4 +17,8 @@ body {
   display: grid;
   place-items: center;
   height: 100%;
+}
+
+a, a:visited {
+  color: rgb(187, 153, 0);
 }

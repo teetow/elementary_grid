@@ -5,6 +5,7 @@ import Grid from "./ui/Grid";
 import Synth from "./ui/Synth";
 
 import "./App.scss";
+import Splainer from "./ui/Splainer";
 
 const pentaScale = ["c", "d", "f", "g", "a"];
 
@@ -51,6 +52,7 @@ function App() {
         hilightStep={metroStep}
         onClear={() => setTracks(initTracks())}
       />
+      <Splainer/>
     </>
   );
 }
