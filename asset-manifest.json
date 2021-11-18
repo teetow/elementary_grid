@@ -1,18 +1,18 @@
 {
   "files": {
-    "main.css": "/static/css/main.ea98c27b.chunk.css",
-    "main.js": "/static/js/main.c8265164.chunk.js",
-    "main.js.map": "/static/js/main.c8265164.chunk.js.map",
-    "runtime-main.js": "/static/js/runtime-main.ea90bc49.js",
-    "runtime-main.js.map": "/static/js/runtime-main.ea90bc49.js.map",
-    "static/js/2.1252d348.chunk.js": "/static/js/2.1252d348.chunk.js",
-    "static/js/2.1252d348.chunk.js.map": "/static/js/2.1252d348.chunk.js.map",
-    "index.html": "/index.html",
-    "static/css/main.ea98c27b.chunk.css.map": "/static/css/main.ea98c27b.chunk.css.map",
-    "static/js/2.1252d348.chunk.js.LICENSE.txt": "/static/js/2.1252d348.chunk.js.LICENSE.txt"
+    "main.css": "/elementary_grid/static/css/main.ea98c27b.chunk.css",
+    "main.js": "/elementary_grid/static/js/main.c8265164.chunk.js",
+    "main.js.map": "/elementary_grid/static/js/main.c8265164.chunk.js.map",
+    "runtime-main.js": "/elementary_grid/static/js/runtime-main.32f7f432.js",
+    "runtime-main.js.map": "/elementary_grid/static/js/runtime-main.32f7f432.js.map",
+    "static/js/2.1252d348.chunk.js": "/elementary_grid/static/js/2.1252d348.chunk.js",
+    "static/js/2.1252d348.chunk.js.map": "/elementary_grid/static/js/2.1252d348.chunk.js.map",
+    "index.html": "/elementary_grid/index.html",
+    "static/css/main.ea98c27b.chunk.css.map": "/elementary_grid/static/css/main.ea98c27b.chunk.css.map",
+    "static/js/2.1252d348.chunk.js.LICENSE.txt": "/elementary_grid/static/js/2.1252d348.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.ea90bc49.js",
+    "static/js/runtime-main.32f7f432.js",
     "static/js/2.1252d348.chunk.js",
     "static/css/main.ea98c27b.chunk.css",
     "static/js/main.c8265164.chunk.js"
