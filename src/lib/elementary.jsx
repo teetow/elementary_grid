@@ -6,6 +6,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { tempoToMs, range } from "./utils";
 
+import { ding, kick, pluck } from "./tones";
+
 let ctx;
 
 function getAudioCtx() {
@@ -15,26 +17,46 @@ function getAudioCtx() {
 }
 getAudioCtx();
 
-function tone(t, gain = 1.0) {
-  return el.mul(
-    gain,
-    el.add(el.sin(el.mul(2 * Math.PI, t)), el.sin(el.mul(3 * Math.PI, t, 0.05)))
-  );
-}
+/**
+ * @typedef {Object} Props
+ *
+ * @property {number[][]} tracks
+ * @property {number[]} scale
+ * @property {function} onTick
+ * @property {boolean} [addKick]
+ * @property {number} [bpm] - optional
+ * @property {string} [tone] - optional
+ */
+
+const tones = {
+  pluck: pluck,
+  ding: ding,
+  kick: kick,
+};
 
 /**
  *
- * @param {number[][]} tracks
- * @param {number[]} scale
- * @param {number} bpm
- * @param {function} onTick
+ * @param {Props} props
  */
-
-export const useElementary = (tracks, scale, bpm = 120, onTick) => {
+export const useElementary = ({
+  tracks,
+  scale,
+  onTick,
+  addKick = true,
+  bpm = 120,
+  tone = "ding",
+}) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const tick = useRef(el.metro({ name: "tick", interval: tempoToMs(bpm, 16) }));
-  const sync = useRef(el.metro({ name: "sync", interval: tempoToMs(bpm, 1) }));
+  const tick = useRef(
+    el.metro({ name: "tick", interval: tempoToMs(bpm, 16) })
+  ).current;
+  const beat = useRef(
+    el.metro({ name: "beat", interval: tempoToMs(bpm, 4) })
+  ).current;
+  const sync = useRef(
+    el.metro({ name: "sync", interval: tempoToMs(bpm, 1) })
+  ).current;
 
   const metroStep = useRef(0);
 
@@ -63,7 +85,7 @@ export const useElementary = (tracks, scale, bpm = 120, onTick) => {
         onTick(metroStep.current);
       }
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const doRender = useCallback(async () => {
@@ -73,23 +95,17 @@ export const useElementary = (tracks, scale, bpm = 120, onTick) => {
 
     if (isLoaded && ctx.state === "running") {
       try {
-        const detune = 0.005;
-
-        const seq = (i) =>
-          el.seq({ seq: tracks[i], loop: false }, tick.current, sync.current);
+        const seq = (i) => el.seq({ seq: tracks[i], loop: false }, tick, sync);
         const env = (i) => el.adsr(0.01, 0.3, 0.1, 1.0, seq(i));
-        const syn = (i) =>
-          el.add(
-            el.mul(tone(el.phasor(scale[i] * (1 + detune)), 0.5)),
-            el.mul(tone(el.phasor(scale[i] * (1 - detune)), 0.5))
-          );
-        const trk = (i) => el.mul(env(i), syn(i));
+        const osc = (freq) => tones[tone](freq, 2.0);
+        const voice = (i) => osc(scale[i]);
+        const patch = (i) => el.mul(env(i), voice(i));
 
         let out = el.add(
-          el.add(range(4, 0).map(trk)),
-          el.add(range(4, 4).map(trk)),
-          el.add(range(4, 8).map(trk)),
-          el.add(range(4, 12).map(trk))
+          el.add(range(4, 0).map(patch)),
+          el.add(range(4, 4).map(patch)),
+          el.add(range(4, 8).map(patch)),
+          el.add(range(4, 12).map(patch))
         );
 
         let dly = el.delay(
@@ -98,14 +114,22 @@ export const useElementary = (tracks, scale, bpm = 120, onTick) => {
           -0.3,
           out
         );
+
         out = el.add(el.mul(0.5, out), el.mul(0.15, dly));
 
-        core.render(out, out, el.mul(0, tick.current), el.mul(0, sync.current));
+        if (addKick) {
+          const kicktrack = kick({ gate: beat, pop: 1.2 });
+          out = el.add(out, kicktrack);
+        }
+
+        out = el.add(el.mul(0, tick), el.mul(0, beat), el.mul(0, sync), out);
+
+        core.render(out, out);
       } catch (e) {
         console.log(e);
       }
     }
-  }, [bpm, isLoaded, tracks, scale]);
+  }, [beat, sync, tick, bpm, isLoaded, tracks, scale, tone, addKick]);
 
   useEffect(() => {
     doRender();

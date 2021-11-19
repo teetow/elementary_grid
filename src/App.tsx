@@ -27,7 +27,7 @@ const initTracks = () =>
 
 function App() {
   const [tracks, setTracks] = useState<number[][]>(initTracks());
-  const [metroStep, setMetroStep] = useState<number>(0);
+  const [tick, setTick] = useState<number>(0);
 
   const toggleNote = (note: number, step: number, value: number) => {
     setTracks((prevTracks) => {
@@ -38,8 +38,8 @@ function App() {
     });
   };
 
-  const onMetro = (step: number) => {
-    setMetroStep(step);
+  const onTick = (tick: number) => {
+    setTick(tick);
   };
 
   return (
@@ -47,13 +47,13 @@ function App() {
       <Synth
         scale={scale.map(noteToMidi)}
         sequence={tracks}
-        onMetro={onMetro}
+        onTick={onTick}
       />
       <Grid
         keyrange={16}
         notes={tracks}
         onToggleNote={toggleNote}
-        hilightStep={metroStep}
+        hilightStep={tick}
         onClear={() => setTracks(initTracks())}
       />
       <Splainer />

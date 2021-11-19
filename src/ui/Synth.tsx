@@ -4,11 +4,15 @@ import { midiToFrequency } from "../lib/utils";
 type Props = {
   scale: number[];
   sequence: number[][];
-  onMetro: (step: number) => void;
+  onTick: (step: number) => void;
 };
 
-function Synth({ scale, sequence, onMetro }: Props) {
-  useElementary(sequence, scale.map(midiToFrequency), 120, onMetro);
+function Synth({ scale, sequence, onTick }: Props) {
+  useElementary({
+    tracks: sequence,
+    scale: scale.map(midiToFrequency),
+    onTick: onTick,
+  });
   return <></>;
 }
 
