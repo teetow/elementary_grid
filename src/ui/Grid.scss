@@ -1,6 +1,9 @@
+@use "sass:color";
+@use "../style/theme";
+
 .gs-grid {
-  --cellSize: 2.2em;
-  --brColor: #0003;
+  --cellSize: min(2.2em, 6.25vw);
+  --brColor: #{color.adjust(theme.$color-gray-100, $alpha: -0.5)};
   display: grid;
   gap: 2em;
 }
@@ -17,7 +20,7 @@
 }
 
 .gs-grid__cursor {
-  background-color: hsla(46, 100%, 50%, 0.178);
+  background-color: color.adjust(theme.$color-brand-200, $alpha: -0.75);
   grid-column: calc(var(--cursor) + 1);
   grid-row: 1 / span var(--rows);
   width: var(--cellSize);
@@ -25,9 +28,10 @@
 }
 
 .gs-key {
-  --button-face: #444f;
-  --button-gradient: radial-gradient(hsla(0, 0%, 100%, 0.02), #fff0);
-  background-color: var(--button-face);
+  --face: #{theme.$color-gray-200};
+  --button-gradient: radial-gradient(#8881, #0000);
+
+  background-color: var(--face);
   border: 1px solid var(--brColor);
   border-width: 1px 1px 0 0;
   border-radius: 2px;
@@ -53,23 +57,15 @@
     grid-area: main;
   }
 
-  &--has-hilight {
-    --button-face: rgb(99, 89, 36);
-    transition: none;
-  }
-
   &--is-active {
-    --button-face: rgb(255, 196, 0);
-    --button-gradient: radial-gradient(hsl(59, 100%, 50%), rgba(255, 0, 0, 0));
+    --face: #{theme.$color-brand-400};
+    --gd-start: #{theme.$color-brand-800};
+    --gd-end: #f000;
+    --button-gradient: radial-gradient(var(--gd-start), var(--gd-end));
     z-index: 1;
-    box-shadow: 0 0 30px 5px hsla(39, 100%, 50%, 0.205);
-    color: #000c;
+    box-shadow: 0 0 16px 4px color.adjust(theme.$color-brand-600, $alpha: -0.9);
+    color: theme.$color-gray-100;
     transition: background-color 800ms, color 100ms;
-  }
-
-  &--is-active.gs-key--has-hilight {
-    --button-face: rgb(255, 248, 147);
-    transition: none;
   }
 
   &__label {

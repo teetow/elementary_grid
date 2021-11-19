@@ -1,11 +1,12 @@
 import { useState } from "react";
+
 import { noteToMidi, range } from "./lib/utils";
 
 import Grid from "./ui/Grid";
+import Splainer from "./ui/Splainer";
 import Synth from "./ui/Synth";
 
 import "./App.scss";
-import Splainer from "./ui/Splainer";
 
 const pentaScale = ["c", "d", "f", "g", "a"];
 
@@ -29,9 +30,12 @@ function App() {
   const [metroStep, setMetroStep] = useState<number>(0);
 
   const toggleNote = (note: number, step: number, value: number) => {
-    const newTracks = [...tracks];
-    newTracks[note][step] = value;
-    setTracks(newTracks);
+    setTracks((prevTracks) => {
+      const newTracks = [...prevTracks];
+      newTracks[note][step] = value;
+
+      return newTracks;
+    });
   };
 
   const onMetro = (step: number) => {
@@ -52,7 +56,7 @@ function App() {
         hilightStep={metroStep}
         onClear={() => setTracks(initTracks())}
       />
-      <Splainer/>
+      <Splainer />
     </>
   );
 }

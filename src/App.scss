@@ -1,3 +1,5 @@
+@use "./style/theme";
+
 @import url(https://fonts.googleapis.com/css?family=Red+Hat+Mono:wght@100..900&display=swap);
 
 html,
@@ -8,9 +10,9 @@ body {
 }
 
 html {
-  color: #fff8;
+  color: theme.$color-gray-600;
   height: 100vh;
-  background-color: #333f;
+  background-color: theme.$color-gray-100;
 }
 
 body {
@@ -19,6 +21,7 @@ body {
   height: 100%;
 }
 
-a, a:visited {
-  color: rgb(187, 153, 0);
+a,
+a:visited {
+  color: theme.$color-brand-400;
 }
