@@ -17,3 +17,7 @@ With [Nick](https://github.com/nick-thompson) having released the WebAudio part 
 * Yes, you can use MIDI input with Elementary Audio. It's that awesome.
 * Yes, you can use it to make VST and AU plugins.
 * Yes, I'll try to make one. Later =)
+
+### Who are you, again?
+
+Hi! I'm Johan. I make software, noise and [music](http://soundcloud.com/teetow). I used to make [video games](https://www.mobygames.com/developer/sheet/view/developerId,41851/).
