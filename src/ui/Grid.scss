@@ -5,18 +5,18 @@
   --cellSize: min(2.2em, 6.25vw);
   --brColor: #{color.adjust(theme.$color-gray-100, $alpha: -0.5)};
   display: grid;
-  gap: 2em;
+  gap: 1em;
 }
 
 .gs-grid__field {
   --columns: 16;
   --rows: 7;
-  display: grid;
-  grid-template-columns: repeat(var(--columns), 1fr);
-  grid-template-rows: repeat(var(--rows), 1fr);
-  grid-auto-flow: column;
   border: 1px solid var(--brColor);
   border-width: 0 0 1px 1px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: repeat(var(--columns), 1fr);
+  grid-template-rows: repeat(var(--rows), 1fr);
 }
 
 .gs-grid__cursor {
@@ -32,10 +32,10 @@
   --button-gradient: radial-gradient(#8881, #0000);
 
   background-color: var(--face);
-  border: 1px solid var(--brColor);
-  border-width: 1px 1px 0 0;
-  border-radius: 2px;
   background-image: var(--button-gradient);
+  border: 1px solid var(--brColor);
+  border-radius: 2px;
+  border-width: 1px 1px 0 0;
   box-sizing: border-box;
   display: grid;
   grid-column: calc(var(--step) + 1);
@@ -62,16 +62,16 @@
     --gd-start: #{theme.$color-brand-800};
     --gd-end: #f000;
     --button-gradient: radial-gradient(var(--gd-start), var(--gd-end));
-    z-index: 1;
     box-shadow: 0 0 16px 4px color.adjust(theme.$color-brand-600, $alpha: -0.9);
     color: theme.$color-gray-100;
     transition: background-color 800ms, color 100ms;
+    z-index: 1;
   }
 
   &__label {
     display: none;
     font-family: "Red Hat Mono";
-    font-weight: 100;
     font-size: 0.625em;
+    font-weight: 100;
   }
 }

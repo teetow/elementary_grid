@@ -10,9 +10,9 @@ body {
 }
 
 html {
+  background-color: theme.$color-gray-100;
   color: theme.$color-gray-600;
   height: 100vh;
-  background-color: theme.$color-gray-100;
 }
 
 body {
@@ -24,4 +24,19 @@ body {
 a,
 a:visited {
   color: theme.$color-brand-400;
+}
+
+button {
+  background-color: theme.$color-brand-200;
+  border-radius: 4px;
+  border: none;
+  color: white;
+  outline: none;
+  padding: 0.5em 1em;
+}
+
+.eg-app {
+  display: grid;
+  place-items: center;
+  gap: 1em;
 }

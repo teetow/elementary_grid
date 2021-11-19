@@ -4,7 +4,7 @@ import {
 } from "@nick-thompson/elementary";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { beatLenFromTempo, range } from "./utils";
+import { tempoToMs, range } from "./utils";
 
 let ctx;
 
@@ -23,10 +23,6 @@ function tone(t, gain = 1.0) {
 }
 
 /**
- * @typedef {number[]} Track
- */
-
-/**
  *
  * @param {number[][]} tracks
  * @param {number[]} scale
@@ -37,12 +33,8 @@ function tone(t, gain = 1.0) {
 export const useElementary = (tracks, scale, bpm = 120, onTick) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const tick = useRef(
-    el.metro({ name: "tick", interval: beatLenFromTempo(bpm, 16) })
-  );
-  const sync = useRef(
-    el.metro({ name: "sync", interval: beatLenFromTempo(bpm, 1) })
-  );
+  const tick = useRef(el.metro({ name: "tick", interval: tempoToMs(bpm, 16) }));
+  const sync = useRef(el.metro({ name: "sync", interval: tempoToMs(bpm, 1) }));
 
   const metroStep = useRef(0);
 
@@ -71,6 +63,7 @@ export const useElementary = (tracks, scale, bpm = 120, onTick) => {
         onTick(metroStep.current);
       }
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const doRender = useCallback(async () => {
@@ -101,7 +94,7 @@ export const useElementary = (tracks, scale, bpm = 120, onTick) => {
 
         let dly = el.delay(
           { size: 44100 },
-          el.ms2samps(3 * beatLenFromTempo(bpm, 16)),
+          el.ms2samps(3 * tempoToMs(bpm, 16)),
           -0.3,
           out
         );

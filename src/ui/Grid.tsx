@@ -7,7 +7,6 @@ import "./Grid.scss";
 type StepNote = {
   hasHilight?: boolean;
   key?: string;
-  label?: string;
   note: number;
   state: boolean;
   step: number;
@@ -20,7 +19,6 @@ type KeyProps = StepNote &
 
 const Key = ({
   hasHilight,
-  label,
   note,
   onToggle,
   state,
@@ -44,9 +42,7 @@ const Key = ({
       style={keyStyle}
       onClick={() => onToggle(note)}
       {...rest}
-    >
-      <div className="gs-key__label">{label}</div>
-    </div>
+    />
   );
 };
 
@@ -56,13 +52,11 @@ const makeGridNotes = (notes: number[][]) => {
   range(notes.length).forEach((note) => {
     range(notes[0].length).forEach((step) => {
       const state = notes[note][step] === 1;
-      const key = `${note}_${step}_${state ? "on" : "off"}`;
       newNotes.push({
-        key: key,
+        key: `${note}_${step}_${state ? "on" : "off"}`,
         note: note,
         step: step,
         state: state,
-        label: `s${step}n${note}`,
       });
     });
   });
@@ -123,22 +117,17 @@ const Grid = ({ notes, hilightStep, onToggleNote, onClear }: Props) => {
   return (
     <div className="gs-grid">
       <div className="gs-grid__field" style={fieldStyle}>
-        {makeGridNotes(notes).map(
-          ({ key, note, step, state, label }: StepNote) => (
-            <Key
-              key={key}
-              note={note}
-              step={step}
-              state={state}
-              label={label}
-              onToggle={() => onToggleNote(note, step, state ? 0 : 1)}
-              onMouseEnter={() =>
-                paintMode !== "none" && handlePaint(note, step)
-              }
-              onMouseDown={() => handleMouseDown(note, step)}
-            />
-          )
-        )}
+        {makeGridNotes(notes).map(({ key, note, step, state }: StepNote) => (
+          <Key
+            key={key}
+            note={note}
+            step={step}
+            state={state}
+            onToggle={() => onToggleNote(note, step, state ? 0 : 1)}
+            onMouseEnter={() => paintMode !== "none" && handlePaint(note, step)}
+            onMouseDown={() => handleMouseDown(note, step)}
+          />
+        ))}
         <div className="gs-grid__cursor" style={cursorStyle} />
       </div>
       <div className="gs-grid__toolbar">

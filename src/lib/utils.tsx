@@ -1,17 +1,12 @@
 /**
  * Calculate the length, in ms, of one given subdivision at the specificed BPM
  * @param {*} tempo tempo in Beats Per Minute
- * @param {*} div subdivision for which the length is sought, defaults to 16:th note
+ * @param {*} subDiv subdivision for which the length is sought, defaults to 16:th note
  * @returns the length of one subdivision in ms
  */
-export const beatLenFromTempo = (tempo: number, div = 16) => {
+export const tempoToMs = (tempo: number, subDiv = 16) => {
   const beatLen = 1 / (tempo / 60);
-  return ((beatLen * 4) / div) * 1000;
-};
-
-export const freqFromTempo = (tempo: number, div = 16) => {
-  const beatsPerSec = tempo / 60;
-  return (beatsPerSec / 4) * div;
+  return ((beatLen * 4) / subDiv) * 1000;
 };
 
 export const noteToMidi = (n: string) => {
@@ -28,15 +23,6 @@ export const midiToFrequency = (m: number) => {
     return 0;
   }
   return 440 * Math.pow(2, (m - 69) / 12);
-};
-
-export const highestNote = (n: number) => {
-  let c = 0;
-  while (n > 0) {
-    n = n >> 1;
-    c += 1;
-  }
-  return c;
 };
 
 export const range = (n: number, start: number = 0) => [

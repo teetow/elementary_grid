@@ -43,7 +43,7 @@ function App() {
   };
 
   return (
-    <>
+    <div className="eg-app">
       <Synth
         scale={scale.map(noteToMidi)}
         sequence={tracks}
@@ -57,7 +57,7 @@ function App() {
         onClear={() => setTracks(initTracks())}
       />
       <Splainer />
-    </>
+    </div>
   );
 }
 
