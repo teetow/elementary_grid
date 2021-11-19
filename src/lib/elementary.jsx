@@ -4,9 +4,8 @@ import {
 } from "@nick-thompson/elementary";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { tempoToMs, range } from "./utils";
-
-import { ding, kick, pluck } from "./tones";
+import { ding, kick, stab } from "./tones";
+import { range, tempoToMs } from "./utils";
 
 let ctx;
 
@@ -23,13 +22,13 @@ getAudioCtx();
  * @property {number[][]} tracks
  * @property {number[]} scale
  * @property {function} onTick
- * @property {boolean} [addKick]
+ * @property {boolean} [withKick]
  * @property {number} [bpm] - optional
  * @property {string} [tone] - optional
  */
 
 const tones = {
-  pluck: pluck,
+  stab: stab,
   ding: ding,
   kick: kick,
 };
@@ -42,7 +41,7 @@ export const useElementary = ({
   tracks,
   scale,
   onTick,
-  addKick = true,
+  withKick = true,
   bpm = 120,
   tone = "ding",
 }) => {
@@ -97,7 +96,7 @@ export const useElementary = ({
       try {
         const seq = (i) => el.seq({ seq: tracks[i], loop: false }, tick, sync);
         const env = (i) => el.adsr(0.01, 0.3, 0.1, 1.0, seq(i));
-        const osc = (freq) => tones[tone](freq, 2.0);
+        const osc = (freq) => tones[tone](freq, {gain: 0.8});
         const voice = (i) => osc(scale[i]);
         const patch = (i) => el.mul(env(i), voice(i));
 
@@ -115,10 +114,12 @@ export const useElementary = ({
           out
         );
 
-        out = el.add(el.mul(0.5, out), el.mul(0.15, dly));
+        out = el.add(el.mul(0.9, out), el.mul(0.4, dly));
 
-        if (addKick) {
-          const kicktrack = kick({ gate: beat, pop: 1.2 });
+        out = el.tanh(out);
+
+        if (withKick) {
+          const kicktrack = kick(beat, { pop: 1.3 });
           out = el.add(out, kicktrack);
         }
 
@@ -129,7 +130,7 @@ export const useElementary = ({
         console.log(e);
       }
     }
-  }, [beat, sync, tick, bpm, isLoaded, tracks, scale, tone, addKick]);
+  }, [beat, sync, tick, bpm, isLoaded, tracks, scale, tone, withKick]);
 
   useEffect(() => {
     doRender();
