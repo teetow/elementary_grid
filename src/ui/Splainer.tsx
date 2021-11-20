@@ -2,7 +2,7 @@ import "./Splainer.scss";
 
 const Splainer = () => {
   return (
-    <div className="splainer">
+    <div className="eg-splainer">
       <span>
         Made with <a href="https://www.elementary.audio/">Elementary Audio</a>
       </span>

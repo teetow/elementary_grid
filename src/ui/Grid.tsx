@@ -26,9 +26,9 @@ const Key = ({
   ...rest
 }: KeyProps) => {
   const keyClasses = classnames({
-    "gs-key": true,
-    "gs-key--is-active": state,
-    "gs-key--has-hilight": hasHilight,
+    "eg-key": true,
+    "eg-key--is-active": state,
+    "eg-key--has-hilight": hasHilight,
   });
 
   const keyStyle = {
@@ -115,8 +115,8 @@ const Grid = ({ notes, hilightStep, onToggleNote, onClear }: Props) => {
   } as CSSProperties;
 
   return (
-    <div className="gs-grid">
-      <div className="gs-grid__field" style={fieldStyle}>
+    <div className="eg-grid">
+      <div className="eg-grid__field" style={fieldStyle}>
         {makeGridNotes(notes).map(({ key, note, step, state }: StepNote) => (
           <Key
             key={key}
@@ -128,9 +128,9 @@ const Grid = ({ notes, hilightStep, onToggleNote, onClear }: Props) => {
             onMouseDown={() => handleMouseDown(note, step)}
           />
         ))}
-        <div className="gs-grid__cursor" style={cursorStyle} />
+        <div className="eg-grid__cursor" style={cursorStyle} />
       </div>
-      <div className="gs-grid__toolbar">
+      <div className="eg-grid__toolbar">
         <button onClick={onClear}>Clear</button>
       </div>
     </div>

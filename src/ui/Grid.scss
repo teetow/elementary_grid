@@ -1,14 +1,14 @@
 @use "sass:color";
 @use "../style/theme";
 
-.gs-grid {
+.eg-grid {
   --cellSize: min(2.2em, 6.25vw);
   --brColor: #{color.adjust(theme.$color-gray-100, $alpha: -0.5)};
   display: grid;
   gap: 1em;
 }
 
-.gs-grid__field {
+.eg-grid__field {
   --columns: 16;
   --rows: 7;
   border: 1px solid var(--brColor);
@@ -19,7 +19,7 @@
   grid-template-rows: repeat(var(--rows), 1fr);
 }
 
-.gs-grid__cursor {
+.eg-grid__cursor {
   background-color: color.adjust(theme.$color-brand-200, $alpha: -0.75);
   grid-column: calc(var(--cursor) + 1);
   grid-row: 1 / span var(--rows);
@@ -27,7 +27,7 @@
   pointer-events: none;
 }
 
-.gs-key {
+.eg-key {
   --face: #{theme.$color-gray-200};
   --button-gradient: radial-gradient(#8881, #0000);
 
