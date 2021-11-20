@@ -24,9 +24,9 @@ export const stab = (
       )
     );
   let out = el.add(
-    el.mul(tone(el.phasor(freq * (1 - detune)), 0.6)),
+    el.mul(tone(el.phasor(freq * (1 - detune)), 0.3)),
     el.mul(tone(el.phasor(freq * 1), 0.6)),
-    el.mul(tone(el.phasor(freq * (1 + detune)), 0.6))
+    el.mul(tone(el.phasor(freq * (1 + detune)), 0.3))
   );
 
   out = el.highpass(70, 1.0, out);
@@ -54,8 +54,8 @@ export const ding = (
     el.mul(
       gain * 8,
       el.add(
-        el.mul(0.9 * richness, el.cycle(freq * (1 - detune))),
-        el.mul(0.9 * richness, el.cycle(freq * (1 + detune)))
+        el.mul(0.3 * richness, el.cycle(freq * (1 - detune))),
+        el.mul(0.3 * richness, el.cycle(freq * (1 + detune)))
       )
     )
   );

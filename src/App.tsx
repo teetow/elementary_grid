@@ -1,31 +1,32 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
-import { noteToMidi, range } from "./lib/utils";
-
+import { getAudioCtx, initElementary } from "./lib/elementary";
+import { makeScale } from "./lib/utils";
 import Grid from "./ui/Grid";
 import Splainer from "./ui/Splainer";
 import Synth from "./ui/Synth";
 
 import "./App.scss";
 
-const pentaScale = ["c", "d", "f", "g", "a"];
-
 const numTracks = 16;
 const numSteps = 16;
 
-const scale = range(numTracks)
-  .map(
-    (i) =>
-      `${pentaScale[i % pentaScale.length]}${
-        Math.floor(i / pentaScale.length) + 4
-      }`
-  )
-  .flat();
+const scale = makeScale(["c", "d", "f", "g", "a"], numTracks);
+
+getAudioCtx();
+
+let metroCallback = (source: string) => {};
+
+initElementary().then((core) => {
+  core.on("metro", (e: { source: string }) => {
+    metroCallback(e.source);
+  });
+});
 
 const initTracks = () =>
   Array.from(Array(numTracks), () => new Array(numSteps).fill(0));
 
-function App() {
+const App = () => {
   const [tracks, setTracks] = useState<number[][]>(initTracks());
   const [tick, setTick] = useState<number>(0);
 
@@ -38,17 +39,23 @@ function App() {
     });
   };
 
-  const onTick = (tick: number) => {
-    setTick(tick);
-  };
+  const onTick = useCallback(
+    (source: string) => {
+      if (source === "sync") {
+        setTick(0);
+      } else if (source === "tick") {
+        setTick((prev) => (prev + 1) % tracks.length);
+      }
+    },
+    [tracks]
+  );
+
+  metroCallback = onTick;
 
   return (
     <div className="eg-app">
-      <Synth
-        scale={scale.map(noteToMidi)}
-        sequence={tracks}
-        onTick={onTick}
-      />
+      <Synth scale={scale} sequence={tracks} />
+
       <Grid
         keyrange={16}
         notes={tracks}
@@ -59,6 +66,6 @@ function App() {
       <Splainer />
     </div>
   );
-}
+};
 
 export default App;
