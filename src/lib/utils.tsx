@@ -9,6 +9,17 @@ export const tempoToMs = (tempo: number, subDiv = 16) => {
   return ((beatLen * 4) / subDiv) * 1000;
 };
 
+export const makeScale = (scale: string[], numNotes: number, octave = 4) => {
+  return range(numNotes)
+    .map(
+      (i) =>
+        `${scale[i % scale.length]}${Math.floor(i / scale.length) + octave}`
+    )
+    .flat()
+    .map(noteToMidi)
+    .map(midiToFrequency);
+};
+
 export const noteToMidi = (n: string) => {
   let notes = ["c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"];
   let [name, octave] = n.split("");
@@ -28,3 +39,6 @@ export const midiToFrequency = (m: number) => {
 export const range = (n: number, start: number = 0) => [
   ...Array.from(Array(n).keys()).map((k) => k + start),
 ];
+
+export const clamp = (n: number, min = 0, max = 1) =>
+  Math.max(Math.min(n, max), min);

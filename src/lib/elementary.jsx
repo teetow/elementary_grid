@@ -1,138 +1,22 @@
-import {
-  el,
-  ElementaryWebAudioRenderer as core,
-} from "@nick-thompson/elementary";
-import { useCallback, useEffect, useRef, useState } from "react";
-
-import { ding, kick, stab } from "./tones";
-import { range, tempoToMs } from "./utils";
+import { ElementaryWebAudioRenderer as core } from "@nick-thompson/elementary";
 
 let ctx;
 
-function getAudioCtx() {
+export function getAudioCtx() {
   if (ctx) return ctx;
-  console.log("creating a new AudioContext");
   return (ctx = new AudioContext());
 }
-getAudioCtx();
 
-/**
- * @typedef {Object} Props
- *
- * @property {number[][]} tracks
- * @property {number[]} scale
- * @property {function} onTick
- * @property {boolean} [withKick]
- * @property {number} [bpm] - optional
- * @property {string} [tone] - optional
- */
+let node;
+export const initElementary = async (onMetro) => {
+  getAudioCtx();
 
-const tones = {
-  stab: stab,
-  ding: ding,
-  kick: kick,
-};
+  node = await core.initialize(getAudioCtx(), {
+    numberOfInputs: 0,
+    numberOfOutputs: 1,
+    outputChannelCount: [2],
+  });
+  node.connect(ctx.destination);
 
-/**
- *
- * @param {Props} props
- */
-export const useElementary = ({
-  tracks,
-  scale,
-  onTick,
-  withKick = true,
-  bpm = 120,
-  tone = "ding",
-}) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  const tick = useRef(
-    el.metro({ name: "tick", interval: tempoToMs(bpm, 16) })
-  ).current;
-  const beat = useRef(
-    el.metro({ name: "beat", interval: tempoToMs(bpm, 4) })
-  ).current;
-  const sync = useRef(
-    el.metro({ name: "sync", interval: tempoToMs(bpm, 1) })
-  ).current;
-
-  const metroStep = useRef(0);
-
-  useEffect(() => {
-    let node;
-    const load = async () => {
-      node = await core.initialize(ctx, {
-        numberOfInputs: 0,
-        numberOfOutputs: 1,
-        outputChannelCount: [4],
-      });
-      node.connect(ctx.destination);
-      setIsLoaded(true);
-    };
-    load();
-  }, []);
-
-  useEffect(() => {
-    core.on("metro", (e) => {
-      if (e.source === "sync") {
-        metroStep.current = -1;
-      }
-
-      if (e.source === "tick") {
-        metroStep.current = metroStep.current + 1;
-        onTick(metroStep.current);
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const doRender = useCallback(async () => {
-    if (ctx.state === "suspended") {
-      await ctx.resume();
-    }
-
-    if (isLoaded && ctx.state === "running") {
-      try {
-        const seq = (i) => el.seq({ seq: tracks[i], loop: false }, tick, sync);
-        const env = (i) => el.adsr(0.01, 0.3, 0.1, 1.0, seq(i));
-        const osc = (freq) => tones[tone](freq, {gain: 0.8});
-        const voice = (i) => osc(scale[i]);
-        const patch = (i) => el.mul(env(i), voice(i));
-
-        let out = el.add(
-          el.add(range(4, 0).map(patch)),
-          el.add(range(4, 4).map(patch)),
-          el.add(range(4, 8).map(patch)),
-          el.add(range(4, 12).map(patch))
-        );
-
-        let dly = el.delay(
-          { size: 44100 },
-          el.ms2samps(3 * tempoToMs(bpm, 16)),
-          -0.3,
-          out
-        );
-
-        out = el.add(el.mul(0.9, out), el.mul(0.4, dly));
-
-        out = el.tanh(out);
-
-        if (withKick) {
-          const kicktrack = kick(beat, { pop: 1.3 });
-          out = el.add(out, kicktrack);
-        }
-
-        out = el.add(el.mul(0, tick), el.mul(0, beat), el.mul(0, sync), out);
-
-        core.render(out, out);
-      } catch (e) {
-        console.log(e);
-      }
-    }
-  }, [beat, sync, tick, bpm, isLoaded, tracks, scale, tone, withKick]);
-
-  useEffect(() => {
-    doRender();
-  }, [doRender, tracks]);
+  return core;
 };

@@ -1,7 +1,6 @@
 /* eslint-disable no-useless-rename */
 import { useState } from "react";
-import { useElementary } from "../lib/elementary";
-import { midiToFrequency } from "../lib/utils";
+import { useSynth } from "../lib/useSynth";
 
 import "./Synth.scss";
 
@@ -66,20 +65,19 @@ const TonePicker = ({ currentTone, onSetTone }: TonePickerProps) => {
 type Props = {
   scale: number[];
   sequence: number[][];
-  onTick: (step: number) => void;
 };
 
-function Synth({ scale, sequence, onTick }: Props) {
+function Synth({ scale, sequence }: Props) {
   const [currentTone, setCurrentTone] = useState<ToneName>("stab");
   const [withKick, setWithKick] = useState<boolean>(false);
 
-  useElementary({
+  useSynth({
     tracks: sequence,
-    scale: scale.map(midiToFrequency),
-    onTick: onTick,
+    scale: scale,
     tone: currentTone,
     withKick: withKick,
   });
+
   return (
     <div className="eg-synthoptions">
       <TonePicker currentTone={currentTone} onSetTone={setCurrentTone} />
