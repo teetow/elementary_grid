@@ -1,10 +1,11 @@
 import { useCallback, useState } from "react";
 
-import { getAudioCtx, initElementary } from "./lib/elementary";
 import { makeScale } from "./lib/utils";
 import Grid from "./ui/Grid";
 import Splainer from "./ui/Splainer";
 import Synth from "./ui/Synth";
+
+import core from "./lib/elementary";
 
 import "./App.scss";
 
@@ -13,11 +14,10 @@ const numSteps = 16;
 
 const scale = makeScale(["c", "d", "f", "g", "a"], numTracks);
 
-getAudioCtx();
-
 let metroCallback = (source: string) => {};
 
-initElementary().then((core) => {
+core.on("load", () => {
+  console.log("attaching metro");
   core.on("metro", (e: { source: string }) => {
     metroCallback(e.source);
   });
