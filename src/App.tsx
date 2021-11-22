@@ -54,14 +54,17 @@ const App = () => {
 
   return (
     <div className="eg-app">
-      <Synth scale={scale} sequence={tracks} />
+      <Synth
+        scale={scale}
+        sequence={tracks}
+        onClear={() => setTracks(initTracks())}
+      />
 
       <Grid
         keyrange={16}
         notes={tracks}
         onToggleNote={toggleNote}
         hilightStep={tick}
-        onClear={() => setTracks(initTracks())}
       />
       <Splainer />
     </div>

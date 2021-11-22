@@ -20,11 +20,9 @@ core.on("load", () => {
   console.log("load");
   if (ctx.state !== "running") {
     console.log("showing splash");
-    ReactDOM.render(<Splash />, document.getElementById("root"));
-    window.addEventListener(
-      "click",
-      () => ctx.resume().then(() => RenderApp()),
-      { once: true }
+    ReactDOM.render(
+      <Splash onClick={() => ctx.resume().then(() => RenderApp())} />,
+      document.getElementById("root")
     );
   } else {
     RenderApp();

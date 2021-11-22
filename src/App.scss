@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "./style/theme";
 
 @import url(https://fonts.googleapis.com/css?family=Red+Hat+Mono:wght@100..900&display=swap);
@@ -10,7 +11,7 @@ body {
 }
 
 html {
-  background-color: theme.$color-gray-100;
+  background-color: theme.$color-gray-50;
   color: theme.$color-gray-600;
   height: 100vh;
 }
@@ -27,16 +28,45 @@ a:visited {
 }
 
 button {
-  background-color: theme.$color-brand-200;
+  --gd-bg-s0: #0008;
+  --gd-bg-s1: #0002;
+
+  background-color: theme.$color-gray-200;
+  background-image: radial-gradient(#0008, #0002);
   border-radius: 4px;
   border: none;
-  color: white;
+  color: theme.$color-gray-800;
+  font-family: "Red Hat Mono";
+  font-weight: 900;
   outline: none;
-  padding: 0.5em 1em;
+  padding: 0.2em 1em;
+  text-transform: uppercase;
+  transition: background-color 200ms ease-in-out;
+
+  &:hover {
+    background-color: theme.$color-gray-400;
+    transition: background-color 60ms ease-in-out;
+    animation: warn calc(1000ms / 7.5) linear infinite both;
+  }
 }
 
 .eg-app {
+  background-color: theme.$color-gray-100;
   display: grid;
-  place-items: center;
   gap: 1em;
+  place-items: center;
+}
+
+$warn-base: #{color.adjust(theme.$color-brand-100, $lightness: 20%)};
+$warn-on: #{color.mix(theme.$color-brand-200, red, 50%)};
+$warn-off: #{color.adjust(theme.$color-brand-100, $lightness: 10%)};
+
+@keyframes warn {
+  0% {
+    background-image: radial-gradient($warn-base, $warn-off);
+  }
+  50% {
+    background-image: radial-gradient($warn-base, $warn-on);
+    box-shadow: 0 0 1em 0 red;
+  }
 }

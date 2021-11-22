@@ -1,16 +1,13 @@
+@use "sass:color";
 @use "../style/theme";
-
-.eg-synth {
-}
 
 .eg-synthoptions {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
   gap: 2em;
-  justify-self: flex-end;
-}
-
-.eg-synth__optiongroup {
+  grid-template-columns: 1fr auto auto auto;
+  justify-self: stretch;
+  align-items: center;
+  padding: 1em 1em 0;
 }
 
 .eg-synth__option {
@@ -27,15 +24,15 @@
   display: none;
 
   & + label {
-    --size: 1em;
+    --size: 0.6em;
+
+    column-gap: 0.5em;
     display: inline-grid;
     grid-template-areas: "led label";
     grid-template-columns: var(--size);
-    column-gap: 0.5em;
-
-    // both
   }
 
+  // both
   & + label:before,
   & + label:after {
     border-radius: var(--size);
@@ -57,7 +54,11 @@
     --size: 0.9em;
   }
   &:checked + label:after {
-    background-image: radial-gradient(circle at 50% 40%, theme.$color-brand-800, theme.$color-brand-200);
+    background-image: radial-gradient(
+      circle at 50% 40%,
+      theme.$color-brand-800,
+      theme.$color-brand-200
+    );
     box-shadow: 0 0 0.5em 0.1em theme.$color-brand-200;
   }
 }
