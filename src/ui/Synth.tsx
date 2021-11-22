@@ -1,8 +1,11 @@
 /* eslint-disable no-useless-rename */
 import { useState } from "react";
 import { useSynth } from "../lib/useSynth";
+import { Logo } from "./Logo";
 
 import "./Synth.scss";
+
+
 
 const KickSwitch = ({
   active,
@@ -65,9 +68,10 @@ const TonePicker = ({ currentTone, onSetTone }: TonePickerProps) => {
 type Props = {
   scale: number[];
   sequence: number[][];
+  onClear: () => void;
 };
 
-function Synth({ scale, sequence }: Props) {
+function Synth({ scale, sequence, onClear }: Props) {
   const [currentTone, setCurrentTone] = useState<ToneName>("stab");
   const [withKick, setWithKick] = useState<boolean>(false);
 
@@ -80,6 +84,14 @@ function Synth({ scale, sequence }: Props) {
 
   return (
     <div className="eg-synthoptions">
+      <Logo />
+      <button
+        type="button"
+        className="eg-button eg-synth__clearbutton"
+        onClick={onClear}
+      >
+        Clear
+      </button>
       <TonePicker currentTone={currentTone} onSetTone={setCurrentTone} />
       <KickSwitch active={withKick} setActive={setWithKick} />
     </div>

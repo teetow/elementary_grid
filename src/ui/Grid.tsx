@@ -70,10 +70,9 @@ type Props = {
   keyrange?: number;
   hilightStep?: number;
   onToggleNote: (note: number, step: number, mode: number) => void;
-  onClear: () => void;
 };
 
-const Grid = ({ notes, hilightStep, onToggleNote, onClear }: Props) => {
+const Grid = ({ notes, hilightStep, onToggleNote }: Props) => {
   const [paintMode, setPaintMode] = useState<PaintMode>("none");
 
   const handleMouseUp = () => setPaintMode("none");
@@ -115,24 +114,19 @@ const Grid = ({ notes, hilightStep, onToggleNote, onClear }: Props) => {
   } as CSSProperties;
 
   return (
-    <div className="eg-grid">
-      <div className="eg-grid__field" style={fieldStyle}>
-        {makeGridNotes(notes).map(({ key, note, step, state }: StepNote) => (
-          <Key
-            key={key}
-            note={note}
-            step={step}
-            state={state}
-            onToggle={() => onToggleNote(note, step, state ? 0 : 1)}
-            onMouseEnter={() => paintMode !== "none" && handlePaint(note, step)}
-            onMouseDown={() => handleMouseDown(note, step)}
-          />
-        ))}
-        <div className="eg-grid__cursor" style={cursorStyle} />
-      </div>
-      <div className="eg-grid__toolbar">
-        <button onClick={onClear}>Clear</button>
-      </div>
+    <div className="eg-grid__field" style={fieldStyle}>
+      {makeGridNotes(notes).map(({ key, note, step, state }: StepNote) => (
+        <Key
+          key={key}
+          note={note}
+          step={step}
+          state={state}
+          onToggle={() => onToggleNote(note, step, state ? 0 : 1)}
+          onMouseEnter={() => paintMode !== "none" && handlePaint(note, step)}
+          onMouseDown={() => handleMouseDown(note, step)}
+        />
+      ))}
+      <div className="eg-grid__cursor" style={cursorStyle} />
     </div>
   );
 };
