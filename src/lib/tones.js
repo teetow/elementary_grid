@@ -13,7 +13,7 @@ import { el } from "@nick-thompson/elementary";
  */
 export const stab = (
   freq,
-  { gain = 1.0, detune = 0.005, sharpness = 1.0 } = {}
+  { gain = 1.0, detune = 0.007, sharpness = 1.0, richness = 1.0 } = {}
 ) => {
   const tone = (t, toneGain) =>
     el.mul(
@@ -24,14 +24,15 @@ export const stab = (
       )
     );
   let out = el.add(
-    el.mul(tone(el.phasor(freq * (1 - detune)), 0.3)),
-    el.mul(tone(el.phasor(freq * 1), 0.6)),
-    el.mul(tone(el.phasor(freq * (1 + detune)), 0.3))
+    el.mul(tone(el.phasor(freq * (1 - detune)), 0.5 * richness)),
+    el.mul(tone(el.phasor(freq * 1), 0.8)),
+    el.mul(tone(el.phasor(freq * (1 + detune)), 0.5 * richness))
   );
 
-  out = el.highpass(70, 1.0, out);
+  out = el.tanh(out);
+  out = el.highpass(60, 1.0, out);
 
-  return el.mul(gain, out);
+  return el.mul(gain * 2, out);
 };
 stab.desc = "Not quite a supersaw, but certainly a stabby little rascal";
 
@@ -48,17 +49,20 @@ stab.desc = "Not quite a supersaw, but certainly a stabby little rascal";
  */
 export const ding = (
   freq,
-  { gain = 1.0, richness = 0.7, detune = 0.004 } = {}
+  { gain = 1.0, richness = 1.0, detune = 0.004 } = {}
 ) => {
-  return el.tanh(
-    el.mul(
-      gain * 8,
-      el.add(
-        el.mul(0.3 * richness, el.cycle(freq * (1 - detune))),
-        el.mul(0.3 * richness, el.cycle(freq * (1 + detune)))
-      )
-    )
+  let osc = el.add(
+    el.cycle(freq * (1 - detune)),
+    el.mul(0.5 * richness, el.cycle(2 * freq * (1 - detune * 0.5))),
+    el.mul(0.5 * richness, el.cycle(2 * freq * (1 + detune * 0.5))),
+    el.cycle(freq * (1 + detune))
   );
+
+  osc = el.highpass(200, 1.0, osc);
+  osc = el.mul(osc, gain * 2);
+  osc = el.tanh(osc);
+
+  return osc;
 };
 ding.desc = "Pseudo-FM bell-like patch with a sprinkle of unpredictability";
 
@@ -74,18 +78,22 @@ ding.desc = "Pseudo-FM bell-like patch with a sprinkle of unpredictability";
  * @param {Object} gate
  * @param {Kickprops} [props]
  */
-export const kick = (gate, { freq = 50, speed = 1.0, pop = 1.0 } = {}) => {
+export const kick = (
+  gate,
+  { freq = 45, speed = 1.0, pop = 1.0, tail = 1.0 } = {}
+) => {
   let ampEnv = el.adsr(0.005, 0.3 * speed, 0.0, 0.0, gate);
   let fastEnv = el.adsr(0.0001, 0.2 * speed, 0.0, 0.0, gate);
   let slowEnv = el.adsr(0.0001, 0.5, 0.0, 0.0, gate);
 
-  let pitch = el.add(1.0, el.mul(2 * pop, fastEnv));
+  let pitch = el.add(1.0, el.mul(3 * pop, fastEnv));
   pitch = el.add(0.0, el.mul(0.5 * pop, slowEnv), pitch);
 
-  let osc = el.cycle(el.mul(pitch, freq));
+  let out = el.cycle(el.mul(pitch, freq));
 
-  let out = el.tanh(el.mul(1.5, ampEnv, osc));
-  out = el.highpass(freq, 8.4, out);
+  out = el.tanh(el.mul(1.8, ampEnv, out));
+  out = el.highpass(freq + 10, tail * 6.0, out);
+  out = el.tanh(out);
 
   return out;
 };

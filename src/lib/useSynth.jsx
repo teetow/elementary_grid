@@ -37,7 +37,7 @@ export const useSynth = ({
 
       nodes = fx(nodes, bpm, 1.0);
 
-      nodes = el.tanh(el.mul(0.8, nodes));
+      nodes = el.tanh(el.mul(0.4, nodes));
 
       if (withKick) {
         nodes = el.add(nodes, drums(beat));
