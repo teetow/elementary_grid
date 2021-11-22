@@ -17,7 +17,6 @@ const scale = makeScale(["c", "d", "f", "g", "a"], numTracks);
 let metroCallback = (source: string) => {};
 
 core.on("load", () => {
-  console.log("attaching metro");
   core.on("metro", (e: { source: string }) => {
     metroCallback(e.source);
   });

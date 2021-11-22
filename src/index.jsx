@@ -17,9 +17,7 @@ const RenderApp = () => {
 };
 
 core.on("load", () => {
-  console.log("load");
   if (ctx.state !== "running") {
-    console.log("showing splash");
     ReactDOM.render(
       <Splash onClick={() => ctx.resume().then(() => RenderApp())} />,
       document.getElementById("root")
@@ -30,13 +28,11 @@ core.on("load", () => {
 });
 
 async function main() {
-  console.log("main");
   let node = await core.initialize(ctx, {
     numberOfInputs: 0,
     numberOfOutputs: 1,
     outputChannelCount: [2],
   });
-  console.log("initialized");
   node.connect(ctx.destination);
 }
 
