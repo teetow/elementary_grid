@@ -1,20 +1,20 @@
 {
   "files": {
-    "main.css": "/elementary_grid/static/css/main.d29615bd.chunk.css",
-    "main.js": "/elementary_grid/static/js/main.717b2de0.chunk.js",
-    "main.js.map": "/elementary_grid/static/js/main.717b2de0.chunk.js.map",
+    "main.css": "/elementary_grid/static/css/main.980ac770.chunk.css",
+    "main.js": "/elementary_grid/static/js/main.6c04c495.chunk.js",
+    "main.js.map": "/elementary_grid/static/js/main.6c04c495.chunk.js.map",
     "runtime-main.js": "/elementary_grid/static/js/runtime-main.32f7f432.js",
     "runtime-main.js.map": "/elementary_grid/static/js/runtime-main.32f7f432.js.map",
-    "static/js/2.76cf1ccf.chunk.js": "/elementary_grid/static/js/2.76cf1ccf.chunk.js",
-    "static/js/2.76cf1ccf.chunk.js.map": "/elementary_grid/static/js/2.76cf1ccf.chunk.js.map",
+    "static/js/2.dd2fb67e.chunk.js": "/elementary_grid/static/js/2.dd2fb67e.chunk.js",
+    "static/js/2.dd2fb67e.chunk.js.map": "/elementary_grid/static/js/2.dd2fb67e.chunk.js.map",
     "index.html": "/elementary_grid/index.html",
-    "static/css/main.d29615bd.chunk.css.map": "/elementary_grid/static/css/main.d29615bd.chunk.css.map",
-    "static/js/2.76cf1ccf.chunk.js.LICENSE.txt": "/elementary_grid/static/js/2.76cf1ccf.chunk.js.LICENSE.txt"
+    "static/css/main.980ac770.chunk.css.map": "/elementary_grid/static/css/main.980ac770.chunk.css.map",
+    "static/js/2.dd2fb67e.chunk.js.LICENSE.txt": "/elementary_grid/static/js/2.dd2fb67e.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.32f7f432.js",
-    "static/js/2.76cf1ccf.chunk.js",
-    "static/css/main.d29615bd.chunk.css",
-    "static/js/main.717b2de0.chunk.js"
+    "static/js/2.dd2fb67e.chunk.js",
+    "static/css/main.980ac770.chunk.css",
+    "static/js/main.6c04c495.chunk.js"
   ]
 }
