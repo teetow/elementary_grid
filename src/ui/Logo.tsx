@@ -1,11 +1,10 @@
 import "./Logo.scss";
 
-export const Logo = () => {
+const LogoTitle = () => {
   return (
     <svg
-      className="eg-logo"
-      viewBox="0 0 122 14"
-      fill="none"
+      className="eg-logo__text"
+      viewBox="-4 2 94 10"
       xmlns="http://www.w3.org/2000/svg"
     >
       <radialGradient
@@ -18,31 +17,6 @@ export const Logo = () => {
       >
         <stop stopColor="var(--gd-text-s0)" />
         <stop offset="1" stopColor="var(--gd-text-s1)" />
-      </radialGradient>
-
-      <radialGradient
-        id="led-full"
-        gradientUnits="objectBoundingBox"
-        gradientTransform="translate(-0.25 -0.3) scale(1.41421)"
-      >
-        <stop stopColor="var(--gd-full-s0)" />
-        <stop offset="1" stopColor="var(--gd-full-s1)" />
-      </radialGradient>
-
-      <radialGradient
-        id="led-half"
-        gradientUnits="objectBoundingBox"
-      >
-        <stop stopColor="var(--gd-half-s0)" />
-        <stop offset="1" stopColor="var(--gd-half-s1)" />
-      </radialGradient>
-
-      <radialGradient
-        id="led-off"
-        gradientUnits="objectBoundingBox"
-      >
-        <stop stopColor="var(--gd-off-s0)" />
-        <stop offset="1" stopColor="var(--gd-off-s1)" />
       </radialGradient>
 
       <g id="text">
@@ -87,6 +61,37 @@ export const Logo = () => {
           fill="url(#grad-text)"
         />
       </g>
+    </svg>
+  );
+};
+
+const LogoGrid = () => {
+  return (
+    <svg
+      className="eg-logo__grid"
+      viewBox="86 0 36 14"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <radialGradient
+        id="led-full"
+        gradientUnits="objectBoundingBox"
+        gradientTransform="translate(-0.25 -0.3) scale(1.41421)"
+      >
+        <stop stopColor="var(--gd-full-s0)" />
+        <stop offset="1" stopColor="var(--gd-full-s1)" />
+      </radialGradient>
+
+      <radialGradient id="led-half" gradientUnits="objectBoundingBox">
+        <stop stopColor="var(--gd-half-s0)" />
+        <stop offset="1" stopColor="var(--gd-half-s1)" />
+      </radialGradient>
+
+      <radialGradient id="led-off" gradientUnits="objectBoundingBox">
+        <stop stopColor="var(--gd-off-s0)" />
+        <stop offset="1" stopColor="var(--gd-off-s1)" />
+      </radialGradient>
+
       <g id="off-leds">
         <path d="M88 0H86V2H88V0Z" fill="url(#led-off)" />
         <path d="M88 10H86V12H88V10Z" fill="url(#led-off)" />
@@ -219,5 +224,13 @@ export const Logo = () => {
         <path d="M90 8H88V10H90V8Z" fill="url(#led-full)" />
       </g>
     </svg>
+  );
+};
+export const Logo = () => {
+  return (
+    <div className="eg-logo">
+      <LogoTitle />
+      <LogoGrid />
+    </div>
   );
 };

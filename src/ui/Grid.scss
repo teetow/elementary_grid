@@ -3,7 +3,7 @@
 
 
 .eg-grid__field {
-  --cellSize: min(2.2em, 6.25vw);
+  --cellSize: min(2.2em, 6vw);
   --brColor: #{color.adjust(theme.$color-gray-100, $alpha: -0.5)};
   --columns: 16;
   --rows: 7;

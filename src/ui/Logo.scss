@@ -5,7 +5,7 @@
   --gd-text-s0: #{color.adjust(theme.$color-gray-400, $lightness: 20%)};
   --gd-text-s1: #{theme.$color-gray-400};
 
-  --gd-off-s0: #{color.adjust(theme.$color-gray-100)};
+  --gd-off-s0: #{color.adjust(theme.$color-gray-200)};
   --gd-off-s1: #{color.adjust(theme.$color-gray-200, $alpha: -0.7)};
 
   --gd-half-s0: #{color.adjust(theme.$color-brand-400, $alpha: -0.2)};
@@ -13,6 +13,11 @@
 
   --gd-full-s0: #{color.adjust(theme.$color-brand-400)};
   --gd-full-s1: #{color.adjust(theme.$color-brand-600)};
+
+  align-items: center;
+  display: grid;
+  grid-auto-flow: column;
+  justify-content: start;
 
   path {
     transform-box: fill-box;
@@ -43,5 +48,32 @@ $flicker-on: 1;
   }
   100% {
     opacity: $flicker-off;
+  }
+}
+
+.eg-logo__text {
+  height: 1em;
+}
+
+.eg-logo__grid {
+  height: 1.4em;
+}
+
+@media all and (max-width: 34em) {
+  .eg-logo {
+    gap: 0;
+    grid-auto-flow: row;
+  }
+
+  .eg-logo__text,
+  .eg-logo__grid {
+    height: auto;
+    width: 5em;
+  }
+}
+
+@media all and (max-width: 23em) {
+  .eg-logo {
+    display: none;
   }
 }

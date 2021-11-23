@@ -2,12 +2,12 @@
 @use "../style/theme";
 
 .eg-synthoptions {
+  align-items: center;
   display: grid;
   gap: 2em;
   grid-template-columns: 1fr auto auto auto;
   justify-self: stretch;
-  align-items: center;
-  padding: 1em 1em 0;
+  padding: 1em 0.5em 0;
 }
 
 .eg-synth__option {
@@ -17,6 +17,7 @@
   grid-auto-flow: column;
   position: relative;
   user-select: none;
+  font-size: 0.85em;
 }
 
 .eg-synth__led {
