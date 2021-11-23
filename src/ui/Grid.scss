@@ -2,7 +2,7 @@
 @use "../style/theme";
 
 
-.eg-grid__field {
+.eg-grid {
   --cellSize: min(2.2em, 6vw);
   --brColor: #{color.adjust(theme.$color-gray-100, $alpha: -0.5)};
   --columns: 16;

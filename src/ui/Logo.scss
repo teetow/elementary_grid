@@ -31,7 +31,7 @@
     }
   }
 
-  #full-leds > path {
+  #full-leds {
     animation: flicker calc(1s / 15) infinite;
   }
 }

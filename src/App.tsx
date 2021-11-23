@@ -29,14 +29,17 @@ const App = () => {
   const [tracks, setTracks] = useState<number[][]>(initTracks());
   const [tick, setTick] = useState<number>(0);
 
-  const toggleNote = (note: number, step: number, value: number) => {
-    setTracks((prevTracks) => {
-      const newTracks = [...prevTracks];
-      newTracks[note][step] = value;
+  const toggleNote = useCallback(
+    (note: number, step: number, value: number) => {
+      setTracks((prevTracks) => {
+        const newTracks = [...prevTracks];
+        newTracks[note][step] = value;
 
-      return newTracks;
-    });
-  };
+        return newTracks;
+      });
+    },
+    []
+  );
 
   const onTick = useCallback(
     (source: string) => {
