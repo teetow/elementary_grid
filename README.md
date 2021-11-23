@@ -12,7 +12,6 @@ With [Nick](https://github.com/nick-thompson) having released the WebAudio part 
 
 ### Known issues and questions
 
-* Adding a note at just the right / wrong moment will corrupt playback for one pattern cycle. Let's call it jazz.
 * If you absolutely spray the grid with notes, you'll get some clipping. Aural injury insurance not included.
 * Yes, you can use MIDI input with Elementary Audio. It's that awesome.
 * Yes, you can use it to make VST and AU plugins.
