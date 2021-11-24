@@ -1,11 +1,11 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useReducer, useState } from "react";
+import core from "./lib/elementary";
 
+import { getUrlState, Patch, patchReducer, setUrlState } from "./lib/patch";
 import { makeScale } from "./lib/utils";
 import Grid from "./ui/Grid";
 import Splainer from "./ui/Splainer";
 import Synth from "./ui/Synth";
-
-import core from "./lib/elementary";
 
 import "./App.scss";
 
@@ -22,34 +22,46 @@ core.on("load", () => {
   });
 });
 
-const initTracks = () =>
-  Array.from(Array(numTracks), () => new Array(numSteps).fill(0));
+const initTracks = () => {
+  return Array.from(Array(numTracks), () => new Array(numSteps).fill(0));
+};
+
+const getPatch = () => {
+  return {
+    tracks: initTracks(),
+    tone: "stab",
+    useKick: false,
+    ...getUrlState(),
+  } as Patch;
+};
 
 const App = () => {
-  const [tracks, setTracks] = useState<number[][]>(initTracks());
+  const [patch, updatePatch] = useReducer(patchReducer, getPatch());
   const [tick, setTick] = useState<number>(0);
 
   const toggleNote = useCallback(
     (note: number, step: number, value: number) => {
-      setTracks((prevTracks) => {
-        const newTracks = [...prevTracks];
-        newTracks[note][step] = value;
+      const newTracks = [...patch.tracks];
+      newTracks[note][step] = value;
 
-        return newTracks;
-      });
+      updatePatch({ type: "setTracks", tracks: newTracks });
     },
-    []
+    [patch.tracks]
   );
+
+  useEffect(() => {
+    setUrlState(patch);
+  }, [patch]);
 
   const onTick = useCallback(
     (source: string) => {
       if (source === "sync") {
         setTick(0);
       } else if (source === "tick") {
-        setTick((prev) => (prev + 1) % tracks.length);
+        setTick((prev) => (prev + 1) % patch.tracks.length);
       }
     },
-    [tracks]
+    [patch.tracks]
   );
 
   metroCallback = onTick;
@@ -58,13 +70,15 @@ const App = () => {
     <div className="eg-app">
       <Synth
         scale={scale}
-        sequence={tracks}
-        onClear={() => setTracks(initTracks())}
+        patch={patch}
+        onClear={() => updatePatch({ type: "setTracks", tracks: initTracks() })}
+        onSetKick={(useKick) => updatePatch({ type: "setUseKick", useKick })}
+        onSetTone={(tone) => updatePatch({ type: "setTone", tone })}
       />
 
       <Grid
         keyrange={16}
-        notes={tracks}
+        notes={patch.tracks}
         onToggleNote={toggleNote}
         hilightStep={tick}
       />

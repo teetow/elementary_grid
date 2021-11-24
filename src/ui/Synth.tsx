@@ -1,11 +1,8 @@
-/* eslint-disable no-useless-rename */
-import { useState } from "react";
+import { Patch } from "../lib/patch";
 import { useSynth } from "../lib/useSynth";
 import { Logo } from "./Logo";
 
 import "./Synth.scss";
-
-
 
 const KickSwitch = ({
   active,
@@ -29,10 +26,12 @@ const KickSwitch = ({
 };
 
 type ToneName = "stab" | "ding";
+
 type Tone = {
   name: ToneName;
   label: string;
 };
+
 const tones = [
   { name: "stab", label: "Stab" },
   { name: "ding", label: "Ding" },
@@ -66,20 +65,19 @@ const TonePicker = ({ currentTone, onSetTone }: TonePickerProps) => {
 };
 
 type Props = {
+  patch: Patch;
   scale: number[];
-  sequence: number[][];
   onClear: () => void;
+  onSetKick: (useKick: boolean) => void;
+  onSetTone: (tone: string) => void;
 };
 
-function Synth({ scale, sequence, onClear }: Props) {
-  const [currentTone, setCurrentTone] = useState<ToneName>("stab");
-  const [withKick, setWithKick] = useState<boolean>(false);
-
+function Synth({ patch, scale, onClear, onSetKick, onSetTone }: Props) {
   useSynth({
-    tracks: sequence,
     scale: scale,
-    tone: currentTone,
-    withKick: withKick,
+    tone: patch.tone,
+    tracks: patch.tracks,
+    withKick: patch.useKick,
   });
 
   return (
@@ -92,8 +90,8 @@ function Synth({ scale, sequence, onClear }: Props) {
       >
         Clear
       </button>
-      <TonePicker currentTone={currentTone} onSetTone={setCurrentTone} />
-      <KickSwitch active={withKick} setActive={setWithKick} />
+      <TonePicker currentTone={patch.tone as ToneName} onSetTone={onSetTone} />
+      <KickSwitch active={patch.useKick} setActive={onSetKick} />
     </div>
   );
 }

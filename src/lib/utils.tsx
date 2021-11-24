@@ -42,3 +42,14 @@ export const range = (n: number, start: number = 0) => [
 
 export const clamp = (n: number, min = 0, max = 1) =>
   Math.max(Math.min(n, max), min);
+
+export const bitsToNumber = (bits: number[]) => {
+  return bits.reduce((prev, cur, i) => prev | (cur << i));
+};
+
+export const numberToBits = (number: number, length = 16) => {
+  return range(length).map((i) => {
+    const bit = 1 << i;
+    return (number & bit) === bit ? 1 : 0;
+  });
+};
