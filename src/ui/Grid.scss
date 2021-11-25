@@ -1,8 +1,13 @@
 @use "sass:color";
 @use "../style/theme";
 
-
 .eg-grid {
+  --color-off: #{theme.$color-gray-200};
+  --color-on: #{theme.$color-gray-600};
+  --color-hilight-outer: #{theme.$color-gray-800};
+  --color-hilight-inner: #{color.adjust(black, $alpha: -1)};
+  --color-glow: #{color.adjust(theme.$color-brand-600, $alpha: -0.9)};
+
   --cellSize: min(2.2em, 6vw);
   --brColor: #{color.adjust(theme.$color-gray-100, $alpha: -0.5)};
   --columns: 16;
@@ -13,10 +18,26 @@
   grid-auto-flow: column;
   grid-template-columns: repeat(var(--columns), 1fr);
   grid-template-rows: repeat(var(--rows), 1fr);
+
+  &--color-yellow {
+    --color-off: #{theme.$color-gray-200};
+    --color-on: #{theme.$color-brand-400};
+    --color-hilight-outer: #{theme.$color-brand-800};
+    --color-hilight-inner: #f000;
+    --color-glow: #{color.adjust(theme.$color-brand-600, $alpha: -0.9)};
+  }
+
+  &--color-blue {
+    --color-off: #{theme.$color-gray-200};
+    --color-on: rgb(0, 109, 233);
+    --color-hilight-outer: #8af;
+    --color-hilight-inner: #0f00;
+    --color-glow: #0af4;
+  }
 }
 
 .eg-grid__cursor {
-  background-color: color.adjust(theme.$color-brand-200, $alpha: -0.75);
+  background-color: var(--color-glow);
   grid-column: calc(var(--cursor) + 1);
   grid-row: 1 / span var(--rows);
   width: var(--cellSize);
@@ -24,10 +45,9 @@
 }
 
 .eg-key {
-  --face: #{theme.$color-gray-200};
   --button-gradient: radial-gradient(#8881, #0000);
-
-  background-color: var(--face);
+  --color-face: var(--color-off);
+  background-color: var(--color-face);
   background-image: var(--button-gradient);
   border: 1px solid var(--brColor);
   border-radius: 2px;
@@ -54,11 +74,11 @@
   }
 
   &--is-active {
-    --face: #{theme.$color-brand-400};
-    --gd-start: #{theme.$color-brand-800};
-    --gd-end: #f000;
+    --color-face: var(--color-on);
+    --gd-start: var(--color-hilight-outer);
+    --gd-end: var(--color-hilight-inner);
     --button-gradient: radial-gradient(var(--gd-start), var(--gd-end));
-    box-shadow: 0 0 16px 4px color.adjust(theme.$color-brand-600, $alpha: -0.9);
+    box-shadow: 0 0 16px 4px var(--color-glow);
     color: theme.$color-gray-100;
     transition: background-color 800ms, color 100ms;
     z-index: 1;

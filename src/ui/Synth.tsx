@@ -67,16 +67,26 @@ const TonePicker = ({ currentTone, onSetTone }: TonePickerProps) => {
 type Props = {
   patch: Patch;
   scale: number[];
+  bassScale: number[];
   onClear: () => void;
   onSetKick: (useKick: boolean) => void;
   onSetTone: (tone: string) => void;
 };
 
-function Synth({ patch, scale, onClear, onSetKick, onSetTone }: Props) {
+function Synth({
+  patch,
+  scale,
+  bassScale,
+  onClear,
+  onSetKick,
+  onSetTone,
+}: Props) {
   useSynth({
     scale: scale,
+    bassScale: bassScale,
     tone: patch.tone,
     tracks: patch.tracks,
+    bassTracks: patch.bassTracks,
     withKick: patch.useKick,
   });
 

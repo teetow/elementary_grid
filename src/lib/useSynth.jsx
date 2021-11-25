@@ -4,14 +4,16 @@ import {
 } from "@nick-thompson/elementary";
 import { useCallback, useEffect, useRef } from "react";
 
-import { drums, fx, master, synth } from "./modules";
+import { bassSynth, drums, fx, master, synth } from "./modules";
 import { tempoToMs } from "./utils";
 
 /**
  * @typedef {Object} Props
  *
  * @property {number[][]} tracks
+ * @property {number[][]} bassTracks
  * @property {number[]} scale
+ * @property {number[]} bassScale
  * @property {boolean} [withKick]
  * @property {number} [bpm]
  * @property {string} [tone]
@@ -22,7 +24,9 @@ import { tempoToMs } from "./utils";
  */
 export const useSynth = ({
   tracks,
+  bassTracks,
   scale,
+  bassScale,
   withKick = true,
   bpm = 120,
   tone = "ding",
@@ -33,23 +37,31 @@ export const useSynth = ({
 
   const doRender = useCallback(() => {
     try {
-      let nodes = synth({ tracks, tone, scale, tick, sync });
+      let nodes = synth({ tracks, tone, part: "synth", scale, tick, sync });
+      // let nodes = el.cycle(20);
 
       nodes = fx(nodes, bpm, 1.0);
 
       nodes = el.tanh(el.mul(0.4, nodes));
 
-      if (withKick) {
-        nodes = el.add(nodes, drums(beat));
-      }
+      let bassNodes = bassSynth({
+        tracks: bassTracks,
+        scale: bassScale,
+        tick,
+        sync,
+      });
 
-      nodes = master(nodes, tick, beat, sync);
+      nodes = el.add(nodes, el.mul(0.8, bassNodes), 0);
+
+      nodes = el.add(nodes, el.mul(withKick ? 1 : 0, drums(beat)));
+
+      nodes = master(nodes, tick, beat, sync, 0.6);
 
       core.render(nodes, nodes);
     } catch (e) {
       console.log(e);
     }
-  }, [tracks, tone, scale, bpm, withKick]);
+  }, [tracks, tone, scale, bpm, bassTracks, bassScale, withKick]);
 
   useEffect(() => {
     if (core.__renderer) {
