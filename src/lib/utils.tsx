@@ -9,20 +9,27 @@ export const tempoToMs = (tempo: number, subDiv = 16) => {
   return ((beatLen * 4) / subDiv) * 1000;
 };
 
-export const makeScale = (scale: string[], numNotes: number, octave = 4) => {
-  return range(numNotes)
-    .map(
-      (i) =>
-        `${scale[i % scale.length]}${Math.floor(i / scale.length) + octave}`
-    )
-    .flat()
-    .map(noteToMidi)
-    .map(midiToFrequency);
+export const makeScale = (
+  scale: string[],
+  numNotes: number = scale.length,
+  octave = 4,
+  octaveBreak = 0
+) => {
+  const noteNames = range(numNotes).map(
+    (i) =>
+      `${scale[i % scale.length]}${
+        Math.floor((i - octaveBreak) / scale.length) + octave
+      }`
+  );
+  return noteNames.flat().map(noteToMidi).map(midiToFrequency);
 };
 
 export const noteToMidi = (n: string) => {
   let notes = ["c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"];
-  let [name, octave] = n.split("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let [_, name, octave] = n.match(
+    /(?<name>\w?#?)(?<octave>\d)/
+  ) as RegExpMatchArray;
 
   if (notes.indexOf(name) < 0) return -1;
 

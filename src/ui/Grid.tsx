@@ -118,12 +118,22 @@ type PaintMode = "none" | "fill" | "clear";
 
 type Props = {
   notes: number[][];
-  keyrange?: number;
+  color?: "yellow" | "blue";
   hilightStep?: number;
   onToggleNote: (note: number, step: number, mode: number) => void;
 };
 
-const Grid = ({ notes, hilightStep, onToggleNote }: Props) => {
+const Grid = ({
+  notes,
+  color = "yellow",
+  hilightStep,
+  onToggleNote,
+}: Props) => {
+  const fieldClasses = classnames({
+    "eg-grid": true,
+    [`eg-grid--color-${color}`]: color !== undefined,
+  });
+
   const fieldStyle = {
     "--columns": notes[0].length,
     "--rows": notes.length,
@@ -134,7 +144,7 @@ const Grid = ({ notes, hilightStep, onToggleNote }: Props) => {
   } as CSSProperties;
 
   return (
-    <div className="eg-grid" style={fieldStyle}>
+    <div className={fieldClasses} style={fieldStyle}>
       <Field notes={notes} onToggleNote={onToggleNote} />
       <div className="eg-grid__cursor" style={cursorStyle} />
     </div>
