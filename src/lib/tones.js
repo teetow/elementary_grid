@@ -80,13 +80,13 @@ export const bass = (freq, { gain = 1.0, richness = 1.0 } = {}) => {
   let osc = el.mul(el.blepsaw(freq), 0.9);
 
   let octaves = el.add(
-    el.mul(0.5 * richness, el.cycle(el.mul(freq, 2.04))),
-    el.mul(0.5 * richness, el.cycle(el.mul(freq, 2.96)))
+    el.mul(0.5 * richness, el.cycle(el.mul(freq, 2.02))),
+    el.mul(0.5 * richness, el.cycle(el.mul(freq, 2.98)))
   );
   osc = el.add(osc, octaves);
   osc = el.highpass(el.mul(1, freq), 5.0, osc);
-  osc = el.lowpass(el.mul(4, freq), 0.6, osc);
-  osc = el.min(1.5, osc);
+  osc = el.min(2.0, osc);
+  osc = el.lowpass(el.mul(4, freq), 0.8, osc);
   osc = el.mul(0.5 * gain, osc);
 
   return osc;
