@@ -76,18 +76,23 @@ ding.desc = "Pseudo-FM bell-like patch with a sprinkle of unpredictability";
  * @param {number} freq
  * @param {BassProps} [props]
  */
-export const bass = (freq, { gain = 1.0, richness = 1.0 } = {}) => {
+export const bass = (freq, gate, { gain = 1.0, richness = 1.0 } = {}) => {
   let osc = el.mul(el.blepsaw(freq), 0.9);
 
   let octaves = el.add(
-    el.mul(0.5 * richness, el.cycle(el.mul(freq, 2.02))),
-    el.mul(0.5 * richness, el.cycle(el.mul(freq, 2.98)))
+    el.mul(0.5 * richness, el.cycle(el.mul(freq, 2.03))),
+    el.mul(0.5 * richness, el.cycle(el.mul(freq, 2.97)))
   );
   osc = el.add(osc, octaves);
-  osc = el.highpass(el.mul(1, freq), 5.0, osc);
+  osc = el.highpass(el.mul(1, freq), 8.0, osc);
   osc = el.min(2.0, osc);
-  osc = el.lowpass(el.mul(4, freq), 0.8, osc);
-  osc = el.mul(0.5 * gain, osc);
+
+  const fltEnv = el.add(1.0, el.mul(5, el.adsr(0.001, 0.3, 0.001, 0.5, gate)));
+  const fltVal = el.mul(3.0, freq, fltEnv);
+  const qEnv = el.add(1.0, el.mul(3.0, el.adsr(0.5, 0.1, 0.001, 0.1, gate)));
+  osc = el.lowpass(fltVal, qEnv, osc);
+
+  osc = el.mul(0.35 * gain, osc);
 
   return osc;
 };

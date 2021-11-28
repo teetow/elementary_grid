@@ -38,10 +38,8 @@ export const useSynth = ({
   const doRender = useCallback(() => {
     try {
       let nodes = synth({ tracks, tone, part: "synth", scale, tick, sync });
-      // let nodes = el.cycle(20);
 
-      nodes = fx(nodes, bpm, 1.0);
-
+      nodes = fx(nodes, bpm);
       nodes = el.tanh(el.mul(0.4, nodes));
 
       let bassNodes = bassSynth({

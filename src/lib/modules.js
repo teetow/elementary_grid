@@ -74,11 +74,11 @@ export const bassSynth = ({ tracks, scale, tick, sync, legato = false }) => {
   bassFreqs = bassFreqs.filter((f) => f > 0);
 
   const bassSeq = el.seq(
-    { seq: bassTriggers, hold: legato, loop: false },
+    { key: "bass:trig", seq: bassTriggers, hold: legato, loop: false },
     tick.current,
     sync.current
   );
-  const ampEnv = el.adsr(0.03, 0.4, 0.6, 0.3, bassSeq);
+  const ampEnv = el.adsr(0.03, 0.4, 0.6, 0.5, bassSeq);
 
   const pitchSeq = el.seq(
     { key: "bass:freq", seq: bassFreqs, hold: true, loop: false },
@@ -86,7 +86,7 @@ export const bassSynth = ({ tracks, scale, tick, sync, legato = false }) => {
     sync.current
   );
 
-  const osc = tones.bass(pitchSeq, { gain: 0.8 });
+  const osc = tones.bass(pitchSeq, bassSeq, { gain: 0.8 });
 
   const out = el.mul(ampEnv, osc);
   return out;
@@ -94,7 +94,7 @@ export const bassSynth = ({ tracks, scale, tick, sync, legato = false }) => {
 
 export const fx = (node, bpm = 120, balance = 1.0) => {
   let dly = el.delay(
-    { size: 1000 },
+    { size: 44100 },
     el.ms2samps(3 * tempoToMs(bpm, 16)),
     -0.3,
     node
