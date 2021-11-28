@@ -3,14 +3,17 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 import App from "./App";
+import Debugger from "./ui/Debugger";
 import { Splash } from "./ui/Splash";
 
 let ctx = new AudioContext();
 
+const runDebugger = false;
+
 const RenderApp = () => {
   ReactDOM.render(
     <React.StrictMode>
-      <App />
+      {runDebugger ? <Debugger /> : <App />}
     </React.StrictMode>,
     document.getElementById("root")
   );
