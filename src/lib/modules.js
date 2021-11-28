@@ -59,33 +59,30 @@ export const synth = ({ tracks, tone, scale, tick, sync }) => {
  */
 export const bassSynth = ({ tracks, scale, tick, sync, legato = false }) => {
   const numSteps = tracks[0].length;
-  const bassSeq = Array(numSteps).fill(0);
-  const bassFreqs = Array(numSteps).fill(scale[0]);
+  const bassTriggers = Array(numSteps).fill(0);
+  let bassFreqs = Array(numSteps).fill(0);
 
   tracks.forEach((track, trackIndex) =>
     track.forEach((step, stepIndex) => {
       if (step === 1) {
-        bassSeq[stepIndex] = 1;
+        bassTriggers[stepIndex] = 1;
         bassFreqs[stepIndex] = scale[trackIndex];
       }
     })
   );
 
-  const ampEnv = el.adsr(
-    0.008,
-    0.4,
-    0.6,
-    0.3,
-    el.seq(
-      { key: `bass:gate`, seq: bassSeq, hold: legato, loop: false },
-      tick.current,
-      sync.current
-    )
+  bassFreqs = bassFreqs.filter((f) => f > 0);
+
+  const bassSeq = el.seq(
+    { seq: bassTriggers, hold: legato, loop: false },
+    tick.current,
+    sync.current
   );
+  const ampEnv = el.adsr(0.03, 0.4, 0.6, 0.3, bassSeq);
 
   const pitchSeq = el.seq(
     { key: "bass:freq", seq: bassFreqs, hold: true, loop: false },
-    tick.current,
+    bassSeq,
     sync.current
   );
 
