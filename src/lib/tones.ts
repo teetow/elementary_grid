@@ -1,21 +1,11 @@
-import { el } from "@nick-thompson/elementary";
+import { Node } from "@nick-thompson/elementary/src/core/node";
+import { el } from "./elementary";
 
-/**
- * @typedef {Object} PluckProps
- * @property {number} [detune]
- * @property {number} [sharpness]
- * */
-
-/**
- *
- * @param {number} freq
- * @param {PluckProps} props
- */
 export const stab = (
-  freq,
+  freq: number,
   { gain = 1.0, detune = 0.004, sharpness = 1.0, richness = 1.0 } = {}
 ) => {
-  const tone = (freq, toneGain) =>
+  const tone = (freq: number, toneGain: number) =>
     el.mul(
       toneGain,
       el.add(
@@ -33,19 +23,8 @@ export const stab = (
 };
 stab.desc = "Not quite a supersaw, but certainly a stabby little rascal";
 
-/**
- * @typedef {Object} DingProps
- * @property {number} [gain]
- * @property {number} [richness]
- * @property {number} [detune]
- */
-
-/**
- * @param {number} freq
- * @param {DingProps} [props]
- */
 export const ding = (
-  freq,
+  freq: number,
   { gain = 1.0, richness = 0.1, detune = 0.003 } = {}
 ) => {
   let osc = el.add(
@@ -66,17 +45,11 @@ export const ding = (
 };
 ding.desc = "Pseudo-FM bell-like patch with a sprinkle of unpredictability";
 
-/**
- * @typedef {Object} BassProps
- * @property {number} [gain]
- * @property {number} [richness]
- */
-
-/**
- * @param {number} freq
- * @param {BassProps} [props]
- */
-export const bass = (freq, gate, { gain = 1.0, richness = 1.0 } = {}) => {
+export const bass = (
+  freq: number,
+  gate: Node,
+  { gain = 1.0, richness = 1.0 } = {}
+) => {
   let osc = el.mul(el.blepsaw(freq), 0.9);
 
   let octaves = el.add(
@@ -98,21 +71,8 @@ export const bass = (freq, gate, { gain = 1.0, richness = 1.0 } = {}) => {
 };
 bass.desc = "BASS";
 
-/**
- * @typedef {Object} KickProps
- * @property {number} [freq]
- * @property {number} [pop]
- * @property {number} [speed]
- * @property {number} [tail]
- */
-
-/**
- *
- * @param {Object} gate
- * @param {Kickprops} [props]
- */
 export const kick = (
-  gate,
+  gate: Node,
   { freq = 42, speed = 1.0, pop = 1.0, tail = 1.0 } = {}
 ) => {
   let fastEnv = el.adsr(0.0001, 0.2 * speed, 0.0, 0.0, gate);

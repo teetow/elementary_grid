@@ -1,4 +1,7 @@
-import {el, ElementaryWebAudioRenderer as core } from "@nick-thompson/elementary";
+import {
+  el,
+  ElementaryWebAudioRenderer as core,
+} from "@nick-thompson/elementary";
 
-export {el, core};
+export { el, core };
 export default core;

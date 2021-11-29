@@ -5,22 +5,22 @@ import { bassSynth, drums, fx, master, synth } from "./modules";
 import { tempoToMs } from "./utils";
 
 type Props = {
-  tracks: number[][];
+  bassScale: number[];
   bassTracks: number[][];
   scale: number[];
-  bassScale: number[];
-  withKick: boolean;
-  bpm: number;
-  tone: string;
+  tracks: number[][];
+  bpm?: number;
+  tone?: string;
+  withKick?: boolean;
 };
 export const useSynth = ({
-  tracks,
+  bassScale,
   bassTracks,
   scale,
-  bassScale,
-  withKick = true,
+  tracks,
   bpm = 120,
   tone = "ding",
+  withKick = true,
 }: Props) => {
   const tick = useRef(el.metro({ name: "tick", interval: tempoToMs(bpm, 16) }));
   const beat = useRef(el.metro({ name: "beat", interval: tempoToMs(bpm, 4) }));

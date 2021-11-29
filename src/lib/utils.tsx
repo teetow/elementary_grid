@@ -1,7 +1,7 @@
 /**
  * Calculate the length, in ms, of one given subdivision at the specificed BPM
- * @param {*} tempo tempo in Beats Per Minute
- * @param {*} subDiv subdivision for which the length is sought, defaults to 16:th note
+ * @param {number} tempo tempo in Beats Per Minute
+ * @param {number} subDiv subdivision for which the length is sought, defaults to 16:th note
  * @returns the length of one subdivision in ms
  */
 export const tempoToMs = (tempo: number, subDiv = 16) => {
@@ -9,9 +9,26 @@ export const tempoToMs = (tempo: number, subDiv = 16) => {
   return ((beatLen * 4) / subDiv) * 1000;
 };
 
+/**
+ * Generates a scale of the desired length from a scale of note names
+ *
+ * @param scale an array of note names, e.g. `["a3", "c#4"]`
+ * @param numNotes the length of the resulting array
+ * @param octave the starting octave
+ * @param octaveBreak specifies an offset into the scale array where it should increase the octave.
+ *
+ * @example
+ * // returns [440, 660, 880, 1760]
+ * makeScale(["a, e"], 4, 4)
+ * @example
+ * // returns [55, 65.4, 82.4, 110, 130.8, 164.8, 220]
+ * makeScale("a,c,e".split(","), 7, 3, 1)
+ * @returns an array of frequency values
+ */
+
 export const makeScale = (
   scale: string[],
-  numNotes: number = scale.length,
+  numNotes = scale.length,
   octave = 4,
   octaveBreak = 0
 ) => {
