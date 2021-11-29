@@ -51,7 +51,8 @@ export const synth = ({ tracks, tone, scale, tick, sync }) => {
  * @property {number[][]} tracks
  * @property {Object} scale
  * @property {Object} tick
- * @property {boolean} legato
+ * @property {Object} sync
+ * @property {boolean} [legato]
  */
 
 /**
