@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "https://teetow.github.io/elementary_grid",
   "dependencies": {
+    "@elemaudio/srvb": "^1.0.0",
     "@nick-thompson/elementary": "^0.10.4",
     "@types/classnames": "^2.3.1",
     "@types/nick-thompson__elementary": "^0.9.0",
@@ -12,6 +13,7 @@
     "@types/react-dom": "^17.0.11",
     "classnames": "^2.3.1",
     "gh-pages": "^3.2.3",
+    "invariant": "^2.2.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",

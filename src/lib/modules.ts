@@ -109,8 +109,20 @@ export const drums = (gate: MutableRefObject<Node>) => {
   return kick(gate.current, { pop: 1.2 });
 };
 
+export const verb = (left: Node, right: Node, verbGain: number = 0.3) => {
+  let [wetL, wetR] = srvb(
+    { name: "verb" },
+    0.5,
+    0.5,
+    0.5,
+    el.mul(verbGain, left),
+    el.mul(verbGain, right),
+  );
+
+  return [wetL, wetR];
+};
+
 export const master = (
-  node: Object,
   tick: MutableRefObject<Node>,
   beat: MutableRefObject<Node>,
   sync: MutableRefObject<Node>,
