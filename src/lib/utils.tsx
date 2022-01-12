@@ -77,3 +77,13 @@ export const numberToBits = (number: number, length = 16) => {
     return (number & bit) === bit ? 1 : 0;
   });
 };
+
+export const countNodes = (node: any) => {
+  if (!node || !node._children) {
+    return 0;
+  }
+  return node._children.reduce(
+    (acc: number, n: any) => acc + countNodes(n) + 1,
+    0,
+  );
+};

@@ -1,7 +1,10 @@
-import { el, core } from "./elementary";
+import {
+  el,
+  ElementaryWebAudioRenderer as core
+} from "@nick-thompson/elementary";
 import { useCallback, useEffect, useRef } from "react";
 
-import { bassSynth, drums, fx, master, synth } from "./modules";
+import { bassSynth, drums, master, pingDelay, synth } from "./modules";
 import { tempoToMs } from "./utils";
 
 type Props = {
@@ -28,10 +31,22 @@ export const useSynth = ({
 
   const doRender = useCallback(() => {
     try {
-      let nodes = synth({ tracks, tone, scale, tick, sync });
+      let signal = synth({ tracks, tone, scale, tick, sync });
 
-      nodes = fx(nodes, bpm);
-      nodes = el.tanh(el.mul(0.4, nodes));
+      let [left, right] = [signal, signal]; // make stereo
+
+      [left, right] = pingDelay(left, right, bpm);
+
+      // bypass the verb until bug is fixed
+      // let [verbL, verbR] = srvb({ name: "swag" }, 0.2, 0.3, 1.0, left, right);
+      // [left, right] = [
+      //   el.select(0.7, left, el.select(0.9, verbL, verbR)),
+      //   el.select(0.7, right, el.select(0.9, verbR, verbL)),
+      // ];
+
+      [left, right] = [left, right].map((c) =>
+        el.tanh(el.mul(el.const({ key: "shaper", value: 0.5 }), c)),
+      );
 
       let bassNodes = bassSynth({
         tracks: bassTracks,
@@ -40,13 +55,23 @@ export const useSynth = ({
         sync,
       });
 
-      nodes = el.add(nodes, el.mul(0.8, bassNodes), 0);
+      [left, right] = [left, right].map((c) =>
+        el.add(c, el.mul(el.const({ value: 0.8 }), bassNodes), 0),
+      );
 
-      nodes = el.add(nodes, el.mul(withKick ? 1 : 0, drums(beat)));
+      [left, right] = [left, right].map((c) =>
+        el.add(
+          c,
+          el.mul(
+            el.const({ key: "withKick", value: withKick ? 1 : 0 }),
+            drums(beat),
+          ),
+        ),
+      );
 
-      nodes = master(nodes, tick, beat, sync, 0.6);
+      [left, right] = master(tick, beat, sync, 0.6, left, right);
 
-      core.render(nodes, nodes);
+      core.render(left, right);
     } catch (e) {
       console.log(e);
     }
