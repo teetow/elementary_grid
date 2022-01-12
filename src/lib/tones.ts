@@ -3,20 +3,20 @@ import { el } from "./elementary";
 
 export const stab = (
   freq: number,
-  { gain = 1.0, detune = 0.004, sharpness = 1.0, richness = 1.0 } = {}
+  { gain = 1.0, detune = 0.004, sharpness = 1.0, richness = 1.0 } = {},
 ) => {
-  const tone = (freq: number, toneGain: number) =>
+  const tone = (freq: Node, toneGain: number) =>
     el.mul(
       toneGain,
       el.add(
         el.sin(el.mul(2 * Math.PI, freq)),
-        el.sin(el.mul(3 * Math.PI, freq, 0.08 * sharpness))
-      )
+        el.sin(el.mul(3 * Math.PI, freq, 0.08 * sharpness)),
+      ),
     );
   let out = el.add(
     tone(el.phasor(freq * (1 - detune)), 0.5 * richness),
     tone(el.phasor(freq * 1), 0.8),
-    tone(el.phasor(freq * (1 + detune)), 0.5 * richness)
+    tone(el.phasor(freq * (1 + detune)), 0.5 * richness),
   );
 
   return el.mul(gain, out);
@@ -25,7 +25,7 @@ stab.desc = "Not quite a supersaw, but certainly a stabby little rascal";
 
 export const ding = (
   freq: number,
-  { gain = 1.0, richness = 0.1, detune = 0.003 } = {}
+  { gain = 1.0, richness = 0.1, detune = 0.003 } = {},
 ) => {
   let osc = el.add(
     el.mul(0.8 * richness, el.cycle(1.0 * freq * (1 - detune))),
@@ -33,7 +33,7 @@ export const ding = (
     el.mul(0.8 * richness, el.cycle(1.0 * freq * (1 + detune))),
 
     el.mul(0.5 * richness, el.cycle(2.0 * freq * (1 - detune * 0.5))),
-    el.mul(0.5 * richness, el.cycle(2.0 * freq * (1 + detune * 0.5)))
+    el.mul(0.5 * richness, el.cycle(2.0 * freq * (1 + detune * 0.5))),
   );
 
   osc = el.mul(osc, gain * 3.0);
@@ -48,13 +48,13 @@ ding.desc = "Pseudo-FM bell-like patch with a sprinkle of unpredictability";
 export const bass = (
   freq: number,
   gate: Node,
-  { gain = 1.0, richness = 1.0 } = {}
+  { gain = 1.0, richness = 1.0 } = {},
 ) => {
   let osc = el.mul(el.blepsaw(freq), 0.9);
 
   let octaves = el.add(
     el.mul(0.5 * richness, el.cycle(el.mul(freq, 2.03))),
-    el.mul(0.5 * richness, el.cycle(el.mul(freq, 2.97)))
+    el.mul(0.5 * richness, el.cycle(el.mul(freq, 2.97))),
   );
   osc = el.add(osc, octaves);
   osc = el.highpass(el.mul(1, freq), 8.0, osc);
@@ -73,7 +73,7 @@ bass.desc = "BASS";
 
 export const kick = (
   gate: Node,
-  { freq = 42, speed = 1.0, pop = 1.0, tail = 1.0 } = {}
+  { freq = 42, speed = 1.0, pop = 1.0, tail = 1.0 } = {},
 ) => {
   let fastEnv = el.adsr(0.0001, 0.2 * speed, 0.0, 0.0, gate);
   let slowEnv = el.adsr(0.0001, 0.5, 0.0, 0.0, gate);

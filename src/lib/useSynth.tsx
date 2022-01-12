@@ -1,7 +1,9 @@
-import { el, core } from "./elementary";
+import {
+  el,
+  ElementaryWebAudioRenderer as core,
+} from "@nick-thompson/elementary";
 import { useCallback, useEffect, useRef } from "react";
-
-import { bassSynth, drums, fx, master, synth } from "./modules";
+import { bassSynth, drums, master, pingDelay, synth } from "./modules";
 import { tempoToMs } from "./utils";
 
 type Props = {
@@ -28,10 +30,19 @@ export const useSynth = ({
 
   const doRender = useCallback(() => {
     try {
-      let nodes = synth({ tracks, tone, scale, tick, sync });
+      let signal = synth({ tracks, tone, scale, tick, sync });
 
-      nodes = fx(nodes, bpm);
-      nodes = el.tanh(el.mul(0.4, nodes));
+      let [left, right] = [signal, signal]; // make stereo
+
+      [left, right] = pingDelay(left, right, bpm);
+
+      // let [verbL, verbR] = verb(left, right, 0.001);
+      // const mixVerb = (dry: Node, wet: Node, otherWet: Node, width = 0.7) =>
+      //   el.add(dry, el.mul(1, wet), el.mul(1 - width, otherWet));
+      // left = mixVerb(left, verbL, verbR);
+      // right = mixVerb(right, verbR, verbL);
+
+      [left, right] = [left, right].map((c) => el.tanh(el.mul(0.4, c)));
 
       let bassNodes = bassSynth({
         tracks: bassTracks,
@@ -40,13 +51,23 @@ export const useSynth = ({
         sync,
       });
 
-      nodes = el.add(nodes, el.mul(0.8, bassNodes), 0);
+      [left, right] = [left, right].map((c) =>
+        el.add(c, el.mul(0.8, bassNodes), 0),
+      );
 
-      nodes = el.add(nodes, el.mul(withKick ? 1 : 0, drums(beat)));
+      [left, right] = [left, right].map((c) =>
+        el.add(
+          c,
+          el.mul(
+            el.const({ key: "withKick", value: withKick ? 1 : 0 }),
+            drums(beat),
+          ),
+        ),
+      );
 
-      nodes = master(nodes, tick, beat, sync, 0.6);
+      [left, right] = master(tick, beat, sync, 0.6, left, right);
 
-      core.render(nodes, nodes);
+      core.render(left, right);
     } catch (e) {
       console.log(e);
     }

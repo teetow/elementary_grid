@@ -1,6 +1,7 @@
+import srvb from "@elemaudio/srvb";
+import { el } from "@nick-thompson/elementary";
 import { Node } from "@nick-thompson/elementary/src/core/node";
 import { MutableRefObject } from "react";
-import { el } from "./elementary";
 
 import { bass, ding, kick, stab } from "./tones";
 import { clamp, range, tempoToMs } from "./utils";
@@ -24,7 +25,7 @@ export const synth = ({ tracks, tone, scale, tick, sync }: SynthParams) => {
     el.seq(
       { key: `synth:${i}:seq`, seq: tracks[i], loop: false },
       tick.current,
-      sync.current
+      sync.current,
     );
   const env = (i: number) => el.adsr(0.02, 0.3, 0.1, 0.9, seq(i));
   const osc = (freq: number) => tones[tone](freq, { gain: 0.8 });
@@ -32,11 +33,8 @@ export const synth = ({ tracks, tone, scale, tick, sync }: SynthParams) => {
   const patch = (i: number) => el.mul(env(i), voice(i));
 
   const out = range(scale.length).reduce((prev, cur) => {
-    if (prev === 0) {
-      return el.add(patch(prev), patch(cur));
-    }
     return el.add(prev, patch(cur));
-  }) as unknown as Node;
+  }, patch(0)) as unknown as Node;
   return out;
 };
 
@@ -65,7 +63,7 @@ export const bassSynth = ({
         bassTriggers[stepIndex] = 1;
         bassFreqs[stepIndex] = scale[trackIndex];
       }
-    })
+    }),
   );
 
   bassFreqs = bassFreqs.filter((f) => f > 0);
@@ -73,14 +71,14 @@ export const bassSynth = ({
   const bassSeq = el.seq(
     { key: "bass:trig", seq: bassTriggers, hold: legato, loop: false },
     tick.current,
-    sync.current
+    sync.current,
   );
   const ampEnv = el.adsr(0.03, 0.4, 0.6, 0.5, bassSeq);
 
   const pitchSeq = el.seq(
     { key: "bass:freq", seq: bassFreqs, hold: true, loop: false },
     bassSeq,
-    sync.current
+    sync.current,
   );
 
   const osc = tones.bass(pitchSeq, bassSeq, { gain: 0.8 });
@@ -89,16 +87,21 @@ export const bassSynth = ({
   return out;
 };
 
-export const fx = (node: Node, bpm = 120, balance = 1.0) => {
-  let dly = el.delay(
-    { size: 44100 },
-    el.ms2samps(3 * tempoToMs(bpm, 16)),
-    -0.3,
-    node
-  );
+export const msDelay = (node: Node, time = 210, balance = 1.0) => {
+  let dly = el.delay({ size: 44100 }, el.ms2samps(time), -0.3, node);
 
   return el.add(el.mul(node, clamp(2 - balance)), el.mul(dly, balance, 0.5));
 };
+
+export const delay = (node: Node, bpm = 120, tap = 3, balance = 1.0) =>
+  msDelay(node, tap * tempoToMs(bpm, 16), balance);
+
+export const pingDelay = (
+  left: Node,
+  right: Node,
+  bpm = 120,
+  balance = 1.0,
+) => [delay(left, bpm, 2, balance), delay(right, bpm, 3, balance)];
 
 /**
  *
@@ -126,17 +129,20 @@ export const master = (
   tick: MutableRefObject<Node>,
   beat: MutableRefObject<Node>,
   sync: MutableRefObject<Node>,
-  gain: number = 1.0
+  gain: number = 1.0,
+  left: Node,
+  right: Node,
 ) => {
-  let out = el.mul(
-    gain * 1.0,
-    el.add(
-      el.mul(0, tick.current),
-      el.mul(0, beat.current),
-      el.mul(0, sync.current),
-      node
-    )
+  left = el.highpass(70, 0.7, left);
+  right = el.highpass(70, 0.7, right);
+  let [outL, outR] = [el.mul(gain, left), el.mul(gain, right)];
+
+  const metros = el.add(
+    el.mul(0, tick.current),
+    el.mul(0, beat.current),
+    el.mul(0, sync.current),
   );
-  out = el.highpass(70, 0.7, out);
-  return out;
+  outL = el.add(outL, metros);
+
+  return [outL, outR];
 };
