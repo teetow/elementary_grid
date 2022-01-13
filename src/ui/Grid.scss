@@ -21,14 +21,18 @@
 
   &--color-yellow {
     --color-off: #{theme.$color-gray-200};
+    --color-label-hi: rgba(255, 0, 0, 0.116);
+    --color-label-lo: rgba(161, 51, 0, 0.541);
     --color-on: #{theme.$color-brand-400};
     --color-hilight-outer: #{theme.$color-brand-800};
     --color-hilight-inner: #f000;
-    --color-glow: #{color.adjust(theme.$color-brand-600, $alpha: -0.9)};
+    --color-glow: #{color.adjust(theme.$color-brand-600, $alpha: -0.8)};
   }
 
   &--color-blue {
     --color-off: #{theme.$color-gray-200};
+    --color-label-hi: rgba(0, 52, 119, 0.527);
+    --color-label-lo: rgba(0, 44, 189, 0.582);
     --color-on: rgb(0, 109, 233);
     --color-hilight-outer: #8af;
     --color-hilight-inner: #0f00;
@@ -78,16 +82,81 @@
     --gd-start: var(--color-hilight-outer);
     --gd-end: var(--color-hilight-inner);
     --button-gradient: radial-gradient(var(--gd-start), var(--gd-end));
-    box-shadow: 0 0 16px 4px var(--color-glow);
+    border: 1px solid var(--color-hilight-inner);
+    box-shadow: 0 0 16px 1px var(--color-glow);
     color: theme.$color-gray-100;
     transition: background-color 800ms, color 100ms;
     z-index: 1;
   }
 
   &__label {
-    display: none;
-    font-family: "Red Hat Mono";
-    font-size: 0.625em;
+    --trans-gd-start: var(--color-label-lo);
+    --trans-gd-end: var(--color-label-hi);
+
+    background-image: linear-gradient(
+      var(--trans-gd-end),
+      var(--trans-gd-start)
+    );
+    color: #ffff;
+    text-shadow: 0 0 0.3em #000f;
+    display: grid;
+    font-family: sans-serif;
+    border-radius: 0.2em;
+    font-size: 0.8em;
     font-weight: 100;
+    grid-area: main;
+    grid-template-areas: "main";
+    place-items: center;
+    justify-self: stretch;
+    height: 50%;
+
+    &--transpose-up {
+      // clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
+      background-image: linear-gradient(
+        var(--trans-gd-start),
+        var(--trans-gd-end)
+      );
+      transform: translate(0, -50%);
+    }
+
+    &--transpose-dn {
+      transform: translate(0, 50%);
+      // clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%);
+    }
+
+    // * {
+    //   grid-area: main;
+    //   z-index: 2;
+    // }
+
+    // &:before {
+    //   --arrow-offset: -0.1em;
+    //   --trans-gd-start: var(--color-alert-lo);
+    //   --trans-gd-end: var(--color-alert-hi);
+
+    //   clip-path: polygon(0 0);
+    //   content: "";
+    //   grid-area: main;
+    //   padding-top: 60%;
+    //   width: calc(1 * var(--cellSize));
+    // }
+
+    // &--transpose-up:before {
+    //   background-image: linear-gradient(
+    //     var(--trans-gd-end),
+    //     var(--trans-gd-start)
+    //   );
+    //   clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    //   transform: translate(0, var(--arrow-offset));
+    // }
+
+    // &--transpose-dn:before {
+    //   background-image: linear-gradient(
+    //     var(--trans-gd-end),
+    //     var(--trans-gd-start)
+    //   );
+    //   clip-path: polygon(0 0, 100% 0, 50% 100%);
+    //   transform: translate(0, calc(-1 * var(--arrow-offset)));
+    // }
   }
 }

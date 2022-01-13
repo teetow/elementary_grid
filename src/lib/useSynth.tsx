@@ -1,6 +1,6 @@
 import {
   el,
-  ElementaryWebAudioRenderer as core
+  ElementaryWebAudioRenderer as core,
 } from "@nick-thompson/elementary";
 import { useCallback, useEffect, useRef } from "react";
 
@@ -31,6 +31,13 @@ export const useSynth = ({
 
   const doRender = useCallback(() => {
     try {
+      core.render(
+        el.mul(
+          el.const({ value: 0 }),
+          el.add(tick.current, sync.current, beat.current),
+        ),
+      );
+
       let signal = synth({ tracks, tone, scale, tick, sync });
 
       let [left, right] = [signal, signal]; // make stereo
@@ -68,8 +75,7 @@ export const useSynth = ({
           ),
         ),
       );
-
-      [left, right] = master(tick, beat, sync, 0.6, left, right);
+      [left, right] = master(0.7, left, right);
 
       core.render(left, right);
     } catch (e) {

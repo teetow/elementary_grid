@@ -1,21 +1,38 @@
 import classnames from "classnames";
-import { CSSProperties, memo, useCallback, useEffect, useState } from "react";
-
+import {
+  CSSProperties,
+  memo,
+  useCallback,
+  useEffect,
+  useState,
+  WheelEvent,
+} from "react";
 import { range } from "../lib/utils";
 
 import "./Grid.scss";
 
 type KeyProps = {
+  hasHilight?: boolean;
   note: number;
   state: boolean;
   step: number;
-  hasHilight?: boolean;
-  onDrawStart: (note: number, step: number) => void;
+  transpose?: number;
   onDrawEnter: (note: number, step: number) => void;
+  onDrawStart: (note: number, step: number) => void;
+  onTranspose?: (note: number, step: number, delta: number) => void;
 };
 
 const Key = memo(
-  ({ hasHilight, note, state, step, onDrawStart, onDrawEnter }: KeyProps) => {
+  ({
+    hasHilight,
+    note,
+    state,
+    step,
+    transpose,
+    onDrawEnter,
+    onDrawStart,
+    onTranspose,
+  }: KeyProps) => {
     const handleMouseDown = useCallback(
       () => onDrawStart(note, step),
       [note, onDrawStart, step]
@@ -24,6 +41,14 @@ const Key = memo(
     const handleMouseEnter = useCallback(
       () => onDrawEnter(note, step),
       [note, onDrawEnter, step]
+    );
+
+    const handleWheel = useCallback(
+      (e: WheelEvent) => {
+        if (!e.shiftKey) return;
+        onTranspose?.(note, step, e.deltaY < 0 ? 1 : -1);
+      },
+      [note, onTranspose, step]
     );
 
     const keyClasses = classnames({
@@ -35,7 +60,14 @@ const Key = memo(
     const keyStyle = {
       "--step": step,
       "--note": note,
+      "--transpose": transpose !== 0,
     } as CSSProperties;
+
+    const labelClasses = classnames({
+      "eg-key__label": true,
+      "eg-key__label--transpose-up": transpose !== undefined && transpose > 0,
+      "eg-key__label--transpose-dn": transpose !== undefined && transpose < 0,
+    });
 
     return (
       <div
@@ -43,17 +75,25 @@ const Key = memo(
         style={keyStyle}
         onMouseEnter={handleMouseEnter}
         onMouseDown={handleMouseDown}
-      />
+        onWheel={onTranspose !== undefined ? handleWheel : undefined}
+      >
+        {transpose !== 0 && (
+          <div className={labelClasses}>
+            <span>{transpose}</span>
+          </div>
+        )}
+      </div>
     );
   }
 );
 
 type FieldProps = {
   notes: number[][];
+  canTranspose?: boolean;
   onToggleNote: (note: number, step: number, mode: number) => void;
 };
 
-const Field = ({ notes, onToggleNote }: FieldProps) => {
+const Field = ({ notes, canTranspose, onToggleNote }: FieldProps) => {
   const [paintMode, setPaintMode] = useState<PaintMode>("none");
 
   const handleMouseUp = useCallback(() => setPaintMode("none"), []);
@@ -85,18 +125,39 @@ const Field = ({ notes, onToggleNote }: FieldProps) => {
         onToggleNote(note, step, 1);
       }
 
-      if (paintMode === "clear" && notes[note][step] === 1) {
+      if (paintMode === "clear" && notes[note][step] !== 0) {
         onToggleNote(note, step, 0);
       }
     },
     [notes, onToggleNote, paintMode]
   );
 
+  const handleTranspose = useCallback(
+    (note, step, delta) => {
+      const currentValue = notes[note][step];
+      if (currentValue === 1 && delta < 0) {
+        onToggleNote(note, step, -1);
+      } else if (currentValue === -1 && delta > 0) {
+        onToggleNote(note, step, 1);
+      } else {
+        onToggleNote(note, step, currentValue + delta);
+      }
+    },
+    [notes, onToggleNote]
+  );
+
+  const getTranspose = (val: number) => {
+    if (val > 0) {
+      return val - 1;
+    }
+    return val;
+  };
+
   return (
     <>
       {range(notes.length).map((note) => {
         return range(notes[0].length).map((step) => {
-          const state = notes[note][step] === 1;
+          const state = notes[note][step] !== 0;
           const key = `${note}_${step}_${state ? "on" : "off"}`;
           return (
             <Key
@@ -104,8 +165,12 @@ const Field = ({ notes, onToggleNote }: FieldProps) => {
               note={note}
               state={state}
               step={step}
+              transpose={
+                canTranspose ? getTranspose(notes[note][step]) : 0
+              }
               onDrawStart={handleDrawStart}
               onDrawEnter={handlePaint}
+              onTranspose={canTranspose ? handleTranspose : undefined}
             />
           );
         });
@@ -120,6 +185,7 @@ type Props = {
   notes: number[][];
   color?: "yellow" | "blue";
   hilightStep?: number;
+  canTranspose?: boolean;
   onToggleNote: (note: number, step: number, mode: number) => void;
 };
 
@@ -127,6 +193,7 @@ const Grid = ({
   notes,
   color = "yellow",
   hilightStep,
+  canTranspose,
   onToggleNote,
 }: Props) => {
   const fieldClasses = classnames({
@@ -145,7 +212,11 @@ const Grid = ({
 
   return (
     <div className={fieldClasses} style={fieldStyle}>
-      <Field notes={notes} onToggleNote={onToggleNote} />
+      <Field
+        canTranspose={canTranspose}
+        notes={notes}
+        onToggleNote={onToggleNote}
+      />
       <div className="eg-grid__cursor" style={cursorStyle} />
     </div>
   );

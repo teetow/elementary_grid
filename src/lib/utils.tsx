@@ -30,13 +30,13 @@ export const makeScale = (
   scale: string[],
   numNotes = scale.length,
   octave = 4,
-  octaveBreak = 0
+  octaveBreak = 0,
 ) => {
   const noteNames = range(numNotes).map(
     (i) =>
       `${scale[i % scale.length]}${
         Math.floor((i - octaveBreak) / scale.length) + octave
-      }`
+      }`,
   );
   return noteNames.flat().map(noteToMidi).map(midiToFrequency);
 };
@@ -45,7 +45,7 @@ export const noteToMidi = (n: string) => {
   let notes = ["c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"];
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let [_, name, octave] = n.match(
-    /(?<name>\w?#?)(?<octave>\d)/
+    /(?<name>\w?#?)(?<octave>\d)/,
   ) as RegExpMatchArray;
 
   if (notes.indexOf(name) < 0) return -1;
@@ -58,6 +58,31 @@ export const midiToFrequency = (m: number) => {
     return 0;
   }
   return 440 * Math.pow(2, (m - 69) / 12);
+};
+
+export const changePitch = (freq: number, delta: number) => {
+  return freq * Math.pow(2, delta / 12);
+};
+
+export const freqDeltaFromSeq = (triggerVal: number, freq: number) => {
+  if (triggerVal < 0) {
+    return changePitch(freq, triggerVal);
+  }
+
+  if (triggerVal > 1) {
+    return changePitch(freq, triggerVal - 1);
+  }
+  return freq;
+};
+
+export const initArray: any = (...dimensions: number[]) => {
+  const dim = dimensions.splice(0, 1)[0];
+  if (dimensions.length > 0) {
+    return Array(dim)
+      .fill(0)
+      .map(() => initArray(...dimensions));
+  }
+  return Array(dim).fill(0);
 };
 
 export const range = (n: number, start: number = 0) => [
