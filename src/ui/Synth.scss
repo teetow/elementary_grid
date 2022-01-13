@@ -4,11 +4,16 @@
 .eg-synth {
   align-items: center;
   display: grid;
-  gap: 2em;
-  grid-template-areas: "logo meters clear tone kick";
+  gap: 1.5em;
+  grid-template-areas: "logo clear tone kick meters";
   grid-template-columns: 1fr auto auto auto auto;
   justify-self: stretch;
-  padding: 1em 0.5em 0;
+
+  @media all and (max-width: theme.$bp-compact) {
+    grid-template-areas: "clear tone kick";
+    grid-template-columns: auto auto 1fr;
+    justify-self: end;
+  }
 }
 
 .eg-synth__meters {
@@ -22,6 +27,7 @@
 .eg-meter__track {
   width: 1.25em;
   background-color: theme.$color-gray-200;
+  border-radius: 2px;
   grid-auto-flow: column;
   align-self: stretch;
   gap: 1px;
@@ -41,10 +47,11 @@
 }
 
 .eg-meter__value {
-  // background-color: var(--meter-color);
   background-image: linear-gradient(to top, transparent, var(--meter-color));
   transform-origin: 50% 100%;
   align-self: stretch;
+  will-change: transform;
+  transition: transform 33.333333ms ease-out;
 }
 
 .eg-synth__option {
