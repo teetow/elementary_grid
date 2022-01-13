@@ -1,7 +1,8 @@
 .eg-splainer {
+  align-self: end;
   display: grid;
   font-size: 0.75em;
-  gap: 1em;
+  gap: 2em;
   grid-auto-flow: column;
-  padding: 0 0 1em 0;
+  justify-content: center;
 }

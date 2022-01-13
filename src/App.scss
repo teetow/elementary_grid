@@ -18,8 +18,12 @@ html {
 
 body {
   display: grid;
-  place-items: center;
+  place-items: stretch;
   height: 100%;
+}
+
+#root {
+  display: contents;
 }
 
 a,
@@ -51,10 +55,20 @@ button {
 }
 
 .eg-app {
+  align-items: center;
   background-color: theme.$color-gray-100;
   display: grid;
   gap: 1em;
-  place-items: center;
+  grid-template-rows: auto auto auto 1fr;
+  padding: 1em;
+  margin: 0 auto;
+  width: calc(100% - 2em);
+  max-width: 35em;
+}
+
+.eg-app__grids {
+  display: grid;
+  gap: 1em;
 }
 
 $warn-base: #{color.adjust(theme.$color-brand-100, $lightness: 20%)};

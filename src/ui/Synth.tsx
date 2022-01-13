@@ -160,9 +160,10 @@ function Synth({
     withKick: patch.useKick,
   });
 
+  const fancyLayout = window.matchMedia("(min-width: 35em)").matches;
   return (
     <div className="eg-synth">
-      <Logo />
+      {fancyLayout && <Logo />}
       <button
         type="button"
         className="eg-button eg-synth__clearbutton"
@@ -170,13 +171,15 @@ function Synth({
       >
         Clear
       </button>
-      <div className="eg-synth__meters">
-        <Meter id="synth" values={meters.synth} color="yellow" />
-        <Meter id="bass" values={meters.bass} color="blue" />
-        <Meter id="kick" values={meters.kick} color="orange" />
-      </div>
       <TonePicker currentTone={patch.tone as ToneName} onSetTone={onSetTone} />
       <KickSwitch active={patch.useKick} setActive={onSetKick} />
+      {fancyLayout && (
+        <div className="eg-synth__meters">
+          <Meter id="synth" values={meters.synth} color="yellow" />
+          <Meter id="bass" values={meters.bass} color="blue" />
+          <Meter id="kick" values={meters.kick} color="orange" />
+        </div>
+      )}
     </div>
   );
 }

@@ -8,7 +8,7 @@
   --color-hilight-inner: #{color.adjust(black, $alpha: -1)};
   --color-glow: #{color.adjust(theme.$color-brand-600, $alpha: -0.9)};
 
-  --cellSize: min(2.2em, 6vw);
+  --cellSize: initial;
   --brColor: #{color.adjust(theme.$color-gray-100, $alpha: -0.5)};
   --columns: 16;
   --rows: 7;
@@ -18,6 +18,7 @@
   grid-auto-flow: column;
   grid-template-columns: repeat(var(--columns), 1fr);
   grid-template-rows: repeat(var(--rows), 1fr);
+  justify-self: stretch;
 
   &--color-yellow {
     --color-off: #{theme.$color-gray-200};

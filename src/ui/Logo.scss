@@ -59,7 +59,7 @@ $flicker-on: 1;
   height: 1.4em;
 }
 
-@media all and (max-width: 34em) {
+@media all and (max-width: theme.$bp-compact) {
   .eg-logo {
     gap: 0;
     grid-auto-flow: row;
@@ -69,11 +69,5 @@ $flicker-on: 1;
   .eg-logo__grid {
     height: auto;
     width: 5em;
-  }
-}
-
-@media all and (max-width: 23em) {
-  .eg-logo {
-    display: none;
   }
 }

@@ -101,7 +101,6 @@ const App = () => {
         onSetKick={(useKick) => updatePatch({ type: "setUseKick", useKick })}
         onSetTone={(tone) => updatePatch({ type: "setTone", tone })}
       />
-
       <Grid notes={patch.tracks} onToggleNote={toggleNote} hilightStep={tick} />
       <Grid
         notes={patch.bassTracks}
