@@ -33,8 +33,6 @@ const freqs = bassNotes
   .map((x) => (x !== "--" ? noteToMidi(x) : 0))
   .map((x) => (x > 0 ? midiToFrequency(x) : 0));
 
-console.log(freqs);
-
 const Bass = (gate: Node) => {
   let trig = el.seq({ seq: bassTriggers }, gate);
   let bassSeq = el.seq({ seq: freqs.filter((x) => x > 0), hold: true }, trig);

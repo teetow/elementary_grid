@@ -1,8 +1,8 @@
+import { ElementaryWebAudioRenderer as core } from "@nick-thompson/elementary";
 import { useCallback, useEffect, useReducer, useState } from "react";
-import core from "./lib/elementary";
 
 import { getUrlState, Patch, patchReducer, setUrlState } from "./lib/patch";
-import { makeScale, range } from "./lib/utils";
+import { initArray, makeScale, range } from "./lib/utils";
 import Grid from "./ui/Grid";
 import Splainer from "./ui/Splainer";
 import Synth from "./ui/Synth";
@@ -28,7 +28,7 @@ core.on("load", () => {
 });
 
 const initTracks = (height: number = numTracks) => {
-  return Array.from(Array(height), () => new Array(numSteps).fill(0));
+  return initArray(height, numSteps);
 };
 
 const getPatch = () => {
@@ -41,8 +41,10 @@ const getPatch = () => {
   } as Patch;
 };
 
+const initialPatch = getPatch();
+
 const App = () => {
-  const [patch, updatePatch] = useReducer(patchReducer, getPatch());
+  const [patch, updatePatch] = useReducer(patchReducer, initialPatch);
   const [tick, setTick] = useState<number>(0);
 
   const toggleNote = useCallback(
@@ -52,7 +54,7 @@ const App = () => {
 
       updatePatch({ type: "setTracks", tracks: newTracks });
     },
-    [patch.tracks]
+    [patch.tracks],
   );
 
   const toggleBassNote = useCallback(
@@ -65,7 +67,7 @@ const App = () => {
 
       updatePatch({ type: "setBassTracks", tracks: newTracks });
     },
-    [patch.bassTracks]
+    [patch.bassTracks],
   );
 
   useEffect(() => {
@@ -80,7 +82,7 @@ const App = () => {
         setTick((prev) => (prev + 1) % patch.tracks.length);
       }
     },
-    [patch.tracks]
+    [patch.tracks],
   );
 
   metroCallback = onTick;
@@ -105,6 +107,7 @@ const App = () => {
         onToggleNote={toggleBassNote}
         hilightStep={tick}
         color="blue"
+        canTranspose={true}
       />
       <Splainer />
     </div>

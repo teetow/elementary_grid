@@ -3,7 +3,7 @@ import { Node } from "@nick-thompson/elementary/src/core/node";
 import { MutableRefObject } from "react";
 
 import { bass, ding, kick, stab } from "./tones";
-import { clamp, range, tempoToMs } from "./utils";
+import { clamp, freqDeltaFromSeq, range, tempoToMs } from "./utils";
 
 const tones: Record<string, Function> = {
   stab: stab,
@@ -22,7 +22,11 @@ type SynthParams = {
 export const synth = ({ tracks, tone, scale, tick, sync }: SynthParams) => {
   const seq = (i: number) =>
     el.seq(
-      { key: `synth:${i}:seq`, seq: tracks[i], loop: false },
+      {
+        key: `synth:${i}:seq`,
+        seq: tracks[i].map((x) => (x !== 0 ? 1 : 0)),
+        loop: false,
+      },
       tick.current,
       sync.current,
     );
@@ -59,9 +63,9 @@ export const bassSynth = ({
 
   tracks.forEach((track, trackIndex) =>
     track.forEach((step, stepIndex) => {
-      if (step === 1) {
+      if (step !== 0) {
         bassTriggers[stepIndex] = 1;
-        bassFreqs[stepIndex] = scale[trackIndex];
+        bassFreqs[stepIndex] = freqDeltaFromSeq(step, scale[trackIndex]);
       }
     }),
   );
@@ -112,24 +116,10 @@ export const drums = (gate: MutableRefObject<Node>) => {
   return kick(gate.current, { pop: 1.2 });
 };
 
-export const master = (
-  tick: MutableRefObject<Node>,
-  beat: MutableRefObject<Node>,
-  sync: MutableRefObject<Node>,
-  gain: number = 1.0,
-  left: Node,
-  right: Node,
-) => {
-  left = el.highpass(70, 0.7, left);
-  right = el.highpass(70, 0.7, right);
+export const master = (gain: number = 1.0, left: Node, right: Node) => {
+  left = el.highpass(60, 1.5, left);
+  right = el.highpass(60, 1.5, right);
   let [outL, outR] = [el.mul(gain, left), el.mul(gain, right)];
-
-  outL = el.add(
-    el.mul(0, tick.current),
-    el.mul(0, beat.current),
-    el.mul(0, sync.current),
-    outL,
-  );
 
   return [outL, outR];
 };
