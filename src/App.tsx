@@ -22,6 +22,7 @@ core.on("load", () => {
   core.on("metro", (e: { source: string }) => {
     metroCallback(e.source);
   });
+
   core.on("error", (e: unknown) => {
     console.log(e);
   });

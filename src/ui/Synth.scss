@@ -1,13 +1,50 @@
 @use "sass:color";
 @use "../style/theme";
 
-.eg-synthoptions {
+.eg-synth {
   align-items: center;
   display: grid;
   gap: 2em;
-  grid-template-columns: 1fr auto auto auto;
+  grid-template-areas: "logo meters clear tone kick";
+  grid-template-columns: 1fr auto auto auto auto;
   justify-self: stretch;
   padding: 1em 0.5em 0;
+}
+
+.eg-synth__meters {
+  align-self: stretch;
+  display: grid;
+  grid-auto-flow: column;
+  gap: 2px;
+  grid-template-areas: "synth bass kick";
+}
+
+.eg-meter__track {
+  width: 1.25em;
+  background-color: theme.$color-gray-200;
+  grid-auto-flow: column;
+  align-self: stretch;
+  gap: 1px;
+  display: grid;
+
+  &--color-yellow {
+    --meter-color: #{theme.$color-brand-600};
+  }
+
+  &--color-blue {
+    --meter-color: #0066ff;
+  }
+
+  &--color-orange {
+    --meter-color: #{theme.$color-brand-400};
+  }
+}
+
+.eg-meter__value {
+  // background-color: var(--meter-color);
+  background-image: linear-gradient(to top, transparent, var(--meter-color));
+  transform-origin: 50% 100%;
+  align-self: stretch;
 }
 
 .eg-synth__option {

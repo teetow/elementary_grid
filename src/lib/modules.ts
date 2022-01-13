@@ -1,6 +1,5 @@
 import { el } from "@nick-thompson/elementary";
 import { Node } from "@nick-thompson/elementary/src/core/node";
-import { MutableRefObject } from "react";
 
 import { bass, ding, kick, stab } from "./tones";
 import { clamp, freqDeltaFromSeq, range, tempoToMs } from "./utils";
@@ -16,8 +15,8 @@ type SynthParams = {
   tracks: number[][];
   tone: string;
   scale: number[];
-  tick: MutableRefObject<Node>;
-  sync: MutableRefObject<Node>;
+  tick: Node;
+  sync: Node;
 };
 export const synth = ({ tracks, tone, scale, tick, sync }: SynthParams) => {
   const seq = (i: number) =>
@@ -27,8 +26,8 @@ export const synth = ({ tracks, tone, scale, tick, sync }: SynthParams) => {
         seq: tracks[i].map((x) => (x !== 0 ? 1 : 0)),
         loop: false,
       },
-      tick.current,
-      sync.current,
+      tick,
+      sync,
     );
   const env = (i: number) => el.adsr(0.02, 0.3, 0.1, 0.9, seq(i));
   const osc = (freq: number, i: number) =>
@@ -45,8 +44,8 @@ export const synth = ({ tracks, tone, scale, tick, sync }: SynthParams) => {
 type BassSynthParams = {
   tracks: number[][];
   scale: number[];
-  tick: MutableRefObject<Node>;
-  sync: MutableRefObject<Node>;
+  tick: Node;
+  sync: Node;
   legato?: boolean;
 };
 
@@ -74,15 +73,15 @@ export const bassSynth = ({
 
   const bassSeq = el.seq(
     { key: "bass:trig", seq: bassTriggers, hold: legato, loop: false },
-    tick.current,
-    sync.current,
+    tick,
+    sync,
   );
   const ampEnv = el.adsr(0.03, 0.4, 0.6, 0.5, bassSeq);
 
   const pitchSeq = el.seq(
     { key: "bass:freq", seq: bassFreqs, hold: true, loop: false },
     bassSeq,
-    sync.current,
+    sync,
   );
 
   const osc = tones.bass(pitchSeq, bassSeq, { gain: 0.8 });
@@ -107,19 +106,23 @@ export const pingDelay = (
   balance = 1.0,
 ) => [delay(left, bpm, 2, balance), delay(right, bpm, 3, balance)];
 
-/**
- *
- * @param {Object} gate -- an el.metro gate node
- */
-
-export const drums = (gate: MutableRefObject<Node>) => {
-  return kick(gate.current, { pop: 1.2 });
+export const drums = (gate: Node) => {
+  return kick(gate, { pop: 1.2 });
 };
 
-export const master = (gain: number = 1.0, left: Node, right: Node) => {
-  left = el.highpass(60, 1.5, left);
-  right = el.highpass(60, 1.5, right);
-  let [outL, outR] = [el.mul(gain, left), el.mul(gain, right)];
+export const master = (
+  gain: number = 1.0,
+  left: Node,
+  right: Node,
+  lowcut = 66,
+  lowq = 1.2,
+) => {
+  [left, right] = [el.mul(gain, left), el.mul(gain, right)];
+  [left, right] = [
+    el.highpass(lowcut, lowq, left),
+    el.highpass(lowcut, lowq, right),
+  ];
+  [left, right] = [el.tanh(left), el.tanh(right)];
 
-  return [outL, outR];
+  return [left, right];
 };
