@@ -1,3 +1,11 @@
+import {
+  ElementaryWebAudioRenderer as core,
+  MeterEvent,
+} from "@nick-thompson/elementary";
+import classNames from "classnames";
+import { clamp } from "lib/utils";
+import { useCallback, useState } from "react";
+
 import { Patch } from "../lib/patch";
 import { useSynth } from "../lib/useSynth";
 import { Logo } from "./Logo";
@@ -64,6 +72,43 @@ const TonePicker = ({ currentTone, onSetTone }: TonePickerProps) => {
   );
 };
 
+type MeterProps = {
+  id: string;
+  values: number[];
+  color?: "yellow" | "blue" | "orange";
+};
+
+const Meter = ({ id, values, color = "yellow" }: MeterProps) => (
+  <div
+    className={classNames([
+      "eg-meter__track",
+      `eg-meter__track--color-${color}`,
+    ])}
+  >
+    {values.map((val, i) => (
+      <div
+        key={`meter:${id}:${i}`}
+        className="eg-meter__value"
+        style={{ transform: `scale(1, ${clamp(Math.abs(val)) * 100}%)` }}
+      ></div>
+    ))}
+  </div>
+);
+
+type Meters = {
+  synth: [number, number];
+  bass: [number];
+  kick: [number];
+};
+
+core.on("load", () => {
+  core.on("meter", (e: MeterEvent) => {
+    meterCallback(e);
+  });
+});
+
+let meterCallback = (source: MeterEvent) => {};
+
 type Props = {
   patch: Patch;
   scale: number[];
@@ -81,6 +126,31 @@ function Synth({
   onSetKick,
   onSetTone,
 }: Props) {
+  const [meters, setMeters] = useState<Meters>({
+    synth: [0, 0],
+    bass: [0],
+    kick: [0],
+  });
+
+  const onMeter = useCallback(
+    (e: MeterEvent) => {
+      if (e.source === "synth:left") {
+        setMeters((prev) => ({ ...prev, synth: [e.max, prev.synth[1]] }));
+      }
+      if (e.source === "synth:right") {
+        setMeters((prev) => ({ ...prev, synth: [prev.synth[0], e.max] }));
+      }
+      if (e.source === "bass") {
+        setMeters((prev) => ({ ...prev, bass: [e.max] }));
+      }
+      if (e.source === "kick") {
+        setMeters((prev) => ({ ...prev, kick: [e.max] }));
+      }
+    },
+    [setMeters],
+  );
+
+  meterCallback = onMeter;
   useSynth({
     scale: scale,
     bassScale: bassScale,
@@ -91,7 +161,7 @@ function Synth({
   });
 
   return (
-    <div className="eg-synthoptions">
+    <div className="eg-synth">
       <Logo />
       <button
         type="button"
@@ -100,6 +170,11 @@ function Synth({
       >
         Clear
       </button>
+      <div className="eg-synth__meters">
+        <Meter id="synth" values={meters.synth} color="yellow" />
+        <Meter id="bass" values={meters.bass} color="blue" />
+        <Meter id="kick" values={meters.kick} color="orange" />
+      </div>
       <TonePicker currentTone={patch.tone as ToneName} onSetTone={onSetTone} />
       <KickSwitch active={patch.useKick} setActive={onSetKick} />
     </div>

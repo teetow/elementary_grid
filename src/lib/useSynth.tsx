@@ -2,7 +2,7 @@ import {
   el,
   ElementaryWebAudioRenderer as core,
 } from "@nick-thompson/elementary";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 
 import { bassSynth, drums, master, pingDelay, synth } from "./modules";
 import { tempoToMs } from "./utils";
@@ -25,20 +25,15 @@ export const useSynth = ({
   tone = "ding",
   withKick = true,
 }: Props) => {
-  const tick = useRef(el.metro({ name: "tick", interval: tempoToMs(bpm, 16) }));
-  const beat = useRef(el.metro({ name: "beat", interval: tempoToMs(bpm, 4) }));
-  const sync = useRef(el.metro({ name: "sync", interval: tempoToMs(bpm, 1) }));
-
   const doRender = useCallback(() => {
     try {
-      core.render(
-        el.mul(
-          el.const({ value: 0 }),
-          el.add(tick.current, sync.current, beat.current),
-        ),
-      );
+      let signal = el.const({ value: 0 });
 
-      let signal = synth({ tracks, tone, scale, tick, sync });
+      let tick = el.metro({ name: "tick", interval: tempoToMs(bpm, 16) });
+      let beat = el.seq({ seq: [1, 0, 0, 0], hold: true }, tick);
+      let sync = el.seq({ seq: [1, 0, 0, 0], hold: true }, beat);
+
+      signal = synth({ tracks, tone, scale, tick, sync });
 
       let [left, right] = [signal, signal]; // make stereo
 
@@ -55,6 +50,12 @@ export const useSynth = ({
         el.tanh(el.mul(el.const({ key: "shaper", value: 0.5 }), c)),
       );
 
+      [left, right] = [
+        el.add(left, el.meter({ name: "synth:left" }, left)),
+        el.add(right, el.meter({ name: "synth:right" }, right)),
+      ];
+
+      // bass
       let bassNodes = bassSynth({
         tracks: bassTracks,
         scale: bassScale,
@@ -62,20 +63,28 @@ export const useSynth = ({
         sync,
       });
 
-      [left, right] = [left, right].map((c) =>
-        el.add(c, el.mul(el.const({ value: 0.8 }), bassNodes), 0),
+      let [bassL, bassR] = [left, right].map(() =>
+        el.mul(el.const({ value: 0.9 }), bassNodes),
       );
+      bassL = el.meter({ name: "bass" }, bassL);
 
-      [left, right] = [left, right].map((c) =>
-        el.add(
-          c,
-          el.mul(
-            el.const({ key: "withKick", value: withKick ? 1 : 0 }),
-            drums(beat),
-          ),
-        ),
+      [left, right] = [left, right].map((c, i) => el.add(c, [bassL, bassR][i]));
+
+      // kick
+      let kickNodes = el.mul(
+        el.const({ key: "withKick", value: withKick ? 1 : 0 }),
+        drums(beat),
       );
-      [left, right] = master(0.7, left, right);
+      left = el.add(left, el.meter({ name: "kick" }, kickNodes));
+
+      [left, right] = [left, right].map((c) => el.add(c, kickNodes));
+
+      [left, right] = master(0.3, left, right);
+
+      left = el.add(
+        left,
+        el.mul(el.const({ value: 0 }), el.add(tick, sync, beat)),
+      );
 
       core.render(left, right);
     } catch (e) {
