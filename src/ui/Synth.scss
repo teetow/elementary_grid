@@ -44,6 +44,10 @@
   &--color-orange {
     --meter-color: #{theme.$color-brand-400};
   }
+
+  &--color-green {
+    --meter-color: #00b80f;
+  }
 }
 
 .eg-meter__value {

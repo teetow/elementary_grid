@@ -92,6 +92,19 @@ export const range = (n: number, start: number = 0) => [
 export const clamp = (n: number, min = 0, max = 1) =>
   Math.max(Math.min(n, max), min);
 
+export const deepCopy = (obj: any) => JSON.parse(JSON.stringify(obj));
+
+export const shiftArray = (array: any[], shift: number) => {
+  if (shift > 0) {
+    const firstElem = array.shift();
+    array = [...array, firstElem];
+  } else {
+    const lastElem = array.pop();
+    array = [lastElem, ...array];
+  }
+  return deepCopy(array) as typeof array[];
+};
+
 export const bitsToNumber = (bits: number[]) => {
   return bits.reduce((prev, cur, i) => prev | (cur << i));
 };

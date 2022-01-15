@@ -4,26 +4,31 @@ import { el } from "./elementary";
 export const stab = (
   freq: number,
   id: string,
-  { gain = 1.0, detune = 0.004, sharpness = 1.0, richness = 1.0 } = {},
+  { gain = 1.0, detune = 0.004, sharpness = 1.3, richness = 1.0 } = {},
 ) => {
-  const tone = (osc: Node, toneGain: number) =>
+  const tone = (osc: Node, toneGain: number | Node) =>
     el.mul(
       toneGain,
-      el.add(
-        el.sin(el.mul(2 * Math.PI, osc)),
-        el.sin(el.mul(3 * Math.PI, osc, 0.08 * sharpness)),
+      el.tanh(
+        el.add(
+          el.sin(el.mul(2 * Math.PI, osc)),
+          el.sin(el.mul(3 * Math.PI, osc, 1.2 * sharpness)),
+        ),
       ),
     );
+  const dry = el.const({
+    key: "synth:dry",
+    value: gain * (1.0 - 0.5 * Math.pow(richness, 2)),
+  });
+  const wet = el.const({
+    key: "synth:wet",
+    value: gain * (Math.sqrt(richness) - 0.3),
+  });
+
   let out = el.add(
-    tone(
-      el.phasor(el.const({ key: `${id}-L1`, value: freq * (1 - detune) })),
-      0.5 * richness,
-    ),
-    tone(el.phasor(el.const({ key: `${id}-C`, value: freq * 1 })), 0.8),
-    tone(
-      el.phasor(el.const({ key: `${id}-R2`, value: freq * (1 + detune) })),
-      0.5 * richness,
-    ),
+    tone(el.phasor(freq * (1 - detune)), wet),
+    tone(el.phasor(freq * 1), dry),
+    tone(el.phasor(freq * (1 + detune)), wet),
   );
 
   return el.mul(gain, out);
@@ -121,4 +126,3 @@ export const kick = (
 
   return out;
 };
-
