@@ -75,7 +75,7 @@ const TonePicker = ({ currentTone, onSetTone }: TonePickerProps) => {
 type MeterProps = {
   id: string;
   values: number[];
-  color?: "yellow" | "blue" | "orange";
+  color?: "yellow" | "blue" | "orange" | "green";
 };
 
 const Meter = ({ id, values, color = "yellow" }: MeterProps) => (
@@ -99,6 +99,7 @@ type Meters = {
   synth: [number, number];
   bass: [number];
   kick: [number];
+  master: [number, number];
 };
 
 core.on("load", () => {
@@ -130,6 +131,7 @@ function Synth({
     synth: [0, 0],
     bass: [0],
     kick: [0],
+    master: [0, 0],
   });
 
   const onMeter = useCallback(
@@ -145,6 +147,12 @@ function Synth({
       }
       if (e.source === "kick") {
         setMeters((prev) => ({ ...prev, kick: [e.max] }));
+      }
+      if (e.source === "master:left") {
+        setMeters((prev) => ({ ...prev, master: [e.max, prev.master[1]] }));
+      }
+      if (e.source === "master:right") {
+        setMeters((prev) => ({ ...prev, master: [prev.master[0], e.max] }));
       }
     },
     [setMeters],
@@ -178,6 +186,7 @@ function Synth({
           <Meter id="synth" values={meters.synth} color="yellow" />
           <Meter id="bass" values={meters.bass} color="blue" />
           <Meter id="kick" values={meters.kick} color="orange" />
+          <Meter id="master" values={meters.master} color="green" />
         </div>
       )}
     </div>

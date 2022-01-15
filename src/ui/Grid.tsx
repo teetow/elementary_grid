@@ -4,10 +4,11 @@ import {
   memo,
   useCallback,
   useEffect,
+  useRef,
   useState,
   WheelEvent,
 } from "react";
-import { range } from "../lib/utils";
+import { deepCopy, range, shiftArray } from "../lib/utils";
 
 import "./Grid.scss";
 
@@ -35,12 +36,12 @@ const Key = memo(
   }: KeyProps) => {
     const handleMouseDown = useCallback(
       () => onDrawStart(note, step),
-      [note, onDrawStart, step]
+      [note, onDrawStart, step],
     );
 
     const handleMouseEnter = useCallback(
       () => onDrawEnter(note, step),
-      [note, onDrawEnter, step]
+      [note, onDrawEnter, step],
     );
 
     const handleWheel = useCallback(
@@ -48,7 +49,7 @@ const Key = memo(
         if (!e.shiftKey) return;
         onTranspose?.(note, step, e.deltaY < 0 ? 1 : -1);
       },
-      [note, onTranspose, step]
+      [note, onTranspose, step],
     );
 
     const keyClasses = classnames({
@@ -84,7 +85,7 @@ const Key = memo(
         )}
       </div>
     );
-  }
+  },
 );
 
 type FieldProps = {
@@ -116,7 +117,7 @@ const Field = ({ notes, canTranspose, onToggleNote }: FieldProps) => {
         setPaintMode("clear");
       }
     },
-    [notes, onToggleNote]
+    [notes, onToggleNote],
   );
 
   const handlePaint = useCallback(
@@ -129,7 +130,7 @@ const Field = ({ notes, canTranspose, onToggleNote }: FieldProps) => {
         onToggleNote(note, step, 0);
       }
     },
-    [notes, onToggleNote, paintMode]
+    [notes, onToggleNote, paintMode],
   );
 
   const handleTranspose = useCallback(
@@ -143,7 +144,7 @@ const Field = ({ notes, canTranspose, onToggleNote }: FieldProps) => {
         onToggleNote(note, step, currentValue + delta);
       }
     },
-    [notes, onToggleNote]
+    [notes, onToggleNote],
   );
 
   const getTranspose = (val: number) => {
@@ -165,9 +166,7 @@ const Field = ({ notes, canTranspose, onToggleNote }: FieldProps) => {
               note={note}
               state={state}
               step={step}
-              transpose={
-                canTranspose ? getTranspose(notes[note][step]) : 0
-              }
+              transpose={canTranspose ? getTranspose(notes[note][step]) : 0}
               onDrawStart={handleDrawStart}
               onDrawEnter={handlePaint}
               onTranspose={canTranspose ? handleTranspose : undefined}
@@ -187,6 +186,7 @@ type Props = {
   hilightStep?: number;
   canTranspose?: boolean;
   onToggleNote: (note: number, step: number, mode: number) => void;
+  onSetNotes: (notes: number[][]) => void;
 };
 
 const Grid = ({
@@ -195,7 +195,10 @@ const Grid = ({
   hilightStep,
   canTranspose,
   onToggleNote,
+  onSetNotes,
 }: Props) => {
+  const ref = useRef<HTMLDivElement>(null);
+
   const fieldClasses = classnames({
     "eg-grid": true,
     [`eg-grid--color-${color}`]: color !== undefined,
@@ -210,8 +213,36 @@ const Grid = ({
     "--cursor": hilightStep,
   } as CSSProperties;
 
+  const handleWheel = useCallback(
+    (e: globalThis.WheelEvent) => {
+      if (e.altKey && e.shiftKey) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        onSetNotes(
+          deepCopy(notes).map((row: number[]) =>
+            shiftArray(row, e.deltaY > 0 ? 1 : -1),
+          ),
+        );
+      } else if (e.altKey) {
+        e.preventDefault();
+        onSetNotes(shiftArray(deepCopy(notes), e.deltaY > 0 ? 1 : -1));
+      }
+    },
+    [notes, onSetNotes],
+  );
+
+  useEffect(() => {
+    if (!ref.current) {
+      return;
+    }
+
+    const savedRef = ref.current;
+    savedRef.addEventListener("wheel", handleWheel, { passive: false });
+    return () => savedRef.removeEventListener("wheel", handleWheel);
+  }, [handleWheel, ref]);
+
   return (
-    <div className={fieldClasses} style={fieldStyle}>
+    <div ref={ref} className={fieldClasses} style={fieldStyle}>
       <Field
         canTranspose={canTranspose}
         notes={notes}

@@ -83,7 +83,7 @@ const App = () => {
         setTick((prev) => (prev + 1) % patch.tracks.length);
       }
     },
-    [patch.tracks],
+    [patch.tracks.length],
   );
 
   metroCallback = onTick;
@@ -101,10 +101,21 @@ const App = () => {
         onSetKick={(useKick) => updatePatch({ type: "setUseKick", useKick })}
         onSetTone={(tone) => updatePatch({ type: "setTone", tone })}
       />
-      <Grid notes={patch.tracks} onToggleNote={toggleNote} hilightStep={tick} />
+      <Grid
+        notes={patch.tracks}
+        onToggleNote={toggleNote}
+        onSetNotes={(notes) => {
+          updatePatch({ type: "setTracks", tracks: notes });
+        }}
+        hilightStep={tick}
+      />
+
       <Grid
         notes={patch.bassTracks}
         onToggleNote={toggleBassNote}
+        onSetNotes={(notes) =>
+          updatePatch({ type: "setBassTracks", tracks: notes })
+        }
         hilightStep={tick}
         color="blue"
         canTranspose={true}
