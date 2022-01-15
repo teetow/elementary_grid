@@ -43,16 +43,23 @@ export const getUrlState = () => {
         .map((s) => numberToBits(Number(s)));
     }
 
+    const parseBassNote = (s: string, i: number) => {
+      let [noteVal, transpose] = s.split("t").map((val) => Number(val));
+
+      noteVal = 1 << i === noteVal ? 1 : 0;
+
+      if (noteVal === 1 && transpose !== undefined) {
+        return transpose >= 1 ? transpose + 1 : transpose;
+      }
+
+      return noteVal;
+    };
+
     const bassParams = p.getAll("bassTracks");
     if (bassParams.length > 0) {
       let newTracks = range(7).map((i) =>
-        bassParams[0].split(",").map((s) => (1 << i === Number(s) ? 1 : 0)),
+        bassParams[0].split(",").map((s) => parseBassNote(s, i)),
       );
-
-      // bassParams[0].split(",").map((s: string) =>
-      //   range(7).map((i) => (1 << i === Number(s) ? 1 : 0)),
-      // );
-      // newTracks.
 
       state.bassTracks = newTracks;
     }
@@ -73,6 +80,7 @@ export const getUrlState = () => {
 };
 
 const getDelta = (val: number) => {
+  if (val === 0 || val === 1) return val;
   return val > 1 ? val - 1 : val;
 };
 
@@ -86,7 +94,9 @@ const encodeBassTracks = (tracks: number[][]) => {
     range(tracks.length).forEach((note) => {
       if (tracks[note][step] !== 0) {
         noteVals[step] = 1 << note;
-        deltas[step] = getDelta(tracks[note][step]);
+        if (tracks[note][step] !== 1) {
+          deltas[step] = getDelta(tracks[note][step]);
+        }
       }
     });
   });
@@ -94,8 +104,8 @@ const encodeBassTracks = (tracks: number[][]) => {
   return range(numSteps)
     .map((step) => {
       const d = deltas[step];
-      const showDelta = d !== 0 && d !== 1;
-      return `${noteVals[step]}${showDelta ? "+" + d : ""}`;
+      const showDelta = d !== 0;
+      return `${noteVals[step]}${showDelta ? "t" + d : ""}`;
     })
     .join(",");
 };

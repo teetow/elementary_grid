@@ -140,6 +140,8 @@ const Field = ({ notes, canTranspose, onToggleNote }: FieldProps) => {
         onToggleNote(note, step, -1);
       } else if (currentValue === -1 && delta > 0) {
         onToggleNote(note, step, 1);
+      } else if (currentValue === 1 && delta > 0) {
+        onToggleNote(note, step, 2);
       } else {
         onToggleNote(note, step, currentValue + delta);
       }
