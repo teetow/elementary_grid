@@ -9,7 +9,9 @@ import { useCallback, useState } from "react";
 import { Patch } from "../lib/patch";
 import { Logo } from "./Logo";
 
-import "./Synth.scss";
+import "./Panel.scss";
+
+const cls = "eg-panel";
 
 const KickSwitch = ({
   active,
@@ -19,9 +21,9 @@ const KickSwitch = ({
   setActive: (active: boolean) => void;
 }) => {
   return (
-    <div className="eg-synth__option eg-synth__kick-switch">
+    <div className={`${cls}__option ${cls}__kick-switch`}>
       <input
-        className="eg-synth__switch"
+        className={`${cls}__switch`}
         type="checkbox"
         id="kick"
         checked={active}
@@ -51,13 +53,13 @@ type TonePickerProps = {
 
 const TonePicker = ({ currentTone, onSetTone }: TonePickerProps) => {
   return (
-    <div className="eg-synth__tone-picker">
+    <div className={`${cls}__tone-picker`}>
       {tones.map((tone) => {
         return (
-          <div className="eg-synth__option" key={tone.name}>
+          <div className={`${cls}__option`} key={tone.name}>
             <input
               type="radio"
-              className="eg-synth__led"
+              className={`${cls}__led`}
               id={tone.name}
               value={tone.name}
               checked={tone.name === currentTone}
@@ -116,7 +118,7 @@ type Props = {
   onSetTone: (tone: string) => void;
 };
 
-function Synth({ patch, onClear, onSetKick, onSetTone }: Props) {
+function Panel({ patch, onClear, onSetKick, onSetTone }: Props) {
   const [meters, setMeters] = useState<Meters>({
     synth: [0, 0],
     bass: [0],
@@ -152,11 +154,11 @@ function Synth({ patch, onClear, onSetKick, onSetTone }: Props) {
 
   const fancyLayout = window.matchMedia("(min-width: 35em)").matches;
   return (
-    <div className="eg-synth">
+    <div className={`${cls}`}>
       {fancyLayout && <Logo />}
       <button
         type="button"
-        className="eg-button eg-synth__clearbutton"
+        className={`eg-button ${cls}__clearbutton`}
         onClick={onClear}
       >
         Clear
@@ -164,7 +166,7 @@ function Synth({ patch, onClear, onSetKick, onSetTone }: Props) {
       <TonePicker currentTone={patch.tone as ToneName} onSetTone={onSetTone} />
       <KickSwitch active={patch.useKick} setActive={onSetKick} />
       {fancyLayout && (
-        <div className="eg-synth__meters">
+        <div className={`${cls}__meters`}>
           <Meter id="synth" values={meters.synth} color="yellow" />
           <Meter id="bass" values={meters.bass} color="blue" />
           <Meter id="kick" values={meters.kick} color="orange" />
@@ -175,4 +177,4 @@ function Synth({ patch, onClear, onSetKick, onSetTone }: Props) {
   );
 }
 
-export default Synth;
+export default Panel;
