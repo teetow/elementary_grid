@@ -84,3 +84,65 @@ $warn-off: #{color.adjust(theme.$color-brand-100, $lightness: 10%)};
     box-shadow: 0 0 1em 0 red;
   }
 }
+
+.eg-svg {
+  --fg-color: #{theme.$color-gray-600};
+  stroke-linecap: round;
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 2px;
+
+  &__path {
+    &--filled {
+      fill: var(--fg-color);
+    }
+    &--stroked {
+      stroke: var(--fg-color);
+    }
+  }
+
+  &--has-hover:hover {
+    --fg-color: #{theme.$color-gray-800};
+  }
+}
+
+.eg-menu {
+  background-color: theme.$color-gray-200;
+  border-radius: 2px;
+  box-shadow: 0 0.4em 1em 0.2em #0006;
+  display: grid;
+  gap: 0.5em;
+  list-style: none;
+  margin: 0;
+  padding: 0.75em 0.75em;
+  position: absolute;
+  transform: translate(0, 1.5em);
+}
+
+.eg-menuitem {
+  align-items: center;
+  display: grid;
+  gap: 1em;
+  grid-template-areas: "text decorators";
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+
+.eg-text {
+  color: theme.$color-gray-800;
+}
+
+a.eg-text--menuitem,
+.eg-text--menuitem {
+  color: theme.$color-gray-800;
+  text-decoration: none;
+}
+
+.eg-text--link {
+  color: theme.$color-gray-800;
+
+  &:visited {
+    color: theme.$color-gray-800;
+  }
+}

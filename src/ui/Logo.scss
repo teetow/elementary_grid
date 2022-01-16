@@ -16,7 +16,7 @@
 
   align-items: center;
   display: grid;
-  grid-auto-flow: column;
+  grid-auto-flow: row;
   justify-content: start;
 
   path {
@@ -52,7 +52,7 @@ $flicker-on: 1;
 }
 
 .eg-logo__text {
-  height: 1em;
+  height: 0.39em;
 }
 
 .eg-logo__grid {
