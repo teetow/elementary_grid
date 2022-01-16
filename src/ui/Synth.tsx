@@ -7,7 +7,6 @@ import { clamp } from "lib/utils";
 import { useCallback, useState } from "react";
 
 import { Patch } from "../lib/patch";
-import { useSynth } from "../lib/useSynth";
 import { Logo } from "./Logo";
 
 import "./Synth.scss";
@@ -112,21 +111,12 @@ let meterCallback = (source: MeterEvent) => {};
 
 type Props = {
   patch: Patch;
-  scale: number[];
-  bassScale: number[];
   onClear: () => void;
   onSetKick: (useKick: boolean) => void;
   onSetTone: (tone: string) => void;
 };
 
-function Synth({
-  patch,
-  scale,
-  bassScale,
-  onClear,
-  onSetKick,
-  onSetTone,
-}: Props) {
+function Synth({ patch, onClear, onSetKick, onSetTone }: Props) {
   const [meters, setMeters] = useState<Meters>({
     synth: [0, 0],
     bass: [0],
@@ -159,14 +149,6 @@ function Synth({
   );
 
   meterCallback = onMeter;
-  useSynth({
-    scale: scale,
-    bassScale: bassScale,
-    tone: patch.tone,
-    tracks: patch.tracks,
-    bassTracks: patch.bassTracks,
-    withKick: patch.useKick,
-  });
 
   const fancyLayout = window.matchMedia("(min-width: 35em)").matches;
   return (
