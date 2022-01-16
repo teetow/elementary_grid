@@ -1,13 +1,16 @@
 import { ElementaryWebAudioRenderer as core } from "@nick-thompson/elementary";
 import { useCallback, useEffect, useReducer, useState } from "react";
-
-import { getUrlState, Patch, patchReducer, setUrlState } from "./lib/patch";
+import "./App.scss";
+import {
+  getLocalStorage,
+  Patch,
+  patchReducer,
+  setLocalStorage,
+} from "./lib/patch";
 import { initArray, makeScale, range } from "./lib/utils";
 import Grid from "./ui/Grid";
 import Splainer from "./ui/Splainer";
 import Synth from "./ui/Synth";
-
-import "./App.scss";
 
 const numTracks = 16;
 const numSteps = 16;
@@ -38,7 +41,7 @@ const getPatch = () => {
     bassTracks: initTracks(7),
     tone: "stab",
     useKick: false,
-    ...getUrlState(),
+    ...getLocalStorage(),
   } as Patch;
 };
 
@@ -72,7 +75,7 @@ const App = () => {
   );
 
   useEffect(() => {
-    setUrlState(patch);
+    setLocalStorage(patch);
   }, [patch]);
 
   const onTick = useCallback(
@@ -102,23 +105,24 @@ const App = () => {
         onSetTone={(tone) => updatePatch({ type: "setTone", tone })}
       />
       <Grid
+        canTranspose={true}
+        hilightStep={tick}
         notes={patch.tracks}
-        onToggleNote={toggleNote}
         onSetNotes={(notes) => {
           updatePatch({ type: "setTracks", tracks: notes });
         }}
-        hilightStep={tick}
+        onToggleNote={toggleNote}
       />
 
       <Grid
+        canTranspose={true}
+        color="blue"
+        hilightStep={tick}
         notes={patch.bassTracks}
-        onToggleNote={toggleBassNote}
         onSetNotes={(notes) =>
           updatePatch({ type: "setBassTracks", tracks: notes })
         }
-        hilightStep={tick}
-        color="blue"
-        canTranspose={true}
+        onToggleNote={toggleBassNote}
       />
       <Splainer />
     </div>

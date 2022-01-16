@@ -31,6 +31,31 @@ export const patchReducer: Reducer<Patch, Action> = (patch, action) => {
   }
 };
 
+const encodeNote = (note: number, transpose: number) => {
+  const transposeAdjusted = transpose << 16;
+  return note + transposeAdjusted;
+};
+
+const decodeNote = (noteValue: number) => {
+  let transpose = 0;
+  if (noteValue > 1 << 16) {
+    transpose = noteValue >> 16;
+  }
+  return [noteValue, transpose];
+};
+
+const parseBassNote = (s: string, i: number) => {
+  let [noteVal, transpose] = s.split("t").map((val) => Number(val));
+
+  noteVal = 1 << i === noteVal ? 1 : 0;
+
+  if (noteVal === 1 && transpose !== undefined) {
+    return transpose >= 1 ? transpose + 1 : transpose;
+  }
+
+  return noteVal;
+};
+
 export const getUrlState = () => {
   const state: Partial<Patch> = {};
   const p = new window.URLSearchParams(window.location.search);
@@ -42,18 +67,6 @@ export const getUrlState = () => {
         .split(",")
         .map((s) => numberToBits(Number(s)));
     }
-
-    const parseBassNote = (s: string, i: number) => {
-      let [noteVal, transpose] = s.split("t").map((val) => Number(val));
-
-      noteVal = 1 << i === noteVal ? 1 : 0;
-
-      if (noteVal === 1 && transpose !== undefined) {
-        return transpose >= 1 ? transpose + 1 : transpose;
-      }
-
-      return noteVal;
-    };
 
     const bassParams = p.getAll("bassTracks");
     if (bassParams.length > 0) {
@@ -117,4 +130,17 @@ export const setUrlState = (patch: Patch) => {
   out += "&tone=" + patch.tone;
   out += "&bassTracks=" + encodeBassTracks(patch.bassTracks);
   globalThis.history.replaceState(null, "", out);
+};
+
+const keys = {
+  patch: "patch",
+};
+
+export const setLocalStorage = (patch: Patch) => {
+  localStorage.setItem(keys.patch, JSON.stringify(patch));
+};
+
+export const getLocalStorage = <T extends unknown>() => {
+  const storedData = localStorage.getItem(keys.patch);
+  if (storedData) return JSON.parse(storedData) as T;
 };
