@@ -1,17 +1,19 @@
 import { ElementaryWebAudioRenderer as core } from "@nick-thompson/elementary";
 import { useSynth } from "lib/useSynth";
 import { useCallback, useEffect, useReducer, useState } from "react";
-import "./App.scss";
+
 import {
   getLocalStorage,
   Patch,
   patchReducer,
-  setLocalStorage,
+  setLocalStorage
 } from "./lib/patch";
 import { initArray, makeScale, range } from "./lib/utils";
 import Grid from "./ui/Grid";
+import Panel from "./ui/Panel";
 import Splainer from "./ui/Splainer";
-import Synth from "./ui/Synth";
+
+import "./App.scss";
 
 const numTracks = 16;
 const numSteps = 16;
@@ -101,7 +103,7 @@ const App = () => {
 
   return (
     <div className="eg-app">
-      <Synth
+      <Panel
         patch={patch}
         onClear={() => {
           updatePatch({ type: "setTracks", tracks: initTracks() });

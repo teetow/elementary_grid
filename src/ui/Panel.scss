@@ -1,7 +1,9 @@
 @use "sass:color";
 @use "../style/theme";
 
-.eg-synth {
+$cls: ".eg-panel";
+
+#{$cls} {
   align-items: center;
   display: grid;
   gap: 1.5em;
@@ -16,7 +18,7 @@
   }
 }
 
-.eg-synth__meters {
+#{$cls}__meters {
   align-self: stretch;
   display: grid;
   grid-auto-flow: column;
@@ -58,7 +60,7 @@
   transition: transform 33.333333ms ease-out;
 }
 
-.eg-synth__option {
+#{$cls}__option {
   align-items: center;
   display: grid;
   gap: 1em;
@@ -68,7 +70,7 @@
   font-size: 0.85em;
 }
 
-.eg-synth__led {
+#{$cls}__led {
   $base: &;
   display: none;
 
@@ -112,7 +114,7 @@
   }
 }
 
-.eg-synth__switch {
+#{$cls}__switch {
   display: none;
 
   & + label {
