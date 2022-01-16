@@ -1,7 +1,10 @@
 import { Reducer } from "react";
+
 import { bitsToNumber, numberToBits, range } from "./utils";
 
 export type Patch = {
+  scale: number[];
+  bassScale: number[];
   tracks: number[][];
   bassTracks: number[][];
   useKick: boolean;
@@ -9,6 +12,8 @@ export type Patch = {
 };
 
 export type Action =
+  | { type: "setScale"; scale: number[] }
+  | { type: "setBassScale"; scale: number[] }
   | { type: "setTracks"; tracks: number[][] }
   | { type: "setBassTracks"; tracks: number[][] }
   | { type: "setTone"; tone: string }
@@ -16,6 +21,10 @@ export type Action =
 
 export const patchReducer: Reducer<Patch, Action> = (patch, action) => {
   switch (action.type) {
+    case "setScale":
+      return { ...patch, scale: action.scale };
+    case "setBassScale":
+      return { ...patch, scale: action.scale };
     case "setTracks":
       return { ...patch, tracks: action.tracks };
     case "setBassTracks":
@@ -125,6 +134,8 @@ const encodeBassTracks = (tracks: number[][]) => {
 
 export const setUrlState = (patch: Patch) => {
   let out = "?";
+  out += "scale=" + patch.scale;
+  out += "&scale=" + patch.bassScale;
   out += "tracks=" + patch.tracks.map(bitsToNumber);
   out += "&kick=" + (patch.useKick ? 1 : 0);
   out += "&tone=" + patch.tone;

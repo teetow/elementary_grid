@@ -1,4 +1,5 @@
 import { ElementaryWebAudioRenderer as core } from "@nick-thompson/elementary";
+import { useSynth } from "lib/useSynth";
 import { useCallback, useEffect, useReducer, useState } from "react";
 import "./App.scss";
 import {
@@ -14,10 +15,6 @@ import Synth from "./ui/Synth";
 
 const numTracks = 16;
 const numSteps = 16;
-
-const scale = makeScale(["c", "d", "f", "g", "a"], numTracks);
-const bassNotes = ["c", "d", "f", "g", "a", "a#"];
-const bassScale = makeScale(bassNotes, 7, 2);
 
 let metroCallback = (source: string) => {};
 
@@ -37,6 +34,8 @@ const initTracks = (height: number = numTracks) => {
 
 const getPatch = () => {
   return {
+    scale: makeScale(["c", "d", "f", "g", "a"], numTracks),
+    bassScale: makeScale(["c", "d", "f", "g", "a", "a#"], 7, 2),
     tracks: initTracks(),
     bassTracks: initTracks(7),
     tone: "stab",
@@ -50,6 +49,15 @@ const initialPatch = getPatch();
 const App = () => {
   const [patch, updatePatch] = useReducer(patchReducer, initialPatch);
   const [tick, setTick] = useState<number>(0);
+
+  useSynth({
+    scale: patch.scale,
+    bassScale: patch.bassScale,
+    tone: patch.tone,
+    tracks: patch.tracks,
+    bassTracks: patch.bassTracks,
+    withKick: patch.useKick,
+  });
 
   const toggleNote = useCallback(
     (note: number, step: number, value: number) => {
@@ -94,8 +102,6 @@ const App = () => {
   return (
     <div className="eg-app">
       <Synth
-        scale={scale}
-        bassScale={bassScale}
         patch={patch}
         onClear={() => {
           updatePatch({ type: "setTracks", tracks: initTracks() });
