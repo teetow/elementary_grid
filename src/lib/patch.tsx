@@ -132,7 +132,7 @@ const encodeBassTracks = (tracks: number[][]) => {
     .join(",");
 };
 
-export const setUrlState = (patch: Patch) => {
+export const encodeUrlParams = (patch: Patch) => {
   let out = "?";
   out += "scale=" + patch.scale;
   out += "&scale=" + patch.bassScale;
@@ -140,7 +140,11 @@ export const setUrlState = (patch: Patch) => {
   out += "&kick=" + (patch.useKick ? 1 : 0);
   out += "&tone=" + patch.tone;
   out += "&bassTracks=" + encodeBassTracks(patch.bassTracks);
-  globalThis.history.replaceState(null, "", out);
+  return out;
+};
+
+export const setUrlState = (patch: Patch) => {
+  globalThis.history.replaceState(null, "", encodeUrlParams(patch));
 };
 
 const keys = {

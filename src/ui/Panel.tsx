@@ -2,16 +2,85 @@ import {
   ElementaryWebAudioRenderer as core,
   MeterEvent,
 } from "@nick-thompson/elementary";
+import Icons from "assets/icons";
 import classNames from "classnames";
+import useClickAway from "lib/useClickAway";
 import { clamp } from "lib/utils";
-import { useCallback, useState } from "react";
-
-import { Patch } from "../lib/patch";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { encodeUrlParams, Patch } from "../lib/patch";
 import { Logo } from "./Logo";
-
 import "./Panel.scss";
 
 const cls = "eg-panel";
+
+const ShareWidget = ({ patch }: { patch: Patch }) => {
+  const [showMenu, setShowMenu] = useState<boolean>(false);
+  const [showCopyAlert, setShowCopyAlert] = useState<boolean>(false);
+
+  const ref = useRef<HTMLDivElement>(null);
+
+  useClickAway(ref, (e) => {
+    setShowMenu(false);
+    setShowCopyAlert(false);
+  });
+
+  const makeUrl = useCallback(
+    () => "https://teetow.github.io/elementary_grid/" + encodeUrlParams(patch),
+    [patch],
+  );
+
+  const showPop = () => setShowCopyAlert(true);
+  const hidePop = () => setShowCopyAlert(false);
+
+  useEffect(() => {
+    if (!showCopyAlert) {
+      return;
+    }
+    const t = window.setTimeout(hidePop, 800);
+    return () => window.clearTimeout(t);
+  }, [showCopyAlert]);
+
+  const handleCopyClick = useCallback(() => {
+    navigator.clipboard.writeText(makeUrl());
+    showPop();
+  }, [makeUrl]);
+
+  return (
+    <div ref={ref} className="eg-share">
+      <Icons.Share
+        className="eg-share__icon"
+        onClick={() => setShowMenu((prev) => !prev)}
+      />
+      {showMenu && (
+        <ul className="eg-menu eg-share__menu">
+          <li className="eg-menuitem">
+            <a className="eg-text eg-text--link" href={makeUrl()}>
+              Link to this track
+            </a>
+            <Icons.Copy
+              className="eg-share__clipboardicon"
+              onClick={handleCopyClick}
+            />
+            {showCopyAlert && (
+              <div className="eg-share__copyalert">Copied!</div>
+            )}
+          </li>
+          <li className="eg-meniutem">
+            <a
+              className="eg-text eg-text--menuitem twitter-share-button"
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
+                `I just made this with Elementary Grid!\n${makeUrl()}`,
+              )}`}
+              data-size="large"
+            >
+              Tweet track
+            </a>
+          </li>
+        </ul>
+      )}
+    </div>
+  );
+};
 
 const KickSwitch = ({
   active,
@@ -165,6 +234,7 @@ function Panel({ patch, onClear, onSetKick, onSetTone }: Props) {
       </button>
       <TonePicker currentTone={patch.tone as ToneName} onSetTone={onSetTone} />
       <KickSwitch active={patch.useKick} setActive={onSetKick} />
+      <ShareWidget patch={patch} />
       {fancyLayout && (
         <div className={`${cls}__meters`}>
           <Meter id="synth" values={meters.synth} color="yellow" />
