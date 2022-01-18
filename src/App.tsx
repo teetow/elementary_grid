@@ -3,9 +3,11 @@ import { useSynth } from "lib/useSynth";
 import { useCallback, useEffect, useReducer, useState } from "react";
 
 import {
+  clearUrlState,
   encodeTracks,
   encodeUrlParams,
   getLocalStorage,
+  getUrlState,
   Patch,
   patchReducer,
   setLocalStorage,
@@ -36,22 +38,32 @@ const initTracks = (height: number = numTracks) => {
   return initArray(height, numSteps);
 };
 
-const getPatch = () => {
-  return {
+const getInitialPatch = () => {
+  let patchData = {
     scale: makeScale(["c", "d", "f", "g", "a"], numTracks),
     bassScale: makeScale(["c", "d", "f", "g", "a", "a#"], 7, 2),
     tracks: initTracks(),
     bassTracks: initTracks(7),
     tone: "stab",
     useKick: false,
-    ...getLocalStorage(),
   } as Patch;
+
+  const urlPatch = getUrlState();
+  if (urlPatch !== {}) {
+    patchData = { ...patchData, ...(urlPatch as Patch) };
+    clearUrlState();
+  } else {
+    const storedPatch = getLocalStorage<Patch>();
+    if (storedPatch) {
+      patchData = storedPatch;
+    }
+  }
+
+  return patchData;
 };
 
-const initialPatch = getPatch();
-
 const App = () => {
-  const [patch, updatePatch] = useReducer(patchReducer, initialPatch);
+  const [patch, updatePatch] = useReducer(patchReducer, getInitialPatch());
   const [tick, setTick] = useState<number>(0);
 
   useSynth({
@@ -137,12 +149,8 @@ const App = () => {
         onToggleNote={toggleBassNote}
       />
       <Splainer />
-      <pre>
-        {JSON.stringify(
-          encodeTracks(patch.tracks).map((row) => row.join(" ")),
-          null,
-          2,
-        )}
+      <pre style={{ position: "absolute", top: 0, left: 0 }}>
+        {JSON.stringify(encodeTracks(patch.tracks), null, 2)}
       </pre>
     </div>
   );

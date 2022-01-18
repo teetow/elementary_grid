@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Reducer } from "react";
 
 import { bitsToNumber, numberToBits, range } from "./utils";
@@ -54,6 +55,10 @@ const parseBassNote = (s: string, i: number) => {
   }
 
   return noteVal;
+};
+
+export const clearUrlState = () => {
+  window.history.pushState({}, document.title, "");
 };
 
 export const getUrlState = () => {
@@ -117,19 +122,27 @@ const encodeNote = (noteVal: number, index: number) => {
     note = 1 << index;
     if (noteVal !== 1) {
       delta = getDelta(noteVal) << index;
-      delta = delta << 16;
     }
   }
-  return note + delta;
+  return [note, delta];
 };
 
-const encodeTrack = (track: number[], trackIndex: number) => {
+const encodeTrack = (track: number[]) => {
   const numSteps = track.length;
-  return range(numSteps).map((step) => encodeNote(track[step], trackIndex));
+
+  const encodedNote = track.reduce(
+    (acc, noteVal, i) => {
+      const [note, delta] = encodeNote(noteVal, i);
+      return [acc[0] | note, acc[1] | delta];
+    },
+    [0, 0],
+  );
+
+  return `${encodedNote[0]}${encodedNote[1] !== 0 ? "t" + encodedNote[1] : ""}`;
 };
 
 export const encodeTracks = (tracks: number[][]) => {
-  return tracks.map((track, trackIndex) => encodeTrack(track, trackIndex));
+  return tracks.map((track) => encodeTrack(track));
 };
 
 const encodeBassTracks = (tracks: number[][]) => {
@@ -160,12 +173,10 @@ const encodeBassTracks = (tracks: number[][]) => {
 
 export const encodeUrlParams = (patch: Patch) => {
   let out = "?";
-  out += "scale=" + patch.scale;
-  out += "&scale=" + patch.bassScale;
-  out += "tracks=" + encodeTracks(patch.tracks);
   out += "&kick=" + (patch.useKick ? 1 : 0);
   out += "&tone=" + patch.tone;
   out += "&bassTracks=" + encodeBassTracks(patch.bassTracks);
+  out += "&tracks=" + encodeTracks(patch.tracks);
   return out;
 };
 
