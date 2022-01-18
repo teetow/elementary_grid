@@ -9,6 +9,7 @@ export type Patch = {
   bassTracks: number[][];
   useKick: boolean;
   tone: string;
+  mute?: boolean;
 };
 
 export type Action =
@@ -17,7 +18,8 @@ export type Action =
   | { type: "setTracks"; tracks: number[][] }
   | { type: "setBassTracks"; tracks: number[][] }
   | { type: "setTone"; tone: string }
-  | { type: "setUseKick"; useKick: boolean };
+  | { type: "setUseKick"; useKick: boolean }
+  | { type: "setMute"; mute: boolean };
 
 export const patchReducer: Reducer<Patch, Action> = (patch, action) => {
   switch (action.type) {
@@ -33,24 +35,13 @@ export const patchReducer: Reducer<Patch, Action> = (patch, action) => {
       return { ...patch, tone: action.tone };
     case "setUseKick":
       return { ...patch, useKick: action.useKick };
+    case "setMute":
+      return { ...patch, mute: action.mute };
     default:
       throw new Error(
         `Tried to perform ${action}, which is not a valid action`,
       );
   }
-};
-
-const encodeNote = (note: number, transpose: number) => {
-  const transposeAdjusted = transpose << 16;
-  return note + transposeAdjusted;
-};
-
-const decodeNote = (noteValue: number) => {
-  let transpose = 0;
-  if (noteValue > 1 << 16) {
-    transpose = noteValue >> 16;
-  }
-  return [noteValue, transpose];
 };
 
 const parseBassNote = (s: string, i: number) => {
@@ -106,6 +97,41 @@ const getDelta = (val: number) => {
   return val > 1 ? val - 1 : val;
 };
 
+const decodeNote = (noteValue: number) => {
+  let transpose = 0;
+  if (noteValue > 1 << 16) {
+    transpose = noteValue >> 16;
+  }
+  return [noteValue, transpose];
+};
+
+// const encodeNote = (note: number, transpose: number) => {
+//   const transposeAdjusted = transpose << 16;
+//   return note + transposeAdjusted;
+// };
+
+const encodeNote = (noteVal: number, index: number) => {
+  let note = 0;
+  let delta = 0;
+  if (noteVal !== 0) {
+    note = 1 << index;
+    if (noteVal !== 1) {
+      delta = getDelta(noteVal) << index;
+      delta = delta << 16;
+    }
+  }
+  return note + delta;
+};
+
+const encodeTrack = (track: number[], trackIndex: number) => {
+  const numSteps = track.length;
+  return range(numSteps).map((step) => encodeNote(track[step], trackIndex));
+};
+
+export const encodeTracks = (tracks: number[][]) => {
+  return tracks.map((track, trackIndex) => encodeTrack(track, trackIndex));
+};
+
 const encodeBassTracks = (tracks: number[][]) => {
   const numSteps = tracks[0].length;
 
@@ -136,7 +162,7 @@ export const encodeUrlParams = (patch: Patch) => {
   let out = "?";
   out += "scale=" + patch.scale;
   out += "&scale=" + patch.bassScale;
-  out += "tracks=" + patch.tracks.map(bitsToNumber);
+  out += "tracks=" + encodeTracks(patch.tracks);
   out += "&kick=" + (patch.useKick ? 1 : 0);
   out += "&tone=" + patch.tone;
   out += "&bassTracks=" + encodeBassTracks(patch.bassTracks);

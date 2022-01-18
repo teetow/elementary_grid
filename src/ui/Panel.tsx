@@ -82,10 +82,12 @@ const ShareWidget = ({ patch }: { patch: Patch }) => {
   );
 };
 
-const KickSwitch = ({
+const Switch = ({
+  label,
   active,
   setActive,
 }: {
+  label: string;
   active: boolean;
   setActive: (active: boolean) => void;
 }) => {
@@ -94,11 +96,11 @@ const KickSwitch = ({
       <input
         className={`${cls}__switch`}
         type="checkbox"
-        id="kick"
+        id={`${label}`}
         checked={active}
         onChange={() => setActive(!active)}
       />
-      <label htmlFor="kick">Kick</label>
+      <label htmlFor={`${label}`}>{label}</label>
     </div>
   );
 };
@@ -185,9 +187,10 @@ type Props = {
   onClear: () => void;
   onSetKick: (useKick: boolean) => void;
   onSetTone: (tone: string) => void;
+  onSetMute: (mute: boolean) => void;
 };
 
-function Panel({ patch, onClear, onSetKick, onSetTone }: Props) {
+function Panel({ patch, onClear, onSetKick, onSetTone, onSetMute }: Props) {
   const [meters, setMeters] = useState<Meters>({
     synth: [0, 0],
     bass: [0],
@@ -233,7 +236,8 @@ function Panel({ patch, onClear, onSetKick, onSetTone }: Props) {
         Clear
       </button>
       <TonePicker currentTone={patch.tone as ToneName} onSetTone={onSetTone} />
-      <KickSwitch active={patch.useKick} setActive={onSetKick} />
+      <Switch label="Kick" active={patch.useKick} setActive={onSetKick} />
+      <Switch label="Mute" active={patch.mute || false} setActive={onSetMute} />
       <ShareWidget patch={patch} />
       {fancyLayout && (
         <div className={`${cls}__meters`}>
