@@ -1,7 +1,7 @@
 import {
   el,
   ElementaryWebAudioRenderer as core,
-} from "@nick-thompson/elementary";
+} from "@elemaudio/core";
 import { useCallback, useEffect } from "react";
 
 import { bassSynth, drums, master, pingDelay, synth } from "./modules";

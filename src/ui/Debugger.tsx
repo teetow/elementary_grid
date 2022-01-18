@@ -1,8 +1,4 @@
-import {
-  el,
-  ElementaryWebAudioRenderer as core,
-  Node,
-} from "@nick-thompson/elementary";
+import { el, ElementaryWebAudioRenderer as core, Node } from "@elemaudio/core";
 
 import { midiToFrequency, noteToMidi } from "../lib/utils";
 

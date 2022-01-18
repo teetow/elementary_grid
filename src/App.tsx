@@ -1,4 +1,4 @@
-import { ElementaryWebAudioRenderer as core } from "@nick-thompson/elementary";
+import { ElementaryWebAudioRenderer as core } from "@elemaudio/core";
 import { useSynth } from "lib/useSynth";
 import { useCallback, useEffect, useReducer, useState } from "react";
 

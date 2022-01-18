@@ -1,7 +1,7 @@
 import {
   ElementaryWebAudioRenderer as core,
   MeterEvent,
-} from "@nick-thompson/elementary";
+} from "@elemaudio/core";
 import Icons from "assets/icons";
 import classNames from "classnames";
 import useClickAway from "lib/useClickAway";

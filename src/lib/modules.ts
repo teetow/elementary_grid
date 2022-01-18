@@ -1,5 +1,5 @@
-import { el } from "@nick-thompson/elementary";
-import { Node } from "@nick-thompson/elementary/src/core/node";
+import { el } from "@elemaudio/core";
+import { Node } from "@elemaudio/core";
 
 import { bass, ding, kick, stab } from "./tones";
 import { clamp, freqDeltaFromSeq, range, tempoToMs } from "./utils";
