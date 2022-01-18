@@ -1,5 +1,5 @@
-import { Node } from "@nick-thompson/elementary/src/core/node";
-import { el } from "./elementary";
+import { Node } from "@elemaudio/core";
+import { el } from "@elemaudio/core";
 
 export const stab = (
   freq: number,

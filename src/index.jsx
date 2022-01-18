@@ -1,4 +1,4 @@
-import { ElementaryWebAudioRenderer as core } from "@nick-thompson/elementary";
+import { ElementaryWebAudioRenderer as core } from "@elemaudio/core";
 import React from "react";
 import ReactDOM from "react-dom";
 

@@ -1154,6 +1154,11 @@
   resolved "https://registry.yarnpkg.com/@csstools/normalize.css/-/normalize.css-10.1.0.tgz#f0950bba18819512d42f7197e56c518aa491cf18"
   integrity sha512-ij4wRiunFfaJxjB0BdrYHIH8FxBJpOwNPhhAcunlmPdXudL1WQV1qoP9un6JsEBAgQH+7UXyyjh0g7jTxXK6tg==
 
+"@elemaudio/core@^0.11.0":
+  version "0.11.0"
+  resolved "https://www.elementary.audio/api/v1/registry/%40elemaudio%2Fcore/-/elemaudio-core-0.11.0.tgz#undefined"
+  integrity sha512-FX75zldifDPIQRH9AcpOkFj/BF0BlmKI6nul6jWvu2HkgXwq2Nv6PWrYwNKgd4526jlMJKxevpw5+OoANOMVEg==
+
 "@eslint/eslintrc@^0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@eslint/eslintrc/-/eslintrc-0.3.0.tgz#d736d6963d7003b6514e6324bec9c602ac340318"
@@ -1388,11 +1393,6 @@
     "@types/node" "*"
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
-
-"@nick-thompson/elementary@^0.10.4":
-  version "0.10.4"
-  resolved "https://registry.yarnpkg.com/@nick-thompson/elementary/-/elementary-0.10.4.tgz#7a40b3821c0091e7dec2e8cc6de5587aa27e16f3"
-  integrity sha512-Ne5yiWq6bya1rarkdj6Novbq3JWGTe37kZUod7MKhrA5Cupoxo01ALwqE7dX3EzksyD33FOePEkWIKtJeieFOw==
 
 "@nodelib/fs.scandir@2.1.4":
   version "2.1.4"
