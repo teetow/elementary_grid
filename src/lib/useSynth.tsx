@@ -15,6 +15,7 @@ type Props = {
   bpm?: number;
   tone?: string;
   withKick?: boolean;
+  mute?: boolean;
 };
 export const useSynth = ({
   bassScale,
@@ -24,6 +25,7 @@ export const useSynth = ({
   bpm = 120,
   tone = "ding",
   withKick = true,
+  mute = false,
 }: Props) => {
   const doRender = useCallback(() => {
     try {
@@ -70,7 +72,7 @@ export const useSynth = ({
         el.add(right, kickNodes),
       ];
 
-      [left, right] = master(0.55, left, right);
+      [left, right] = master(0.55 * (mute ? 0 : 1), left, right);
 
       left = el.add(
         left,
@@ -86,7 +88,7 @@ export const useSynth = ({
     } catch (e) {
       console.log(e);
     }
-  }, [tracks, tone, scale, bpm, bassTracks, bassScale, withKick]);
+  }, [bpm, tracks, tone, scale, bassTracks, bassScale, withKick, mute]);
 
   useEffect(() => {
     if (core.__renderer) {

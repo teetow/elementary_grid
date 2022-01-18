@@ -3,10 +3,12 @@ import { useSynth } from "lib/useSynth";
 import { useCallback, useEffect, useReducer, useState } from "react";
 
 import {
+  encodeTracks,
+  encodeUrlParams,
   getLocalStorage,
   Patch,
   patchReducer,
-  setLocalStorage
+  setLocalStorage,
 } from "./lib/patch";
 import { initArray, makeScale, range } from "./lib/utils";
 import Grid from "./ui/Grid";
@@ -59,6 +61,7 @@ const App = () => {
     tracks: patch.tracks,
     bassTracks: patch.bassTracks,
     withKick: patch.useKick,
+    mute: patch.mute,
   });
 
   const toggleNote = useCallback(
@@ -111,6 +114,7 @@ const App = () => {
         }}
         onSetKick={(useKick) => updatePatch({ type: "setUseKick", useKick })}
         onSetTone={(tone) => updatePatch({ type: "setTone", tone })}
+        onSetMute={(mute) => updatePatch({ type: "setMute", mute })}
       />
       <Grid
         canTranspose={true}
@@ -133,6 +137,13 @@ const App = () => {
         onToggleNote={toggleBassNote}
       />
       <Splainer />
+      <pre>
+        {JSON.stringify(
+          encodeTracks(patch.tracks).map((row) => row.join(" ")),
+          null,
+          2,
+        )}
+      </pre>
     </div>
   );
 };
