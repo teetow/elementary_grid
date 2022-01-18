@@ -8,7 +8,7 @@ import {
   useState,
   WheelEvent,
 } from "react";
-import { deepCopy, range, shiftArray } from "../lib/utils";
+import { clamp, deepCopy, range, shiftArray } from "../lib/utils";
 
 import "./Grid.scss";
 
@@ -134,27 +134,21 @@ const Field = ({ notes, canTranspose, onToggleNote }: FieldProps) => {
   );
 
   const handleTranspose = useCallback(
-    (note, step, delta) => {
-      const currentValue = notes[note][step];
-      if (currentValue === 1 && delta < 0) {
-        onToggleNote(note, step, -1);
-      } else if (currentValue === -1 && delta > 0) {
-        onToggleNote(note, step, 1);
-      } else if (currentValue === 1 && delta > 0) {
-        onToggleNote(note, step, 2);
-      } else {
-        onToggleNote(note, step, currentValue + delta);
+    (note: number, step: number, delta: number) => {
+      let val = notes[note][step];
+      if (val === 0) {
+        return;
       }
+
+      val += val === -delta ? delta * 2 : delta;
+      val = clamp(val, -2, 3);
+
+      onToggleNote(note, step, val);
     },
     [notes, onToggleNote],
   );
 
-  const getTranspose = (val: number) => {
-    if (val > 0) {
-      return val - 1;
-    }
-    return val;
-  };
+  const getTranspose = (val: number) => (val > 0 ? val - 1 : val);
 
   return (
     <>

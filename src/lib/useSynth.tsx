@@ -72,7 +72,7 @@ export const useSynth = ({
         el.add(right, kickNodes),
       ];
 
-      [left, right] = master(0.55 * (mute ? 0 : 1), left, right);
+      [left, right] = master(0.55 * (mute ? 0.0001 : 1), left, right);
 
       left = el.add(
         left,

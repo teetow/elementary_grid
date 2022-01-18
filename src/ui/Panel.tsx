@@ -25,7 +25,10 @@ const ShareWidget = ({ patch }: { patch: Patch }) => {
   });
 
   const makeUrl = useCallback(
-    () => "https://teetow.github.io/elementary_grid/" + encodeUrlParams(patch),
+    () =>
+      globalThis.location.origin +
+      globalThis.location.pathname +
+      encodeUrlParams(patch),
     [patch],
   );
 
