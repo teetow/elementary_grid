@@ -1,15 +1,6 @@
-import { el } from "@elemaudio/core";
-import { Node } from "@elemaudio/core";
-
-import { bass, ding, kick, stab } from "./tones";
-import { clamp, freqDeltaFromSeq, range, tempoToMs } from "./utils";
-
-const tones: Record<string, Function> = {
-  stab: stab,
-  ding: ding,
-  bass: bass,
-  kick: kick,
-};
+import { el, NativeNode, Node } from "@elemaudio/core";
+import { kick, Tones } from "./tones";
+import { clamp, freqDeltaFromSeq, tempoToMs } from "./utils";
 
 type SynthParams = {
   tracks: number[][];
@@ -19,25 +10,50 @@ type SynthParams = {
   sync: Node;
 };
 export const synth = ({ tracks, tone, scale, tick, sync }: SynthParams) => {
-  const seq = (i: number) =>
-    el.seq(
+  const makeTrigSeq = (track: number[], trackIndex: number) => {
+    const seqProps = {
+      key: `synth:${trackIndex}:trig`,
+      seq: track.map((x) => (x !== 0 ? 1 : 0)),
+      loop: false,
+    };
+    return el.seq(seqProps, tick, sync);
+  };
+
+  const makeFreqSeq = (
+    track: number[],
+    trackIndex: number,
+    trigSeq: NativeNode<"seq">,
+  ) => {
+    const freqs = track
+      .map((trig) =>
+        trig !== 0 ? freqDeltaFromSeq(trig, scale[trackIndex]) : 0,
+      )
+      .filter((x) => x !== 0);
+    return el.seq(
       {
-        key: `synth:${i}:seq`,
-        seq: tracks[i].map((x) => (x !== 0 ? 1 : 0)),
+        key: `synth:${trackIndex}:freq`,
+        seq: freqs,
         loop: false,
+        hold: true,
       },
-      tick,
+      trigSeq,
       sync,
     );
-  const env = (i: number) => el.adsr(0.02, 0.3, 0.1, 0.9, seq(i));
-  const osc = (freq: number, i: number) =>
-    tones[tone](freq, `synth:voice${i}:freq`, { gain: 0.8 });
-  const voice = (i: number) => osc(scale[i], i);
-  const patch = (i: number) => el.mul(env(i), voice(i));
+  };
 
-  const out = range(scale.length).reduce((prev, cur) => {
-    return el.add(prev, patch(cur));
-  }, patch(0)) as Node;
+  const osc = (seq: Node, trigSeq: Node, i: number) =>
+    Tones[tone](seq, trigSeq, `synth:voice${i}:freq`, { gain: 0.7 });
+
+  // const ampEnv = (seq: Node) => el.adsr(0.02, 0.12, 0.3, 0.9, seq);
+
+  let out = tracks.reduce((stack, track, trackIndex) => {
+    const trigSeq = makeTrigSeq(track, trackIndex);
+    const freqSeq = makeFreqSeq(track, trackIndex, trigSeq);
+    // const env = ampEnv(trigSeq);
+
+    return el.add(stack, osc(freqSeq, trigSeq, trackIndex));
+  }, el.const({ value: 0 }));
+
   return out;
 };
 
@@ -84,7 +100,7 @@ export const bassSynth = ({
     sync,
   );
 
-  const osc = tones.bass(pitchSeq, bassSeq, { gain: 0.8 });
+  const osc = Tones.bass(pitchSeq, bassSeq, "bass", { gain: 1.0 });
 
   const out = el.mul(ampEnv, osc);
   return out;
@@ -103,19 +119,19 @@ export const pingDelay = (
   left: Node,
   right: Node,
   bpm = 120,
-  balance = 1.0,
+  balance = 0.8,
 ) => [delay(left, bpm, 2, balance), delay(right, bpm, 3, balance)];
 
-export const drums = (gate: Node) => {
-  return kick(gate, { pop: 1.2 });
+export const drums = (trig: Node) => {
+  return kick(null, trig, "kick", { pop: 1.2 });
 };
 
 export const master = (
   gain: number = 1.0,
   left: Node,
   right: Node,
-  lowcut = 66,
-  lowq = 1.2,
+  lowcut = 70,
+  lowq = 0.9,
 ) => {
   [left, right] = [el.mul(gain, left), el.mul(gain, right)];
   [left, right] = [

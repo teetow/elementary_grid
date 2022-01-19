@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Reducer } from "react";
 
-import { bitsToNumber, numberToBits, range } from "./utils";
+import base64table, { dec3bit, enc3bit } from "./encoding";
+import { range } from "./utils";
 
 export type Patch = {
   scale: number[];
@@ -58,7 +59,8 @@ const parseBassNote = (s: string, i: number) => {
 };
 
 export const clearUrlState = () => {
-  window.history.pushState({}, document.title, "");
+  console.log("clearing");
+  globalThis.history.replaceState(null, "", globalThis.location.pathname);
 };
 
 export const getUrlState = () => {
@@ -68,9 +70,7 @@ export const getUrlState = () => {
   try {
     const tracksParams = p.getAll("tracks");
     if (tracksParams.length > 0) {
-      state.tracks = tracksParams[0]
-        .split(",")
-        .map((s) => numberToBits(Number(s)));
+      state.tracks = tracksParams[0].split(",").map((s) => decodeTrack(s));
     }
 
     const bassParams = p.getAll("bassTracks");
@@ -102,47 +102,43 @@ const getDelta = (val: number) => {
   return val > 1 ? val - 1 : val;
 };
 
-const decodeNote = (noteValue: number) => {
-  let transpose = 0;
-  if (noteValue > 1 << 16) {
-    transpose = noteValue >> 16;
+const decodeTrack = (track: string) => {
+  if (track.length === 0) {
+    return Array(16).fill(0);
   }
-  return [noteValue, transpose];
-};
 
-// const encodeNote = (note: number, transpose: number) => {
-//   const transposeAdjusted = transpose << 16;
-//   return note + transposeAdjusted;
-// };
+  const numSteps = track.length * 2;
+  let decoded = Array(numSteps).fill(0);
 
-const encodeNote = (noteVal: number, index: number) => {
-  let note = 0;
-  let delta = 0;
-  if (noteVal !== 0) {
-    note = 1 << index;
-    if (noteVal !== 1) {
-      delta = getDelta(noteVal) << index;
-    }
-  }
-  return [note, delta];
+  range(track.length).forEach((i) => {
+    let combined = Object.values(base64table).indexOf(track[i]);
+    const lo = combined & 0b000111;
+    const hi = combined >> 3;
+    decoded[i * 2] = dec3bit(lo);
+    decoded[i * 2 + 1] = dec3bit(hi);
+  });
+
+  return decoded;
 };
 
 const encodeTrack = (track: number[]) => {
   const numSteps = track.length;
+  const encoded = range(Math.floor(numSteps / 2)).map((i) => {
+    let lo = track[i * 2];
+    let hi = track[i * 2 + 1];
+    lo = enc3bit(lo);
+    hi = enc3bit(hi);
+    let packed = lo | (hi << 3);
 
-  const encodedNote = track.reduce(
-    (acc, noteVal, i) => {
-      const [note, delta] = encodeNote(noteVal, i);
-      return [acc[0] | note, acc[1] | delta];
-    },
-    [0, 0],
-  );
-
-  return `${encodedNote[0]}${encodedNote[1] !== 0 ? "t" + encodedNote[1] : ""}`;
+    return base64table[packed];
+  });
+  return encoded.join("");
 };
 
 export const encodeTracks = (tracks: number[][]) => {
-  return tracks.map((track) => encodeTrack(track));
+  return tracks
+    .map((track) => encodeTrack(track))
+    .map((row) => (row === "AAAAAAAA" ? "" : row));
 };
 
 const encodeBassTracks = (tracks: number[][]) => {

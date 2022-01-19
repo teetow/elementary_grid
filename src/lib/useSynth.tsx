@@ -1,9 +1,5 @@
-import {
-  el,
-  ElementaryWebAudioRenderer as core,
-} from "@elemaudio/core";
+import { el, ElementaryWebAudioRenderer as core } from "@elemaudio/core";
 import { useCallback, useEffect } from "react";
-
 import { bassSynth, drums, master, pingDelay, synth } from "./modules";
 import { tempoToMs } from "./utils";
 
@@ -42,7 +38,7 @@ export const useSynth = ({
       [left, right] = pingDelay(left, right, bpm);
 
       [left, right] = [left, right].map((c) =>
-        el.mul(el.const({ key: "shaper", value: 0.37 }), c),
+        el.mul(el.const({ key: "shaper", value: 0.47 }), c),
       );
 
       [left, right] = [

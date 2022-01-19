@@ -4,8 +4,6 @@ import { useCallback, useEffect, useReducer, useState } from "react";
 
 import {
   clearUrlState,
-  encodeTracks,
-  encodeUrlParams,
   getLocalStorage,
   getUrlState,
   Patch,
@@ -49,21 +47,23 @@ const getInitialPatch = () => {
   } as Patch;
 
   const urlPatch = getUrlState();
-  if (urlPatch !== {}) {
+  if (urlPatch && Object.keys(urlPatch).length !== 0) {
     patchData = { ...patchData, ...(urlPatch as Patch) };
-    clearUrlState();
   } else {
     const storedPatch = getLocalStorage<Patch>();
     if (storedPatch) {
       patchData = storedPatch;
     }
   }
+  clearUrlState();
 
   return patchData;
 };
 
+const initialPatch = getInitialPatch();
+
 const App = () => {
-  const [patch, updatePatch] = useReducer(patchReducer, getInitialPatch());
+  const [patch, updatePatch] = useReducer(patchReducer, initialPatch);
   const [tick, setTick] = useState<number>(0);
 
   useSynth({
@@ -149,9 +149,6 @@ const App = () => {
         onToggleNote={toggleBassNote}
       />
       <Splainer />
-      <pre style={{ position: "absolute", top: 0, left: 0 }}>
-        {JSON.stringify(encodeTracks(patch.tracks), null, 2)}
-      </pre>
     </div>
   );
 };
