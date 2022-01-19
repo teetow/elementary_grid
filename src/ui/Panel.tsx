@@ -118,6 +118,7 @@ type Tone = {
 const tones = [
   { name: "stab", label: "Stab" },
   { name: "ding", label: "Ding" },
+  { name: "bell", label: "Bell" },
 ] as Array<Tone>;
 
 type TonePickerProps = {

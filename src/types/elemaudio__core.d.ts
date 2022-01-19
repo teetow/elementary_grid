@@ -1,5 +1,5 @@
 declare module "@elemaudio/core" {
-  import { Elementary, Node } from "@nick-thompson/elementary";
+  import { Elementary, Node, NativeNode } from "@nick-thompson/elementary";
   import { el, ElementaryWebAudioRenderer } from "@elemaudio/core";
 
   /*
@@ -24,5 +24,5 @@ declare module "@elemaudio/core" {
     source?: string;
   };
 
-  export { el, Node, ElementaryWebAudioRenderer };
+  export { el, Node, NativeNode, ElementaryWebAudioRenderer };
 }
