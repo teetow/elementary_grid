@@ -237,9 +237,10 @@ const Grid = ({
     return () => savedRef.removeEventListener("wheel", handleWheel);
   }, [handleWheel, ref]);
 
+  const MemoField = Field;
   return (
     <div ref={ref} className={fieldClasses} style={fieldStyle}>
-      <Field
+      <MemoField
         canTranspose={canTranspose}
         notes={notes}
         onToggleNote={onToggleNote}

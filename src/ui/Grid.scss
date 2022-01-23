@@ -112,7 +112,6 @@
     height: 50%;
 
     &--transpose-up {
-      // clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
       background-image: linear-gradient(
         var(--trans-gd-start),
         var(--trans-gd-end)
@@ -122,42 +121,6 @@
 
     &--transpose-dn {
       transform: translate(0, 50%);
-      // clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%);
     }
-
-    // * {
-    //   grid-area: main;
-    //   z-index: 2;
-    // }
-
-    // &:before {
-    //   --arrow-offset: -0.1em;
-    //   --trans-gd-start: var(--color-alert-lo);
-    //   --trans-gd-end: var(--color-alert-hi);
-
-    //   clip-path: polygon(0 0);
-    //   content: "";
-    //   grid-area: main;
-    //   padding-top: 60%;
-    //   width: calc(1 * var(--cellSize));
-    // }
-
-    // &--transpose-up:before {
-    //   background-image: linear-gradient(
-    //     var(--trans-gd-end),
-    //     var(--trans-gd-start)
-    //   );
-    //   clip-path: polygon(50% 0, 100% 100%, 0 100%);
-    //   transform: translate(0, var(--arrow-offset));
-    // }
-
-    // &--transpose-dn:before {
-    //   background-image: linear-gradient(
-    //     var(--trans-gd-end),
-    //     var(--trans-gd-start)
-    //   );
-    //   clip-path: polygon(0 0, 100% 0, 50% 100%);
-    //   transform: translate(0, calc(-1 * var(--arrow-offset)));
-    // }
   }
 }
