@@ -12,7 +12,7 @@ $cls: ".eg-panel";
   justify-self: stretch;
 
   @media all and (max-width: theme.$bp-compact) {
-    grid-template-areas: "clear tone kick";
+    grid-template-areas: "clear share tone kick mute";
     grid-template-columns: auto auto 1fr;
     justify-self: end;
   }

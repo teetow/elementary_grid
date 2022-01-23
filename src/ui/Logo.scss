@@ -8,55 +8,29 @@
   --gd-off-s0: #{color.adjust(theme.$color-gray-200)};
   --gd-off-s1: #{color.adjust(theme.$color-gray-200, $alpha: -0.7)};
 
-  --gd-half-s0: #{color.adjust(theme.$color-brand-400, $alpha: -0.2)};
-  --gd-half-s1: #{color.adjust(theme.$color-brand-400, $alpha: -0.2)};
+  --gd-half-s0: #{color.adjust(theme.$color-brand-400, $alpha: -0.5)};
+  --gd-half-s1: #{color.adjust(theme.$color-brand-400, $alpha: -0.7)};
 
-  --gd-full-s0: #{color.adjust(theme.$color-brand-400)};
-  --gd-full-s1: #{color.adjust(theme.$color-brand-600)};
+  --gd-full-s0: #{color.adjust(theme.$color-brand-600)};
+  --gd-full-s1: #{color.adjust(theme.$color-brand-400)};
 
   align-items: center;
   display: grid;
   grid-auto-flow: row;
   justify-content: start;
+  gap: 3px;
 
   path {
     transform-box: fill-box;
   }
-
-  #off-leds,
-  #half-leds,
-  #full-leds {
-    > path {
-      transform: scale(0.7);
-    }
-  }
-
-  #full-leds {
-    animation: flicker calc(1s / 15) infinite;
-  }
-}
-
-$flicker-off: 0.9;
-$flicker-on: 1;
-
-@keyframes flicker {
-  0% {
-    opacity: $flicker-off;
-  }
-  50% {
-    opacity: $flicker-on;
-  }
-  100% {
-    opacity: $flicker-off;
-  }
 }
 
 .eg-logo__text {
-  height: 0.39em;
+  height: 0.51em;
 }
 
 .eg-logo__grid {
-  height: 1.4em;
+  height: 2.2em;
 }
 
 @media all and (max-width: theme.$bp-compact) {

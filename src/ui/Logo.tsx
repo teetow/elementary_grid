@@ -19,7 +19,7 @@ const LogoTitle = () => {
         <stop offset="1" stopColor="var(--gd-text-s1)" />
       </radialGradient>
 
-      <g id="text">
+      <g id="text" transform="translate(-3 0)">
         <path
           d="M5.28333 7.69336H2.15247V10.332H5.85754V12H0.1427V2.04688H5.84387V3.72168H2.15247V6.07324H5.28333V7.69336Z"
           fill="url(#grad-text)"
@@ -69,163 +69,169 @@ const LogoGrid = () => {
   return (
     <svg
       className="eg-logo__grid"
-      viewBox="86 0 36 14"
-      fill="none"
+      viewBox="0 0 40 18"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <radialGradient
-        id="led-full"
-        gradientUnits="objectBoundingBox"
-        gradientTransform="translate(-0.25 -0.3) scale(1.41421)"
-      >
-        <stop stopColor="var(--gd-full-s0)" />
-        <stop offset="1" stopColor="var(--gd-full-s1)" />
-      </radialGradient>
+      <defs>
+        <radialGradient
+          id="grad-led-full"
+          gradientUnits="objectBoundingBox"
+          gradientTransform="translate(-0.25 -0.3) scale(1.41421)"
+        >
+          <stop stopColor="var(--gd-full-s0)" />
+          <stop offset="1" stopColor="var(--gd-full-s1)" />
+        </radialGradient>
 
-      <radialGradient id="led-half" gradientUnits="objectBoundingBox">
-        <stop stopColor="var(--gd-half-s0)" />
-        <stop offset="1" stopColor="var(--gd-half-s1)" />
-      </radialGradient>
+        <radialGradient id="grad-led-half" gradientUnits="objectBoundingBox">
+          <stop stopColor="var(--gd-half-s0)" />
+          <stop offset="1" stopColor="var(--gd-half-s1)" />
+        </radialGradient>
 
-      <radialGradient id="led-off" gradientUnits="objectBoundingBox">
-        <stop stopColor="var(--gd-off-s0)" />
-        <stop offset="1" stopColor="var(--gd-off-s1)" />
-      </radialGradient>
+        <radialGradient id="grad-led-off" gradientUnits="objectBoundingBox">
+          <stop stopColor="var(--gd-off-s0)" />
+          <stop offset="1" stopColor="var(--gd-off-s1)" />
+        </radialGradient>
+        <path id="led-off" d="M2 0H0V2H2V0Z" fill="url(#grad-led-off)" />
+        <path id="led-half" d="M2 0H0V2H2V0Z" fill="url(#grad-led-half)" />
+        <path id="led-full" d="M2 0H0V2H2V0Z" fill="url(#grad-led-full)" />
+      </defs>
 
       <g id="off-leds">
-        <path d="M88 0H86V2H88V0Z" fill="url(#led-off)" />
-        <path d="M88 10H86V12H88V10Z" fill="url(#led-off)" />
-        <path d="M88 2H86V4H88V2Z" fill="url(#led-off)" />
-        <path d="M88 4H86V6H88V4Z" fill="url(#led-off)" />
-        <path d="M88 6H86V8H88V6Z" fill="url(#led-off)" />
-        <path d="M88 8H86V10H88V8Z" fill="url(#led-off)" />
-        <path d="M90 0H88V2H90V0Z" fill="url(#led-off)" />
-        <path d="M90 12H88V14H90V12Z" fill="url(#led-off)" />
-        <path d="M92 0H90V2H92V0Z" fill="url(#led-off)" />
-        <path d="M92 12H90V14H92V12Z" fill="url(#led-off)" />
-        <path d="M92 4H90V6H92V4Z" fill="url(#led-off)" />
-        <path d="M92 6H90V8H92V6Z" fill="url(#led-off)" />
-        <path d="M92 8H90V10H92V8Z" fill="url(#led-off)" />
-        <path d="M94 0H92V2H94V0Z" fill="url(#led-off)" />
-        <path d="M94 12H92V14H94V12Z" fill="url(#led-off)" />
-        <path d="M94 4H92V6H94V4Z" fill="url(#led-off)" />
-        <path d="M94 8H92V10H94V8Z" fill="url(#led-off)" />
-        <path d="M96 0H94V2H96V0Z" fill="url(#led-off)" />
-        <path d="M96 12H94V14H96V12Z" fill="url(#led-off)" />
-        <path d="M96 4H94V6H96V4Z" fill="url(#led-off)" />
-        <path d="M98 0H96V2H98V0Z" fill="url(#led-off)" />
-        <path d="M98 10H96V12H98V10Z" fill="url(#led-off)" />
-        <path d="M98 12H96V14H98V12Z" fill="url(#led-off)" />
-        <path d="M98 2H96V4H98V2Z" fill="url(#led-off)" />
-        <path d="M98 4H96V6H98V4Z" fill="url(#led-off)" />
-        <path d="M98 6H96V8H98V6Z" fill="url(#led-off)" />
-        <path d="M98 8H96V10H98V8Z" fill="url(#led-off)" />
-        <path d="M100 0H98V2H100V0Z" fill="url(#led-off)" />
-        <path d="M100 12H98V14H100V12Z" fill="url(#led-off)" />
-        <path d="M102 0H100V2H102V0Z" fill="url(#led-off)" />
-        <path d="M102 10H100V12H102V10Z" fill="url(#led-off)" />
-        <path d="M102 12H100V14H102V12Z" fill="url(#led-off)" />
-        <path d="M102 4H100V6H102V4Z" fill="url(#led-off)" />
-        <path d="M102 8H100V10H102V8Z" fill="url(#led-off)" />
-        <path d="M104 0H102V2H104V0Z" fill="url(#led-off)" />
-        <path d="M104 10H102V12H104V10Z" fill="url(#led-off)" />
-        <path d="M104 12H102V14H104V12Z" fill="url(#led-off)" />
-        <path d="M104 4H102V6H104V4Z" fill="url(#led-off)" />
-        <path d="M104 8H102V10H104V8Z" fill="url(#led-off)" />
-        <path d="M106 0H104V2H106V0Z" fill="url(#led-off)" />
-        <path d="M106 12H104V14H106V12Z" fill="url(#led-off)" />
-        <path d="M108 0H106V2H108V0Z" fill="url(#led-off)" />
-        <path d="M108 10H106V12H108V10Z" fill="url(#led-off)" />
-        <path d="M108 12H106V14H108V12Z" fill="url(#led-off)" />
-        <path d="M108 2H106V4H108V2Z" fill="url(#led-off)" />
-        <path d="M108 4H106V6H108V4Z" fill="url(#led-off)" />
-        <path d="M108 6H106V8H108V6Z" fill="url(#led-off)" />
-        <path d="M108 8H106V10H108V8Z" fill="url(#led-off)" />
-        <path d="M110 0H108V2H110V0Z" fill="url(#led-off)" />
-        <path d="M110 12H108V14H110V12Z" fill="url(#led-off)" />
-        <path d="M112 0H110V2H112V0Z" fill="url(#led-off)" />
-        <path d="M112 10H110V12H112V10Z" fill="url(#led-off)" />
-        <path d="M112 12H110V14H112V12Z" fill="url(#led-off)" />
-        <path d="M112 2H110V4H112V2Z" fill="url(#led-off)" />
-        <path d="M112 4H110V6H112V4Z" fill="url(#led-off)" />
-        <path d="M112 6H110V8H112V6Z" fill="url(#led-off)" />
-        <path d="M112 8H110V10H112V8Z" fill="url(#led-off)" />
-        <path d="M114 0H112V2H114V0Z" fill="url(#led-off)" />
-        <path d="M114 12H112V14H114V12Z" fill="url(#led-off)" />
-        <path d="M116 0H114V2H116V0Z" fill="url(#led-off)" />
-        <path d="M116 12H114V14H116V12Z" fill="url(#led-off)" />
-        <path d="M116 4H114V6H116V4Z" fill="url(#led-off)" />
-        <path d="M116 6H114V8H116V6Z" fill="url(#led-off)" />
-        <path d="M116 8H114V10H116V8Z" fill="url(#led-off)" />
-        <path d="M118 0H116V2H118V0Z" fill="url(#led-off)" />
-        <path d="M118 12H116V14H118V12Z" fill="url(#led-off)" />
-        <path d="M118 4H116V6H118V4Z" fill="url(#led-off)" />
-        <path d="M118 6H116V8H118V6Z" fill="url(#led-off)" />
-        <path d="M118 8H116V10H118V8Z" fill="url(#led-off)" />
-        <path d="M120 0H118V2H120V0Z" fill="url(#led-off)" />
-        <path d="M120 12H118V14H120V12Z" fill="url(#led-off)" />
-        <path d="M122 0H120V2H122V0Z" fill="url(#led-off)" />
-        <path d="M122 10H120V12H122V10Z" fill="url(#led-off)" />
-        <path d="M122 12H120V14H122V12Z" fill="url(#led-off)" />
-        <path d="M122 2H120V4H122V2Z" fill="url(#led-off)" />
-        <path d="M122 4H120V6H122V4Z" fill="url(#led-off)" />
-        <path d="M122 6H120V8H122V6Z" fill="url(#led-off)" />
-        <path d="M122 8H120V10H122V8Z" fill="url(#led-off)" />
+        <use href="#led-off" x="0" y="0" />
+        <use href="#led-off" x="0" y="2" />
+        <use href="#led-off" x="0" y="4" />
+        <use href="#led-off" x="0" y="6" />
+        <use href="#led-off" x="0" y="8" />
+        <use href="#led-off" x="0" y="10" />
+        <use href="#led-off" x="0" y="12" />
+        <use href="#led-off" x="2" y="0" />
+        <use href="#led-off" x="2" y="12" />
+        <use href="#led-off" x="4" y="0" />
+        <use href="#led-off" x="4" y="12" />
+        <use href="#led-off" x="4" y="4" />
+        <use href="#led-off" x="4" y="6" />
+        <use href="#led-off" x="4" y="8" />
+        <use href="#led-off" x="6" y="0" />
+        <use href="#led-off" x="6" y="12" />
+        <use href="#led-off" x="6" y="4" />
+        <use href="#led-off" x="6" y="8" />
+        <use href="#led-off" x="8" y="0" />
+        <use href="#led-off" x="8" y="12" />
+        <use href="#led-off" x="8" y="4" />
+        <use href="#led-off" x="10" y="0" />
+        <use href="#led-off" x="10" y="10" />
+        <use href="#led-off" x="10" y="12" />
+        <use href="#led-off" x="10" y="2" />
+        <use href="#led-off" x="10" y="4" />
+        <use href="#led-off" x="10" y="6" />
+        <use href="#led-off" x="10" y="8" />
+        <use href="#led-off" x="12" y="0" />
+        <use href="#led-off" x="12" y="12" />
+        <use href="#led-off" x="14" y="0" />
+        <use href="#led-off" x="14" y="10" />
+        <use href="#led-off" x="14" y="12" />
+        <use href="#led-off" x="14" y="4" />
+        <use href="#led-off" x="14" y="8" />
+        <use href="#led-off" x="16" y="0" />
+        <use href="#led-off" x="16" y="10" />
+        <use href="#led-off" x="16" y="12" />
+        <use href="#led-off" x="16" y="4" />
+        <use href="#led-off" x="16" y="8" />
+        <use href="#led-off" x="18" y="0" />
+        <use href="#led-off" x="18" y="12" />
+        <use href="#led-off" x="20" y="0" />
+        <use href="#led-off" x="20" y="10" />
+        <use href="#led-off" x="20" y="12" />
+        <use href="#led-off" x="20" y="2" />
+        <use href="#led-off" x="20" y="4" />
+        <use href="#led-off" x="20" y="6" />
+        <use href="#led-off" x="20" y="8" />
+        <use href="#led-off" x="22" y="0" />
+        <use href="#led-off" x="22" y="12" />
+        <use href="#led-off" x="24" y="0" />
+        <use href="#led-off" x="24" y="10" />
+        <use href="#led-off" x="24" y="12" />
+        <use href="#led-off" x="24" y="2" />
+        <use href="#led-off" x="24" y="4" />
+        <use href="#led-off" x="24" y="6" />
+        <use href="#led-off" x="24" y="8" />
+        <use href="#led-off" x="26" y="0" />
+        <use href="#led-off" x="26" y="12" />
+        <use href="#led-off" x="28" y="0" />
+        <use href="#led-off" x="28" y="12" />
+        <use href="#led-off" x="28" y="4" />
+        <use href="#led-off" x="28" y="6" />
+        <use href="#led-off" x="28" y="8" />
+        <use href="#led-off" x="30" y="0" />
+        <use href="#led-off" x="30" y="12" />
+        <use href="#led-off" x="30" y="4" />
+        <use href="#led-off" x="30" y="6" />
+        <use href="#led-off" x="30" y="8" />
+        <use href="#led-off" x="32" y="0" />
+        <use href="#led-off" x="32" y="12" />
+        <use href="#led-off" x="34" y="0" />
+        <use href="#led-off" x="34" y="2" />
+        <use href="#led-off" x="34" y="4" />
+        <use href="#led-off" x="34" y="6" />
+        <use href="#led-off" x="34" y="8" />
+        <use href="#led-off" x="34" y="10" />
+        <use href="#led-off" x="34" y="12" />
       </g>
       <g id="half-leds">
-        <path d="M106 2H104V4H106V2Z" fill="url(#led-half)" />
-        <path d="M90 2H88V4H90V2Z" fill="url(#led-half)" />
-        <path d="M90 10H88V12H90V10Z" fill="url(#led-half)" />
-        <path d="M96 10H94V12H96V10Z" fill="url(#led-half)" />
-        <path d="M120 10H118V12H120V10Z" fill="url(#led-half)" />
-        <path d="M120 2H118V4H120V2Z" fill="url(#led-half)" />
-        <path d="M106 6H104V8H106V6Z" fill="url(#led-half)" />
+        <use href="#led-half" x="2" y="2" />
+        <use href="#led-half" x="2" y="10" />
+        <use href="#led-half" x="8" y="10" />
+        <use href="#led-half" x="18" y="2" />
+        <use href="#led-half" x="18" y="6" />
+        <use href="#led-half" x="32" y="2" />
+        <use href="#led-half" x="32" y="10" />
       </g>
       <g id="full-leds">
-        <path d="M92 2H90V4H92V2Z" fill="url(#led-full)" />
-        <path d="M94 2H92V4H94V2Z" fill="url(#led-full)" />
-        <path d="M96 2H94V4H96V2Z" fill="url(#led-full)" />
-        <path d="M100 2H98V4H100V2Z" fill="url(#led-full)" />
-        <path d="M114 2H112V4H114V2Z" fill="url(#led-full)" />
-        <path d="M110 2H108V4H110V2Z" fill="url(#led-full)" />
-        <path d="M102 2H100V4H102V2Z" fill="url(#led-full)" />
-        <path d="M116 2H114V4H116V2Z" fill="url(#led-full)" />
-        <path d="M104 2H102V4H104V2Z" fill="url(#led-full)" />
-        <path d="M118 2H116V4H118V2Z" fill="url(#led-full)" />
-        <path d="M106 4H104V6H106V4Z" fill="url(#led-full)" />
-        <path d="M120 4H118V6H120V4Z" fill="url(#led-full)" />
-        <path d="M102 6H100V8H102V6Z" fill="url(#led-full)" />
-        <path d="M116 10H114V12H116V10Z" fill="url(#led-full)" />
-        <path d="M104 6H102V8H104V6Z" fill="url(#led-full)" />
-        <path d="M118 10H116V12H118V10Z" fill="url(#led-full)" />
-        <path d="M106 8H104V10H106V8Z" fill="url(#led-full)" />
-        <path d="M120 6H118V8H120V6Z" fill="url(#led-full)" />
-        <path d="M106 10H104V12H106V10Z" fill="url(#led-full)" />
-        <path d="M120 8H118V10H120V8Z" fill="url(#led-full)" />
-        <path d="M100 4H98V6H100V4Z" fill="url(#led-full)" />
-        <path d="M114 4H112V6H114V4Z" fill="url(#led-full)" />
-        <path d="M110 4H108V6H110V4Z" fill="url(#led-full)" />
-        <path d="M100 6H98V8H100V6Z" fill="url(#led-full)" />
-        <path d="M114 6H112V8H114V6Z" fill="url(#led-full)" />
-        <path d="M110 6H108V8H110V6Z" fill="url(#led-full)" />
-        <path d="M100 8H98V10H100V8Z" fill="url(#led-full)" />
-        <path d="M114 8H112V10H114V8Z" fill="url(#led-full)" />
-        <path d="M110 8H108V10H110V8Z" fill="url(#led-full)" />
-        <path d="M100 10H98V12H100V10Z" fill="url(#led-full)" />
-        <path d="M114 10H112V12H114V10Z" fill="url(#led-full)" />
-        <path d="M110 10H108V12H110V10Z" fill="url(#led-full)" />
-        <path d="M90 4H88V6H90V4Z" fill="url(#led-full)" />
-        <path d="M90 6H88V8H90V6Z" fill="url(#led-full)" />
-        <path d="M94 6H92V8H94V6Z" fill="url(#led-full)" />
-        <path d="M96 8H94V10H96V8Z" fill="url(#led-full)" />
-        <path d="M96 6H94V8H96V6Z" fill="url(#led-full)" />
-        <path d="M94 10H92V12H94V10Z" fill="url(#led-full)" />
-        <path d="M92 10H90V12H92V10Z" fill="url(#led-full)" />
-        <path d="M90 8H88V10H90V8Z" fill="url(#led-full)" />
+        <use href="#led-full" x="4" y="2" />
+        <use href="#led-full" x="2" y="4" />
+        <use href="#led-full" x="2" y="6" />
+        <use href="#led-full" x="2" y="8" />
+        <use href="#led-full" x="4" y="10" />
+        <use href="#led-full" x="6" y="2" />
+        <use href="#led-full" x="6" y="6" />
+        <use href="#led-full" x="8" y="2" />
+        <use href="#led-full" x="8" y="6" />
+        <use href="#led-full" x="8" y="8" />
+        <use href="#led-full" x="6" y="10" />
+        <use href="#led-full" x="12" y="2" />
+        <use href="#led-full" x="12" y="4" />
+        <use href="#led-full" x="12" y="6" />
+        <use href="#led-full" x="12" y="8" />
+        <use href="#led-full" x="12" y="10" />
+        <use href="#led-full" x="14" y="2" />
+        <use href="#led-full" x="14" y="6" />
+        <use href="#led-full" x="16" y="2" />
+        <use href="#led-full" x="16" y="6" />
+        <use href="#led-full" x="18" y="4" />
+        <use href="#led-full" x="18" y="8" />
+        <use href="#led-full" x="18" y="10" />
+        <use href="#led-full" x="22" y="2" />
+        <use href="#led-full" x="22" y="4" />
+        <use href="#led-full" x="22" y="6" />
+        <use href="#led-full" x="22" y="8" />
+        <use href="#led-full" x="22" y="10" />
+        <use href="#led-full" x="26" y="2" />
+        <use href="#led-full" x="26" y="4" />
+        <use href="#led-full" x="26" y="6" />
+        <use href="#led-full" x="26" y="8" />
+        <use href="#led-full" x="26" y="10" />
+        <use href="#led-full" x="28" y="10" />
+        <use href="#led-full" x="28" y="2" />
+        <use href="#led-full" x="30" y="2" />
+        <use href="#led-full" x="32" y="4" />
+        <use href="#led-full" x="32" y="6" />
+        <use href="#led-full" x="32" y="8" />
+        <use href="#led-full" x="30" y="10" />
       </g>
     </svg>
   );
 };
+
 export const Logo = () => {
   return (
     <div className="eg-logo">
