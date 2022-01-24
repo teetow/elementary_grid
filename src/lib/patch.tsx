@@ -59,7 +59,6 @@ const parseBassNote = (s: string, i: number) => {
 };
 
 export const clearUrlState = () => {
-  console.log("clearing");
   globalThis.history.replaceState(null, "", globalThis.location.pathname);
 };
 

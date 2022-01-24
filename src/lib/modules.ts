@@ -8,8 +8,16 @@ type SynthParams = {
   scale: number[];
   tick: Node;
   sync: Node;
+  gain: number;
 };
-export const synth = ({ tracks, tone, scale, tick, sync }: SynthParams) => {
+export const synth = ({
+  tracks,
+  tone,
+  scale,
+  tick,
+  sync,
+  gain = 1.0,
+}: SynthParams) => {
   const makeTrigSeq = (track: number[], trackIndex: number) => {
     const seqProps = {
       key: `synth:${trackIndex}:trig`,
@@ -42,14 +50,11 @@ export const synth = ({ tracks, tone, scale, tick, sync }: SynthParams) => {
   };
 
   const osc = (seq: Node, trigSeq: Node, i: number) =>
-    Tones[tone](seq, trigSeq, `synth:voice${i}:freq`, { gain: 0.7 });
-
-  // const ampEnv = (seq: Node) => el.adsr(0.02, 0.12, 0.3, 0.9, seq);
+    Tones[tone](seq, trigSeq, `synth:voice${i}:freq`, { gain: 0.5 * gain });
 
   let out = tracks.reduce((stack, track, trackIndex) => {
     const trigSeq = makeTrigSeq(track, trackIndex);
     const freqSeq = makeFreqSeq(track, trackIndex, trigSeq);
-    // const env = ampEnv(trigSeq);
 
     return el.add(stack, osc(freqSeq, trigSeq, trackIndex));
   }, el.const({ value: 0 }));
@@ -100,7 +105,7 @@ export const bassSynth = ({
     sync,
   );
 
-  const osc = Tones.bass(pitchSeq, bassSeq, "bass", { gain: 1.0 });
+  const osc = Tones.bass(pitchSeq, bassSeq, "bass", { gain: 0.6 });
 
   const out = el.mul(ampEnv, osc);
   return out;
@@ -123,22 +128,27 @@ export const pingDelay = (
 ) => [delay(left, bpm, 2, balance), delay(right, bpm, 3, balance)];
 
 export const drums = (trig: Node) => {
-  return kick(null, trig, "kick", { pop: 1.2 });
+  return kick(null, trig, "kick", { gain: 0.8, pop: 1.2 });
 };
 
 export const master = (
   gain: number = 1.0,
   left: Node,
   right: Node,
-  lowcut = 70,
+  lowcut = 40,
   lowq = 0.9,
+  crunch = 0.5,
 ) => {
-  [left, right] = [el.mul(gain, left), el.mul(gain, right)];
+  [left, right] = [el.mul(crunch, left), el.mul(crunch, right)];
+  [left, right] = [el.tanh(left), el.tanh(right)];
+  [left, right] = [el.mul(1 / crunch, left), el.mul(1 / crunch, right)];
+
   [left, right] = [
     el.highpass(lowcut, lowq, left),
     el.highpass(lowcut, lowq, right),
   ];
-  [left, right] = [el.tanh(left), el.tanh(right)];
+
+  [left, right] = [el.mul(gain, left), el.mul(gain, right)];
 
   return [left, right];
 };

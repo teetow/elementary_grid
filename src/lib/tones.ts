@@ -30,11 +30,9 @@ export const stab: Tone & {
     const o = el.phasor(el.mul(osc, detune));
     return el.mul(
       toneGain,
-      el.tanh(
-        el.add(
-          el.sin(el.mul(2 * Math.PI, o)),
-          el.sin(el.mul(3 * Math.PI, o, 1.2 * sharpness)),
-        ),
+      el.add(
+        el.sin(el.mul(2 * Math.PI, o)),
+        el.sin(el.mul(3 * Math.PI, o, 1.2 * sharpness)),
       ),
     );
   };
@@ -57,7 +55,7 @@ export const stab: Tone & {
 
   let env = el.adsr(0.01, 0.3, 0.3, 0.8, trigs);
 
-  return el.mul(out, gain, env);
+  return el.mul(out, 0.66, gain, env);
 };
 stab.desc = "Not quite a supersaw, but certainly a stabby little rascal";
 
@@ -144,15 +142,15 @@ export const bass: Tone = (
     el.mul(0.5 * richness, el.cycle(el.mul(freqs, 2.97))),
   );
   osc = el.add(osc, octaves);
-  osc = el.highpass(el.mul(1, freqs), 8.0, osc);
+  osc = el.highpass(el.mul(1.05, freqs), 7.0, osc);
   osc = el.min(2.0, osc);
 
-  const fltEnv = el.add(1.0, el.mul(5, el.adsr(0.001, 0.3, 0.001, 0.5, trigs)));
-  const fltVal = el.mul(3.0, freqs, fltEnv);
+  const fltEnv = el.add(0.9, el.mul(5, el.adsr(0.001, 0.3, 0.001, 0.5, trigs)));
+  const fltVal = el.mul(4.0, freqs, fltEnv);
   const qEnv = el.add(1.0, el.mul(3.0, el.adsr(0.5, 0.1, 0.001, 0.1, trigs)));
   osc = el.lowpass(fltVal, qEnv, osc);
 
-  osc = el.mul(0.35 * gain, osc);
+  osc = el.mul(0.27 * gain, osc);
 
   return osc;
 };
@@ -162,7 +160,7 @@ export const kick: Tone = (
   freqs: Node,
   trigs: Node,
   id,
-  { freq = 42, speed = 1.0, pop = 1.0, tail = 1.0 },
+  { freq = 42, speed = 1.0, pop = 1.0, tail = 1.0, gain = 1.0 },
 ) => {
   let fastEnv = el.adsr(0.0001, 0.2 * speed, 0.0, 0.0, trigs);
   let slowEnv = el.adsr(0.0001, 0.5, 0.0, 0.0, trigs);
@@ -173,7 +171,7 @@ export const kick: Tone = (
   let out = el.cycle(el.mul(pitchEnv, freq));
 
   let ampEnv = el.adsr(0.03, 0.23 * speed, 0.0, 0.0, trigs);
-  out = el.tanh(el.mul(1.0, ampEnv, out));
+  out = el.mul(ampEnv, out);
 
   let snapEnv = el.adsr(0.001, 0.01, 0.0, 0.0, trigs);
   let snap = el.cycle(el.mul(snapEnv, 3000));
@@ -181,8 +179,9 @@ export const kick: Tone = (
   snap = el.lowpass(el.add(110, el.mul(1200, snapFltEnv)), 1, snap);
   out = el.add(el.mul(0.4, snap), out);
 
-  out = el.highpass(freq + 14, tail * 5.0, out);
-  out = el.tanh(out);
+  out = el.highpass(freq + 14, tail * 6.0, out);
+
+  out = el.mul(gain, out);
 
   return out;
 };
