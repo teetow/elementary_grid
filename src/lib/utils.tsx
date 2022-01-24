@@ -26,6 +26,10 @@ export const tempoToMs = (tempo: number, subDiv = 16) => {
  * @returns an array of frequency values
  */
 
+export const bpmToHz = (tempo: number, subDiv = 16) => {
+  return (tempo / (60 * 4)) * subDiv;
+};
+
 export const makeScale = (
   scale: string[],
   numNotes = scale.length,

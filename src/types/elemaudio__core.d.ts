@@ -16,6 +16,7 @@ declare module "@elemaudio/core" {
   const el: Elementary & {
     metro: (props: { name: string; interval: number }) => Node;
     meter: (props: { name: string }, node: Node) => Node;
+    snapshot: (props: { name: string }, trigger: Node, signal: Node) => Node;
   };
 
   export type MeterEvent = {
