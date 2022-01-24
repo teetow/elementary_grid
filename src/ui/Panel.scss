@@ -28,7 +28,7 @@ $cls: ".eg-panel";
 
 .eg-meter__track {
   width: 1.25em;
-  background-color: theme.$color-gray-200;
+  background-color: color.adjust(theme.$color-gray-200, $alpha: -0.8);
   border-radius: 2px;
   grid-auto-flow: column;
   align-self: stretch;
@@ -52,12 +52,14 @@ $cls: ".eg-panel";
   }
 }
 
+$curve-bounce: cubic-bezier(0.57, 1.87, 0.34, -0.05);
+
 .eg-meter__value {
-  background-image: linear-gradient(to top, transparent, var(--meter-color));
+  background-image: linear-gradient(to top, var(--meter-color), transparent);
   transform-origin: 50% 100%;
   align-self: stretch;
   will-change: transform;
-  transition: transform 33.333333ms ease-out;
+  transition: transform calc(1000 / 3.75 * 1ms) $curve-bounce;
 }
 
 #{$cls}__option {

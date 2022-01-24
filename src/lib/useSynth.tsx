@@ -61,7 +61,10 @@ export const useSynth = ({
 
       signal = el.add(signal, el.mul(0, patternSignal));
 
-      signal = el.add(signal, synth({ tracks, tone, scale, tick, sync }));
+      signal = el.add(
+        signal,
+        synth({ tracks, tone, scale, tick, sync, gain: 0.7 }),
+      );
 
       let [left, right] = [signal, signal]; // make stereo
 
@@ -90,7 +93,7 @@ export const useSynth = ({
 
       // kick
       let kickNodes = el.mul(
-        el.const({ key: "withKick", value: withKick ? 1 : 0 }),
+        el.const({ key: "withKick", value: withKick ? 1.0 : 0 }),
         drums(beat),
       );
       [left, right] = [
@@ -98,7 +101,7 @@ export const useSynth = ({
         el.add(right, kickNodes),
       ];
 
-      [left, right] = master(0.55 * (mute ? 0.0001 : 1), left, right);
+      [left, right] = master(0.85 * (mute ? 0.0001 : 1), left, right);
 
       left = el.add(
         left,

@@ -165,7 +165,7 @@ const Meter = ({ id, values, color = "yellow" }: MeterProps) => (
       <div
         key={`meter:${id}:${i}`}
         className="eg-meter__value"
-        style={{ transform: `scale(1, ${clamp(Math.abs(val)) * 100}%)` }}
+        style={{ transform: `scale(1, ${clamp(Math.sqrt(val)) * 100}%)` }}
       ></div>
     ))}
   </div>
@@ -201,20 +201,32 @@ function Panel({ patch, onClear, onSetKick, onSetTone, onSetMute }: Props) {
     kick: [0],
     master: [0, 0],
   });
+  const meterTimers = useRef<Record<string, number>>({});
+  const meterRate = 1000 / 15;
 
   const onMeter = useCallback(
     (e: MeterEvent) => {
+      const sourceChannel = e.source || "dummy";
+
+      if (
+        meterTimers.current &&
+        meterTimers.current[sourceChannel] &&
+        Date.now() - meterTimers.current[sourceChannel] < meterRate
+      ) {
+        return;
+      }
+
       if (e.source === "synth:left") {
-        setMeters((prev) => ({ ...prev, synth: [e.max, prev.synth[1]] }));
+        setMeters((prev) => ({ ...prev, synth: [e.max * 8, prev.synth[1]] }));
       }
       if (e.source === "synth:right") {
-        setMeters((prev) => ({ ...prev, synth: [prev.synth[0], e.max] }));
+        setMeters((prev) => ({ ...prev, synth: [prev.synth[0], e.max * 8] }));
       }
       if (e.source === "bass") {
-        setMeters((prev) => ({ ...prev, bass: [e.max] }));
+        setMeters((prev) => ({ ...prev, bass: [e.max * 4] }));
       }
       if (e.source === "kick") {
-        setMeters((prev) => ({ ...prev, kick: [e.max] }));
+        setMeters((prev) => ({ ...prev, kick: [e.max * 4] }));
       }
       if (e.source === "master:left") {
         setMeters((prev) => ({ ...prev, master: [e.max, prev.master[1]] }));
@@ -222,8 +234,9 @@ function Panel({ patch, onClear, onSetKick, onSetTone, onSetMute }: Props) {
       if (e.source === "master:right") {
         setMeters((prev) => ({ ...prev, master: [prev.master[0], e.max] }));
       }
+      meterTimers.current[sourceChannel] = Date.now();
     },
-    [setMeters],
+    [meterRate],
   );
 
   meterCallback = onMeter;
