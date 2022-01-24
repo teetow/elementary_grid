@@ -20,13 +20,7 @@ import "./App.scss";
 const numTracks = 16;
 const numSteps = 16;
 
-let metroCallback = (source: string) => {};
-
 core.on("load", () => {
-  core.on("metro", (e: { source: string }) => {
-    metroCallback(e.source);
-  });
-
   core.on("error", (e: unknown) => {
     console.log(e);
   });
@@ -66,6 +60,10 @@ const App = () => {
   const [patch, updatePatch] = useReducer(patchReducer, initialPatch);
   const [tick, setTick] = useState<number>(0);
 
+  const handlePatternPos = (patternPos: number) => {
+    setTick(patternPos);
+  };
+
   useSynth({
     scale: patch.scale,
     bassScale: patch.bassScale,
@@ -74,6 +72,7 @@ const App = () => {
     bassTracks: patch.bassTracks,
     withKick: patch.useKick,
     mute: patch.mute,
+    onPatternPos: handlePatternPos,
   });
 
   const toggleNote = useCallback(
@@ -102,19 +101,6 @@ const App = () => {
   useEffect(() => {
     setLocalStorage(patch);
   }, [patch]);
-
-  const onTick = useCallback(
-    (source: string) => {
-      if (source === "sync") {
-        setTick(0);
-      } else if (source === "tick") {
-        setTick((prev) => (prev + 1) % patch.tracks.length);
-      }
-    },
-    [patch.tracks.length],
-  );
-
-  metroCallback = onTick;
 
   return (
     <div className="eg-app">

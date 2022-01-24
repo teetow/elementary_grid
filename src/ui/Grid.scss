@@ -42,11 +42,22 @@
 }
 
 .eg-grid__cursor {
-  background-color: var(--color-glow);
-  grid-column: calc(var(--cursor) + 1);
+  grid-column: 1;
   grid-row: 1 / span var(--rows);
-  width: var(--cellSize);
   pointer-events: none;
+  position: relative;
+  width: var(--cellSize);
+
+  &:after {
+    content: "";
+    background-color: var(--color-glow);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transform: translate(calc(100% * var(--cursor)), 0);
+  }
 }
 
 .eg-key {

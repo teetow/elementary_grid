@@ -1,7 +1,7 @@
 import { el, ElementaryWebAudioRenderer as core } from "@elemaudio/core";
 import { useCallback, useEffect } from "react";
 import { bassSynth, drums, master, pingDelay, synth } from "./modules";
-import { tempoToMs } from "./utils";
+import { bpmToHz, tempoToMs } from "./utils";
 
 type Props = {
   bassScale: number[];
@@ -12,7 +12,9 @@ type Props = {
   tone?: string;
   withKick?: boolean;
   mute?: boolean;
+  onPatternPos?: (tick: number) => void;
 };
+
 export const useSynth = ({
   bassScale,
   bassTracks,
@@ -22,16 +24,44 @@ export const useSynth = ({
   tone = "ding",
   withKick = true,
   mute = false,
+  onPatternPos,
 }: Props) => {
+  const handleSnapshot = useCallback(
+    (e: { source: string; data: number }) => {
+      if (e.source === "patternPos") {
+        onPatternPos?.(Math.floor(tracks[0].length * e.data));
+      }
+    },
+    [onPatternPos, tracks],
+  );
+
+  useEffect(() => {
+    core.on("snapshot", handleSnapshot);
+    return () => core.off("snapshot", handleSnapshot);
+  }, [handleSnapshot]);
+
   const doRender = useCallback(() => {
     try {
-      let signal = el.const({ value: 0 });
-
       let tick = el.metro({ name: "tick", interval: tempoToMs(bpm, 16) });
       let beat = el.seq({ seq: [1, 1, 0, 0], hold: true }, tick);
       let sync = el.seq({ seq: [1, ...Array(15).fill(0)], hold: true }, tick);
 
-      signal = synth({ tracks, tone, scale, tick, sync });
+      let signal = el.const({ value: 0 });
+      let patternTrain = el.phasor(bpmToHz(bpm, 1));
+
+      let patternCycle = el.seq(
+        { seq: [...Array(16).fill(1)], hold: false, loop: true },
+        tick,
+      );
+      let patternSignal = el.snapshot(
+        { name: "patternPos" },
+        patternCycle,
+        patternTrain,
+      );
+
+      signal = el.add(signal, el.mul(0, patternSignal));
+
+      signal = el.add(signal, synth({ tracks, tone, scale, tick, sync }));
 
       let [left, right] = [signal, signal]; // make stereo
 
