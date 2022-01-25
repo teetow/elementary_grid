@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/elementary_grid/static/css/main.48abdf33.css",
-    "main.js": "/elementary_grid/static/js/main.68666902.js",
+    "main.js": "/elementary_grid/static/js/main.72d93af0.js",
     "index.html": "/elementary_grid/index.html",
     "main.48abdf33.css.map": "/elementary_grid/static/css/main.48abdf33.css.map",
-    "main.68666902.js.map": "/elementary_grid/static/js/main.68666902.js.map"
+    "main.72d93af0.js.map": "/elementary_grid/static/js/main.72d93af0.js.map"
   },
   "entrypoints": [
     "static/css/main.48abdf33.css",
-    "static/js/main.68666902.js"
+    "static/js/main.72d93af0.js"
   ]
 }
