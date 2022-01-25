@@ -7,7 +7,7 @@ $cls: ".eg-panel";
   align-items: center;
   display: grid;
   gap: 1.5em;
-  grid-template-areas: "logo clear share tone kick mute meters";
+  grid-template-areas: "logo clear share tone kick mute";
   grid-template-columns: 1fr auto auto auto auto;
   justify-self: stretch;
 
@@ -18,12 +18,20 @@ $cls: ".eg-panel";
   }
 }
 
+#{$cls}__logo {
+  display: grid;
+  place-self: stretch;
+}
+
 #{$cls}__meters {
   align-self: stretch;
   display: grid;
   grid-auto-flow: column;
+  justify-self: start;
   gap: 2px;
-  grid-template-areas: "synth bass kick";
+  grid-template-areas: "synth bass kick master";
+  border-radius: 2px;
+  overflow: hidden;
 }
 
 .eg-meter__track {
@@ -59,7 +67,6 @@ $curve-bounce: cubic-bezier(0.57, 1.87, 0.34, -0.05);
   transform-origin: 50% 100%;
   align-self: stretch;
   will-change: transform;
-  transition: transform calc(1000 / 3.75 * 1ms) $curve-bounce;
 }
 
 #{$cls}__option {

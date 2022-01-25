@@ -1,13 +1,19 @@
 import classnames from "classnames";
+import PlaybackContext from "lib/PlaybackContext";
+import useAnimationFrame from "lib/useAnimationFrame";
 import {
   CSSProperties,
+  FunctionComponent,
   memo,
+  PropsWithChildren,
   useCallback,
+  useContext,
   useEffect,
   useRef,
   useState,
   WheelEvent,
 } from "react";
+
 import { clamp, deepCopy, range, shiftArray } from "../lib/utils";
 
 import "./Grid.scss";
@@ -176,23 +182,35 @@ const Field = ({ notes, canTranspose, onToggleNote }: FieldProps) => {
 
 type PaintMode = "none" | "fill" | "clear";
 
-type Props = {
+export const Playhead = () => {
+  const ctx = useContext(PlaybackContext);
+
+  useAnimationFrame(60 / (ctx.bpm / 4), "playhead");
+
+  const cursorStyle = {
+    "--cursor": ctx.playheadPos,
+  } as CSSProperties;
+
+  return <div className="eg-grid__cursor" style={cursorStyle} />;
+};
+
+type Props = PropsWithChildren<{
   notes: number[][];
   color?: "yellow" | "blue";
   hilightStep?: number;
   canTranspose?: boolean;
   onToggleNote: (note: number, step: number, mode: number) => void;
   onSetNotes: (notes: number[][]) => void;
-};
+}>;
 
-const Grid = ({
+const Grid: FunctionComponent<Props> = ({
+  children,
   notes,
   color = "yellow",
-  hilightStep,
   canTranspose,
   onToggleNote,
   onSetNotes,
-}: Props) => {
+}) => {
   const ref = useRef<HTMLDivElement>(null);
 
   const fieldClasses = classnames({
@@ -203,10 +221,6 @@ const Grid = ({
   const fieldStyle = {
     "--columns": notes[0].length,
     "--rows": notes.length,
-  } as CSSProperties;
-
-  const cursorStyle = {
-    "--cursor": hilightStep,
   } as CSSProperties;
 
   const handleWheel = useCallback(
@@ -237,7 +251,7 @@ const Grid = ({
     return () => savedRef.removeEventListener("wheel", handleWheel);
   }, [handleWheel, ref]);
 
-  const MemoField = Field;
+  const MemoField = memo(Field);
   return (
     <div ref={ref} className={fieldClasses} style={fieldStyle}>
       <MemoField
@@ -245,7 +259,8 @@ const Grid = ({
         notes={notes}
         onToggleNote={onToggleNote}
       />
-      <div className="eg-grid__cursor" style={cursorStyle} />
+      <Playhead />
+      {children}
     </div>
   );
 };

@@ -1,3 +1,4 @@
+import { memo } from "react";
 import "./Logo.scss";
 
 const LogoTitle = () => {
@@ -232,11 +233,11 @@ const LogoGrid = () => {
   );
 };
 
-export const Logo = () => {
+export const Logo = memo(() => {
   return (
     <div className="eg-logo">
       <LogoTitle />
       <LogoGrid />
     </div>
   );
-};
+});

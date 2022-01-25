@@ -1,6 +1,11 @@
-import { el, ElementaryWebAudioRenderer as core } from "@elemaudio/core";
-import { useCallback, useEffect } from "react";
+import {
+  el,
+  ElementaryWebAudioRenderer as core,
+  MeterEvent,
+} from "@elemaudio/core";
+import { useCallback, useContext, useEffect } from "react";
 import { bassSynth, drums, master, pingDelay, synth } from "./modules";
+import PlaybackContext from "./PlaybackContext";
 import { bpmToHz, tempoToMs } from "./utils";
 
 type Props = {
@@ -12,33 +17,47 @@ type Props = {
   tone?: string;
   withKick?: boolean;
   mute?: boolean;
-  onPatternPos?: (tick: number) => void;
 };
+
+let meterCallback = (e: MeterEvent) => {};
+
+core.on("load", () => {
+  core.on("meter", (e: MeterEvent) => {
+    meterCallback(e);
+  });
+});
 
 export const useSynth = ({
   bassScale,
   bassTracks,
   scale,
   tracks,
-  bpm = 120,
   tone = "ding",
   withKick = true,
   mute = false,
-  onPatternPos,
 }: Props) => {
+  const playheadCtx = useContext(PlaybackContext);
+  const bpm = playheadCtx.bpm;
+
   const handleSnapshot = useCallback(
     (e: { source: string; data: number }) => {
       if (e.source === "patternPos") {
-        onPatternPos?.(Math.floor(tracks[0].length * e.data));
+        playheadCtx.playheadPos = Math.floor(tracks[0].length * e.data);
       }
     },
-    [onPatternPos, tracks],
+    [playheadCtx, tracks],
   );
 
   useEffect(() => {
     core.on("snapshot", handleSnapshot);
     return () => core.off("snapshot", handleSnapshot);
   }, [handleSnapshot]);
+
+  meterCallback = (e) => {
+    if (e.source) {
+      playheadCtx.meters[e.source] = e.max;
+    }
+  };
 
   const doRender = useCallback(() => {
     try {

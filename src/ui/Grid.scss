@@ -12,8 +12,6 @@
   --brColor: #{color.adjust(theme.$color-gray-100, $alpha: -0.5)};
   --columns: 16;
   --rows: 7;
-  border: 1px solid var(--brColor);
-  border-width: 0 0 1px 1px;
   display: grid;
   grid-auto-flow: column;
   grid-template-columns: repeat(var(--columns), 1fr);
@@ -63,6 +61,7 @@
 .eg-key {
   --button-gradient: radial-gradient(#8881, #0000);
   --color-face: var(--color-off);
+  aspect-ratio: 1;
   background-color: var(--color-face);
   background-image: var(--button-gradient);
   border: 1px solid var(--brColor);
@@ -78,12 +77,6 @@
   transition: background-color 100ms, color 100ms;
   user-select: none;
   width: var(--cellSize);
-
-  &:before {
-    content: "";
-    grid-area: main;
-    padding-top: 100%;
-  }
 
   & > * {
     grid-area: main;

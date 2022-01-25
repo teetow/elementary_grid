@@ -1,14 +1,21 @@
 import {
-  ElementaryWebAudioRenderer as core,
-  MeterEvent,
-} from "@elemaudio/core";
-import Icons from "assets/icons";
+  MouseEventHandler,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import classNames from "classnames";
+
+import Icons from "assets/icons";
+import PlaybackContext from "lib/PlaybackContext";
+import useAnimationFrame from "lib/useAnimationFrame";
 import useClickAway from "lib/useClickAway";
 import { clamp } from "lib/utils";
-import { useCallback, useEffect, useRef, useState } from "react";
 import { encodeUrlParams, Patch } from "../lib/patch";
 import { Logo } from "./Logo";
+
 import "./Panel.scss";
 
 const cls = "eg-panel";
@@ -149,42 +156,34 @@ const TonePicker = ({ currentTone, onSetTone }: TonePickerProps) => {
 };
 
 type MeterProps = {
-  id: string;
-  values: number[];
+  ids: string[];
   color?: "yellow" | "blue" | "orange" | "green";
 };
 
-const Meter = ({ id, values, color = "yellow" }: MeterProps) => (
-  <div
-    className={classNames([
-      "eg-meter__track",
-      `eg-meter__track--color-${color}`,
-    ])}
-  >
-    {values.map((val, i) => (
-      <div
-        key={`meter:${id}:${i}`}
-        className="eg-meter__value"
-        style={{ transform: `scale(1, ${clamp(Math.sqrt(val)) * 100}%)` }}
-      ></div>
-    ))}
-  </div>
-);
+const Meter = ({ ids, color = "yellow" }: MeterProps) => {
+  const ctx = useContext(PlaybackContext);
 
-type Meters = {
-  synth: [number, number];
-  bass: [number];
-  kick: [number];
-  master: [number, number];
+  useAnimationFrame(1000 / 60, "meter");
+
+  return (
+    <div
+      className={classNames([
+        "eg-meter__track",
+        `eg-meter__track--color-${color}`,
+      ])}
+    >
+      {ids.map((id, i) => (
+        <div
+          key={`meter:${id}:${i}`}
+          className="eg-meter__value"
+          style={{
+            transform: `scale(1, ${clamp(Math.sqrt(ctx.meters[id])) * 100}%)`,
+          }}
+        ></div>
+      ))}
+    </div>
+  );
 };
-
-core.on("load", () => {
-  core.on("meter", (e: MeterEvent) => {
-    meterCallback(e);
-  });
-});
-
-let meterCallback = (source: MeterEvent) => {};
 
 type Props = {
   patch: Patch;
@@ -194,57 +193,46 @@ type Props = {
   onSetMute: (mute: boolean) => void;
 };
 
+const getUseFancyLayout = () => window.matchMedia("(min-width: 55em)").matches;
+
 function Panel({ patch, onClear, onSetKick, onSetTone, onSetMute }: Props) {
-  const [meters, setMeters] = useState<Meters>({
-    synth: [0, 0],
-    bass: [0],
-    kick: [0],
-    master: [0, 0],
-  });
-  const meterTimers = useRef<Record<string, number>>({});
-  const meterRate = 1000 / 15;
+  const [fancyLayout, setFancyLayout] = useState<boolean>(getUseFancyLayout());
+  const [showMeters, setShowMeters] = useState<boolean>(false);
+  const ref = useRef<HTMLDivElement>(null);
 
-  const onMeter = useCallback(
-    (e: MeterEvent) => {
-      const sourceChannel = e.source || "dummy";
+  const handleResize = () => {
+    setFancyLayout(getUseFancyLayout);
+  };
 
-      if (
-        meterTimers.current &&
-        meterTimers.current[sourceChannel] &&
-        Date.now() - meterTimers.current[sourceChannel] < meterRate
-      ) {
-        return;
-      }
+  const handleLogoClick: MouseEventHandler = (ev) => {
+    setShowMeters((prev) => !prev);
+  };
 
-      if (e.source === "synth:left") {
-        setMeters((prev) => ({ ...prev, synth: [e.max * 8, prev.synth[1]] }));
-      }
-      if (e.source === "synth:right") {
-        setMeters((prev) => ({ ...prev, synth: [prev.synth[0], e.max * 8] }));
-      }
-      if (e.source === "bass") {
-        setMeters((prev) => ({ ...prev, bass: [e.max * 4] }));
-      }
-      if (e.source === "kick") {
-        setMeters((prev) => ({ ...prev, kick: [e.max * 4] }));
-      }
-      if (e.source === "master:left") {
-        setMeters((prev) => ({ ...prev, master: [e.max, prev.master[1]] }));
-      }
-      if (e.source === "master:right") {
-        setMeters((prev) => ({ ...prev, master: [prev.master[0], e.max] }));
-      }
-      meterTimers.current[sourceChannel] = Date.now();
-    },
-    [meterRate],
-  );
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-  meterCallback = onMeter;
-
-  const fancyLayout = window.matchMedia("(min-width: 35em)").matches;
   return (
-    <div className={`${cls}`}>
-      {fancyLayout && <Logo />}
+    <div ref={ref} className={`${cls}`}>
+      {fancyLayout && (
+        <div
+          className={`${cls}__logo`}
+          onClick={handleLogoClick}
+        >
+          {showMeters ? (
+            <div className={`${cls}__meters`}>
+              <Meter ids={["synth:left", "synth:right"]} color="yellow" />
+              <Meter ids={["bass"]} color="blue" />
+              <Meter ids={["kick"]} color="orange" />
+              <Meter ids={["master:left", "master:right"]} color="green" />
+            </div>
+          ) : (
+            <Logo />
+          )}
+        </div>
+      )}
+
       <button
         type="button"
         className={`eg-button ${cls}__clearbutton`}
@@ -252,18 +240,14 @@ function Panel({ patch, onClear, onSetKick, onSetTone, onSetMute }: Props) {
       >
         Clear
       </button>
+
       <TonePicker currentTone={patch.tone as ToneName} onSetTone={onSetTone} />
+
       <Switch label="Kick" active={patch.useKick} setActive={onSetKick} />
+
       <Switch label="Mute" active={patch.mute || false} setActive={onSetMute} />
+
       <ShareWidget patch={patch} />
-      {fancyLayout && (
-        <div className={`${cls}__meters`}>
-          <Meter id="synth" values={meters.synth} color="yellow" />
-          <Meter id="bass" values={meters.bass} color="blue" />
-          <Meter id="kick" values={meters.kick} color="orange" />
-          <Meter id="master" values={meters.master} color="green" />
-        </div>
-      )}
     </div>
   );
 }

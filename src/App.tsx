@@ -1,7 +1,6 @@
 import { ElementaryWebAudioRenderer as core } from "@elemaudio/core";
 import { useSynth } from "lib/useSynth";
-import { useCallback, useEffect, useReducer, useState } from "react";
-
+import { useCallback, useEffect, useReducer } from "react";
 import {
   clearUrlState,
   getLocalStorage,
@@ -10,6 +9,7 @@ import {
   patchReducer,
   setLocalStorage,
 } from "./lib/patch";
+
 import { initArray, makeScale, range } from "./lib/utils";
 import Grid from "./ui/Grid";
 import Panel from "./ui/Panel";
@@ -58,11 +58,6 @@ const initialPatch = getInitialPatch();
 
 const App = () => {
   const [patch, updatePatch] = useReducer(patchReducer, initialPatch);
-  const [tick, setTick] = useState<number>(0);
-
-  const handlePatternPos = (patternPos: number) => {
-    setTick(patternPos);
-  };
 
   useSynth({
     scale: patch.scale,
@@ -72,7 +67,6 @@ const App = () => {
     bassTracks: patch.bassTracks,
     withKick: patch.useKick,
     mute: patch.mute,
-    onPatternPos: handlePatternPos,
   });
 
   const toggleNote = useCallback(
@@ -106,32 +100,40 @@ const App = () => {
     <div className="eg-app">
       <Panel
         patch={patch}
-        onClear={() => {
+        onClear={useCallback(() => {
           updatePatch({ type: "setTracks", tracks: initTracks() });
           updatePatch({ type: "setBassTracks", tracks: initTracks(7) });
-        }}
-        onSetKick={(useKick) => updatePatch({ type: "setUseKick", useKick })}
-        onSetTone={(tone) => updatePatch({ type: "setTone", tone })}
-        onSetMute={(mute) => updatePatch({ type: "setMute", mute })}
+        }, [])}
+        onSetKick={useCallback(
+          (useKick) => updatePatch({ type: "setUseKick", useKick }),
+          [],
+        )}
+        onSetTone={useCallback(
+          (tone) => updatePatch({ type: "setTone", tone }),
+          [],
+        )}
+        onSetMute={useCallback(
+          (mute) => updatePatch({ type: "setMute", mute }),
+          [],
+        )}
       />
       <Grid
         canTranspose={true}
-        hilightStep={tick}
         notes={patch.tracks}
-        onSetNotes={(notes) => {
+        onSetNotes={useCallback((notes) => {
           updatePatch({ type: "setTracks", tracks: notes });
-        }}
+        }, [])}
         onToggleNote={toggleNote}
-      />
+      ></Grid>
 
       <Grid
         canTranspose={true}
         color="blue"
-        hilightStep={tick}
         notes={patch.bassTracks}
-        onSetNotes={(notes) =>
-          updatePatch({ type: "setBassTracks", tracks: notes })
-        }
+        onSetNotes={useCallback(
+          (notes) => updatePatch({ type: "setBassTracks", tracks: notes }),
+          [],
+        )}
         onToggleNote={toggleBassNote}
       />
       <Splainer />
