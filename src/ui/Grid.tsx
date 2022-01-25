@@ -128,6 +128,7 @@ const Field = ({ notes, canTranspose, onToggleNote }: FieldProps) => {
 
   const handlePaint = useCallback(
     (note: number, step: number) => {
+      console.log(paintMode);
       if (paintMode === "fill" && notes[note][step] === 0) {
         onToggleNote(note, step, 1);
       }
@@ -185,7 +186,7 @@ type PaintMode = "none" | "fill" | "clear";
 export const Playhead = () => {
   const ctx = useContext(PlaybackContext);
 
-  useAnimationFrame(60 / (ctx.bpm / 4), "playhead");
+  useAnimationFrame(1000 / 60, "playhead");
 
   const cursorStyle = {
     "--cursor": ctx.playheadPos,
@@ -251,10 +252,9 @@ const Grid: FunctionComponent<Props> = ({
     return () => savedRef.removeEventListener("wheel", handleWheel);
   }, [handleWheel, ref]);
 
-  const MemoField = memo(Field);
   return (
     <div ref={ref} className={fieldClasses} style={fieldStyle}>
-      <MemoField
+      <Field
         canTranspose={canTranspose}
         notes={notes}
         onToggleNote={onToggleNote}

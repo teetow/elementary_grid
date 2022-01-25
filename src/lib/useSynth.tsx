@@ -6,14 +6,13 @@ import {
 import { useCallback, useContext, useEffect } from "react";
 import { bassSynth, drums, master, pingDelay, synth } from "./modules";
 import PlaybackContext from "./PlaybackContext";
-import { bpmToHz, tempoToMs } from "./utils";
+import { bpmToHz } from "./utils";
 
 type Props = {
   bassScale: number[];
   bassTracks: number[][];
   scale: number[];
   tracks: number[][];
-  bpm?: number;
   tone?: string;
   withKick?: boolean;
   mute?: boolean;
@@ -42,7 +41,7 @@ export const useSynth = ({
   const handleSnapshot = useCallback(
     (e: { source: string; data: number }) => {
       if (e.source === "patternPos") {
-        playheadCtx.playheadPos = Math.floor(tracks[0].length * e.data);
+        playheadCtx.playheadPos = Math.round(tracks[0].length * e.data);
       }
     },
     [playheadCtx, tracks],
@@ -61,24 +60,22 @@ export const useSynth = ({
 
   const doRender = useCallback(() => {
     try {
-      let tick = el.metro({ name: "tick", interval: tempoToMs(bpm, 16) });
-      let beat = el.seq({ seq: [1, 1, 0, 0], hold: true }, tick);
-      let sync = el.seq({ seq: [1, ...Array(15).fill(0)], hold: true }, tick);
+      let bpmAsHz = el.const({ key: "bpm:hz", value: bpmToHz(bpm, 1) });
+
+      let tick = el.train(el.mul(bpmAsHz, 16));
+      let sync = el.seq({ seq: [1, ...Array(15).fill(0)], hold: false }, tick);
+      let beat = el.seq({ seq: [1, 1, 1, 0], hold: true }, tick, sync);
 
       let signal = el.const({ value: 0 });
-      let patternTrain = el.phasor(bpmToHz(bpm, 1));
 
-      let patternCycle = el.seq(
-        { seq: [...Array(16).fill(1)], hold: false, loop: true },
-        tick,
-      );
-      let patternSignal = el.snapshot(
+      let playheadTrain = el.phasor(bpmAsHz, sync);
+      let playheadSignal = el.snapshot(
         { name: "patternPos" },
-        patternCycle,
-        patternTrain,
+        tick,
+        playheadTrain,
       );
 
-      signal = el.add(signal, el.mul(0, patternSignal));
+      signal = el.add(signal, el.mul(0, playheadSignal));
 
       signal = el.add(
         signal,

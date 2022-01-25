@@ -1,4 +1,9 @@
-import { memo } from "react";
+import PlaybackContext from "lib/PlaybackContext";
+import useAnimationFrame from "lib/useAnimationFrame";
+
+import { clamp } from "lib/utils";
+import { CSSProperties, memo, useContext } from "react";
+
 import "./Logo.scss";
 
 const LogoTitle = () => {
@@ -179,63 +184,80 @@ const LogoGrid = () => {
         <use href="#led-off" x="34" y="12" />
       </g>
       <g id="half-leds">
-        <use href="#led-half" x="2" y="2" />
-        <use href="#led-half" x="2" y="10" />
-        <use href="#led-half" x="8" y="10" />
-        <use href="#led-half" x="18" y="2" />
-        <use href="#led-half" x="18" y="6" />
-        <use href="#led-half" x="32" y="2" />
-        <use href="#led-half" x="32" y="10" />
+        <use className="led-g" href="#led-half" x="2" y="2" />
+        <use className="led-g" href="#led-half" x="2" y="10" />
+        <use className="led-g" href="#led-half" x="8" y="10" />
+        <use className="led-r" href="#led-half" x="18" y="2" />
+        <use className="led-r" href="#led-half" x="18" y="6" />
+        <use className="led-d" href="#led-half" x="32" y="2" />
+        <use className="led-d" href="#led-half" x="32" y="10" />
       </g>
       <g id="full-leds">
-        <use href="#led-full" x="4" y="2" />
-        <use href="#led-full" x="2" y="4" />
-        <use href="#led-full" x="2" y="6" />
-        <use href="#led-full" x="2" y="8" />
-        <use href="#led-full" x="4" y="10" />
-        <use href="#led-full" x="6" y="2" />
-        <use href="#led-full" x="6" y="6" />
-        <use href="#led-full" x="8" y="2" />
-        <use href="#led-full" x="8" y="6" />
-        <use href="#led-full" x="8" y="8" />
-        <use href="#led-full" x="6" y="10" />
-        <use href="#led-full" x="12" y="2" />
-        <use href="#led-full" x="12" y="4" />
-        <use href="#led-full" x="12" y="6" />
-        <use href="#led-full" x="12" y="8" />
-        <use href="#led-full" x="12" y="10" />
-        <use href="#led-full" x="14" y="2" />
-        <use href="#led-full" x="14" y="6" />
-        <use href="#led-full" x="16" y="2" />
-        <use href="#led-full" x="16" y="6" />
-        <use href="#led-full" x="18" y="4" />
-        <use href="#led-full" x="18" y="8" />
-        <use href="#led-full" x="18" y="10" />
-        <use href="#led-full" x="22" y="2" />
-        <use href="#led-full" x="22" y="4" />
-        <use href="#led-full" x="22" y="6" />
-        <use href="#led-full" x="22" y="8" />
-        <use href="#led-full" x="22" y="10" />
-        <use href="#led-full" x="26" y="2" />
-        <use href="#led-full" x="26" y="4" />
-        <use href="#led-full" x="26" y="6" />
-        <use href="#led-full" x="26" y="8" />
-        <use href="#led-full" x="26" y="10" />
-        <use href="#led-full" x="28" y="10" />
-        <use href="#led-full" x="28" y="2" />
-        <use href="#led-full" x="30" y="2" />
-        <use href="#led-full" x="32" y="4" />
-        <use href="#led-full" x="32" y="6" />
-        <use href="#led-full" x="32" y="8" />
-        <use href="#led-full" x="30" y="10" />
+        <use className="led-g" href="#led-full" x="2" y="4" />
+        <use className="led-g" href="#led-full" x="2" y="6" />
+        <use className="led-g" href="#led-full" x="2" y="8" />
+        <use className="led-g" href="#led-full" x="4" y="2" />
+        <use className="led-g" href="#led-full" x="4" y="10" />
+        <use className="led-g" href="#led-full" x="6" y="2" />
+        <use className="led-g" href="#led-full" x="6" y="6" />
+        <use className="led-g" href="#led-full" x="6" y="10" />
+        <use className="led-g" href="#led-full" x="8" y="2" />
+        <use className="led-g" href="#led-full" x="8" y="6" />
+        <use className="led-g" href="#led-full" x="8" y="8" />
+
+        <use className="led-r" href="#led-full" x="12" y="2" />
+        <use className="led-r" href="#led-full" x="12" y="4" />
+        <use className="led-r" href="#led-full" x="12" y="6" />
+        <use className="led-r" href="#led-full" x="12" y="8" />
+        <use className="led-r" href="#led-full" x="12" y="10" />
+        <use className="led-r" href="#led-full" x="14" y="2" />
+        <use className="led-r" href="#led-full" x="14" y="6" />
+        <use className="led-r" href="#led-full" x="16" y="2" />
+        <use className="led-r" href="#led-full" x="16" y="6" />
+        <use className="led-r" href="#led-full" x="18" y="4" />
+        <use className="led-r" href="#led-full" x="18" y="8" />
+        <use className="led-r" href="#led-full" x="18" y="10" />
+
+        <use className="led-i" href="#led-full" x="22" y="2" />
+        <use className="led-i" href="#led-full" x="22" y="4" />
+        <use className="led-i" href="#led-full" x="22" y="6" />
+        <use className="led-i" href="#led-full" x="22" y="8" />
+        <use className="led-i" href="#led-full" x="22" y="10" />
+
+        <use className="led-d" href="#led-full" x="26" y="2" />
+        <use className="led-d" href="#led-full" x="26" y="4" />
+        <use className="led-d" href="#led-full" x="26" y="6" />
+        <use className="led-d" href="#led-full" x="26" y="8" />
+        <use className="led-d" href="#led-full" x="26" y="10" />
+        <use className="led-d" href="#led-full" x="28" y="10" />
+        <use className="led-d" href="#led-full" x="28" y="2" />
+        <use className="led-d" href="#led-full" x="30" y="2" />
+        <use className="led-d" href="#led-full" x="30" y="10" />
+        <use className="led-d" href="#led-full" x="32" y="4" />
+        <use className="led-d" href="#led-full" x="32" y="6" />
+        <use className="led-d" href="#led-full" x="32" y="8" />
       </g>
     </svg>
   );
 };
 
 export const Logo = memo(() => {
+  const { meters } = useContext(PlaybackContext);
+  useAnimationFrame(1000 / 30, "logo");
+
+  const meter = (id: string, gain = 0.5) => clamp(meters[id] * gain) + 0.5;
+
+  const calcStyle = () => {
+    return {
+      [`--meter-g`]: meter("synth:right", 6),
+      [`--meter-r`]: meter("bass", 2),
+      [`--meter-i`]: meter("kick"),
+      [`--meter-d`]: meter("master:left"),
+    } as CSSProperties;
+  };
+
   return (
-    <div className="eg-logo">
+    <div className="eg-logo" style={calcStyle()}>
       <LogoTitle />
       <LogoGrid />
     </div>

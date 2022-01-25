@@ -17,6 +17,7 @@ declare module "@elemaudio/core" {
     metro: (props: { name: string; interval: number }) => Node;
     meter: (props: { name: string }, node: Node) => Node;
     snapshot: (props: { name: string }, trigger: Node, signal: Node) => Node;
+    phasor: (rate: number | Node, train?: Node) => Node;
   };
 
   export type MeterEvent = {

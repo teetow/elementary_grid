@@ -26,11 +26,27 @@
 }
 
 .eg-logo__text {
-  height: 0.5em;
+  width: 6em;
 }
 
 .eg-logo__grid {
-  height: 1.7em;
+  width: 6.1em;
+
+  .led-g {
+    opacity: var(--meter-g);
+  }
+
+  .led-r {
+    opacity: var(--meter-r);
+  }
+
+  .led-i {
+    opacity: var(--meter-i);
+  }
+
+  .led-d {
+    opacity: var(--meter-d);
+  }
 }
 
 @media all and (max-width: theme.$bp-compact) {

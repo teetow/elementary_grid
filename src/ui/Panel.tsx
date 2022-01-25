@@ -193,7 +193,7 @@ type Props = {
   onSetMute: (mute: boolean) => void;
 };
 
-const getUseFancyLayout = () => window.matchMedia("(min-width: 55em)").matches;
+const getUseFancyLayout = () => window.matchMedia("(min-width: 35.001em)").matches;
 
 function Panel({ patch, onClear, onSetKick, onSetTone, onSetMute }: Props) {
   const [fancyLayout, setFancyLayout] = useState<boolean>(getUseFancyLayout());
