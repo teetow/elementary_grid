@@ -69,7 +69,7 @@ export const getUrlState = () => {
   try {
     const tracksParams = p.getAll("tracks");
     if (tracksParams.length > 0) {
-      state.tracks = tracksParams[0].split(",").map((s) => decodeTrack(s));
+      state.tracks = tracksParams[0].split("-").map((s) => decodeTrack(s));
     }
 
     const bassParams = p.getAll("bassTracks");
@@ -171,7 +171,7 @@ export const encodeUrlParams = (patch: Patch) => {
   out += "&kick=" + (patch.useKick ? 1 : 0);
   out += "&tone=" + patch.tone;
   out += "&bassTracks=" + encodeBassTracks(patch.bassTracks);
-  out += "&tracks=" + encodeTracks(patch.tracks);
+  out += "&tracks=" + encodeTracks(patch.tracks).join("-");
   return out;
 };
 
