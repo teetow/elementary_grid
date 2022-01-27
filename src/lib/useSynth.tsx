@@ -129,8 +129,7 @@ export const useSynth = ({
         el.meter({ name: "master:right" }, right),
       ];
 
-      const stats = core.render(left, right);
-      console.log(stats);
+      core.render(left, right);
     } catch (e) {
       console.log(e);
     }

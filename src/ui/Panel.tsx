@@ -1,3 +1,11 @@
+import Icons from "assets/icons";
+import classNames from "classnames";
+import PlaybackContext from "lib/PlaybackContext";
+
+import SessionContext from "lib/SessionContext";
+import useAnimationFrame from "lib/useAnimationFrame";
+import useClickAway from "lib/useClickAway";
+import { clamp } from "lib/utils";
 import {
   MouseEventHandler,
   useCallback,
@@ -6,13 +14,6 @@ import {
   useRef,
   useState,
 } from "react";
-import classNames from "classnames";
-
-import Icons from "assets/icons";
-import PlaybackContext from "lib/PlaybackContext";
-import useAnimationFrame from "lib/useAnimationFrame";
-import useClickAway from "lib/useClickAway";
-import { clamp } from "lib/utils";
 import { encodeUrlParams, Patch } from "../lib/patch";
 import { Logo } from "./Logo";
 
@@ -190,12 +191,14 @@ type Props = {
   onClear: () => void;
   onSetKick: (useKick: boolean) => void;
   onSetTone: (tone: string) => void;
-  onSetMute: (mute: boolean) => void;
 };
 
-const getUseFancyLayout = () => window.matchMedia("(min-width: 35.001em)").matches;
+const getUseFancyLayout = () =>
+  window.matchMedia("(min-width: 35.001em)").matches;
 
-function Panel({ patch, onClear, onSetKick, onSetTone, onSetMute }: Props) {
+function Panel({ patch, onClear, onSetKick, onSetTone }: Props) {
+  const sessionCtx = useContext(SessionContext);
+
   const [fancyLayout, setFancyLayout] = useState<boolean>(getUseFancyLayout());
   const [showMeters, setShowMeters] = useState<boolean>(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -216,10 +219,7 @@ function Panel({ patch, onClear, onSetKick, onSetTone, onSetMute }: Props) {
   return (
     <div ref={ref} className={`${cls}`}>
       {fancyLayout && (
-        <div
-          className={`${cls}__logo`}
-          onClick={handleLogoClick}
-        >
+        <div className={`${cls}__logo`} onClick={handleLogoClick}>
           {showMeters ? (
             <div className={`${cls}__meters`}>
               <Meter ids={["synth:left", "synth:right"]} color="yellow" />
@@ -245,7 +245,18 @@ function Panel({ patch, onClear, onSetKick, onSetTone, onSetMute }: Props) {
 
       <Switch label="Kick" active={patch.useKick} setActive={onSetKick} />
 
-      <Switch label="Mute" active={patch.mute || false} setActive={onSetMute} />
+      <div className="eg-panel__session">
+        <Switch
+          label="Mute"
+          active={sessionCtx.mute}
+          setActive={sessionCtx.setMute}
+        />
+        <Switch
+          label="Life"
+          active={sessionCtx.life}
+          setActive={sessionCtx.setLife}
+        />
+      </div>
 
       <ShareWidget patch={patch} />
     </div>

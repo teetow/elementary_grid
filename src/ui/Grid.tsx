@@ -1,4 +1,5 @@
 import classnames from "classnames";
+
 import PlaybackContext from "lib/PlaybackContext";
 import useAnimationFrame from "lib/useAnimationFrame";
 import {
@@ -13,7 +14,6 @@ import {
   useState,
   WheelEvent,
 } from "react";
-
 import { clamp, deepCopy, range, shiftArray } from "../lib/utils";
 
 import "./Grid.scss";
@@ -128,7 +128,6 @@ const Field = ({ notes, canTranspose, onToggleNote }: FieldProps) => {
 
   const handlePaint = useCallback(
     (note: number, step: number) => {
-      console.log(paintMode);
       if (paintMode === "fill" && notes[note][step] === 0) {
         onToggleNote(note, step, 1);
       }

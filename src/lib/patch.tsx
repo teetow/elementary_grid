@@ -11,7 +11,6 @@ export type Patch = {
   bassTracks: number[][];
   useKick: boolean;
   tone: string;
-  mute?: boolean;
 };
 
 export type Action =
@@ -20,8 +19,7 @@ export type Action =
   | { type: "setTracks"; tracks: number[][] }
   | { type: "setBassTracks"; tracks: number[][] }
   | { type: "setTone"; tone: string }
-  | { type: "setUseKick"; useKick: boolean }
-  | { type: "setMute"; mute: boolean };
+  | { type: "setUseKick"; useKick: boolean };
 
 export const patchReducer: Reducer<Patch, Action> = (patch, action) => {
   switch (action.type) {
@@ -37,8 +35,6 @@ export const patchReducer: Reducer<Patch, Action> = (patch, action) => {
       return { ...patch, tone: action.tone };
     case "setUseKick":
       return { ...patch, useKick: action.useKick };
-    case "setMute":
-      return { ...patch, mute: action.mute };
     default:
       throw new Error(
         `Tried to perform ${action}, which is not a valid action`,

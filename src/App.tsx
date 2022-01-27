@@ -1,6 +1,12 @@
 import { ElementaryWebAudioRenderer as core } from "@elemaudio/core";
 import { useSynth } from "lib/useSynth";
-import { useCallback, useEffect, useReducer } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+  useState,
+} from "react";
 import {
   clearUrlState,
   getLocalStorage,
@@ -16,6 +22,8 @@ import Panel from "./ui/Panel";
 import Splainer from "./ui/Splainer";
 
 import "./App.scss";
+import SessionContext from "lib/SessionContext";
+import useLife from "lib/useLife";
 
 const numTracks = 16;
 const numSteps = 16;
@@ -59,6 +67,10 @@ const initialPatch = getInitialPatch();
 const App = () => {
   const [patch, updatePatch] = useReducer(patchReducer, initialPatch);
 
+  const sessionCtx = useContext(SessionContext);
+  [sessionCtx.mute, sessionCtx.setMute] = useState<boolean>(false);
+  [sessionCtx.life, sessionCtx.setLife] = useState<boolean>(false);
+
   useSynth({
     scale: patch.scale,
     bassScale: patch.bassScale,
@@ -66,7 +78,16 @@ const App = () => {
     tracks: patch.tracks,
     bassTracks: patch.bassTracks,
     withKick: patch.useKick,
-    mute: patch.mute,
+    mute: sessionCtx.mute,
+  });
+
+  const handleLife = useCallback((field) => {
+    updatePatch({ type: "setTracks", tracks: field });
+  }, []);
+
+  useLife({
+    field: patch.tracks,
+    setField: handleLife,
   });
 
   const toggleNote = useCallback(
@@ -110,10 +131,6 @@ const App = () => {
         )}
         onSetTone={useCallback(
           (tone) => updatePatch({ type: "setTone", tone }),
-          [],
-        )}
-        onSetMute={useCallback(
-          (mute) => updatePatch({ type: "setMute", mute }),
           [],
         )}
       />
