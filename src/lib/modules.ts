@@ -1,4 +1,4 @@
-import { el, NativeNode, Node } from "@elemaudio/core";
+import { el, NodeRepr_t } from "@elemaudio/core";
 import { kick, Tones } from "./tones";
 import { clamp, freqDeltaFromSeq, tempoToMs } from "./utils";
 
@@ -6,8 +6,8 @@ type SynthParams = {
   tracks: number[][];
   tone: string;
   scale: number[];
-  tick: Node;
-  sync: Node;
+  tick: NodeRepr_t;
+  sync: NodeRepr_t;
   gain: number;
 };
 export const synth = ({
@@ -30,7 +30,7 @@ export const synth = ({
   const makeFreqSeq = (
     track: number[],
     trackIndex: number,
-    trigSeq: NativeNode<"seq">,
+    trigSeq: NodeRepr_t,
   ) => {
     const freqs = track
       .map((trig) =>
@@ -49,7 +49,7 @@ export const synth = ({
     );
   };
 
-  const osc = (seq: Node, trigSeq: Node, i: number) =>
+  const osc = (seq: NodeRepr_t, trigSeq: NodeRepr_t, i: number) =>
     Tones[tone](seq, trigSeq, `synth:voice${i}:freq`, { gain: 0.5 * gain });
 
   let out = tracks.reduce((stack, track, trackIndex) => {
@@ -65,8 +65,8 @@ export const synth = ({
 type BassSynthParams = {
   tracks: number[][];
   scale: number[];
-  tick: Node;
-  sync: Node;
+  tick: NodeRepr_t;
+  sync: NodeRepr_t;
   legato?: boolean;
 };
 
@@ -111,30 +111,30 @@ export const bassSynth = ({
   return out;
 };
 
-export const msDelay = (node: Node, time = 210, balance = 1.0) => {
+export const msDelay = (node: NodeRepr_t, time = 210, balance = 1.0) => {
   let dly = el.delay({ size: 44100 }, el.ms2samps(time), -0.3, node);
 
   return el.add(el.mul(node, clamp(2 - balance)), el.mul(dly, balance, 0.5));
 };
 
-export const delay = (node: Node, bpm = 120, tap = 3, balance = 1.0) =>
+export const delay = (node: NodeRepr_t, bpm = 120, tap = 3, balance = 1.0) =>
   msDelay(node, tap * tempoToMs(bpm, 16), balance);
 
 export const pingDelay = (
-  left: Node,
-  right: Node,
+  left: NodeRepr_t,
+  right: NodeRepr_t,
   bpm = 120,
   balance = 0.8,
 ) => [delay(left, bpm, 2, balance), delay(right, bpm, 3, balance)];
 
-export const drums = (trig: Node) => {
+export const drums = (trig: NodeRepr_t) => {
   return kick(null, trig, "kick", { gain: 0.8, pop: 1.2 });
 };
 
 export const master = (
   gain: number = 1.0,
-  left: Node,
-  right: Node,
+  left: NodeRepr_t,
+  right: NodeRepr_t,
   lowcut = 40,
   lowq = 0.9,
   crunch = 0.5,

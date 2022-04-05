@@ -1,4 +1,4 @@
-declare module "@elemaudio/core" {
+declare module "@elemaudio/legacy" {
   import { Elementary, Node, NativeNode } from "@nick-thompson/elementary";
   import { el, ElementaryWebAudioRenderer } from "@elemaudio/core";
 

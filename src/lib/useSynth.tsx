@@ -1,12 +1,16 @@
-import {
-  el,
-  ElementaryWebAudioRenderer as core,
-  MeterEvent,
-} from "@elemaudio/core";
+import WebAudioRenderer from "@elemaudio/web-renderer";
+import { el, NodeRepr_t } from "@elemaudio/core";
+
+// import {
+//   el,
+//   ElementaryWebAudioRenderer as core,
+//   MeterEvent,
+// } from "@elemaudio/core";
 import { useCallback, useContext, useEffect } from "react";
 import { bassSynth, drums, master, pingDelay, synth } from "./modules";
 import PlaybackContext from "./PlaybackContext";
 import { bpmToHz } from "./utils";
+import { MeterEvent } from "@elemaudio/legacy";
 
 type Props = {
   bassScale: number[];
@@ -18,10 +22,12 @@ type Props = {
   mute?: boolean;
 };
 
-let meterCallback = (e: MeterEvent) => {};
+let core = new WebAudioRenderer();
+
+let meterCallback = (e: any) => {};
 
 core.on("load", () => {
-  core.on("meter", (e: MeterEvent) => {
+  core.on("meter", (e: any) => {
     meterCallback(e);
   });
 });
@@ -49,10 +55,12 @@ export const useSynth = ({
 
   useEffect(() => {
     core.on("snapshot", handleSnapshot);
-    return () => core.off("snapshot", handleSnapshot);
+    return () => {
+      core.off("snapshot", handleSnapshot);
+    };
   }, [handleSnapshot]);
 
-  meterCallback = (e) => {
+  meterCallback = (e: MeterEvent) => {
     if (e.source) {
       playheadCtx.meters[e.source] = e.max;
     }
@@ -63,10 +71,14 @@ export const useSynth = ({
       let bpmAsHz = el.const({ key: "bpm:hz", value: bpmToHz(bpm, 1) });
 
       let tick = el.train(el.mul(bpmAsHz, 16));
-      let sync = el.seq({ seq: [1, ...Array(15).fill(0)], hold: false }, tick);
+      let sync = el.seq(
+        { seq: [1, ...Array(15).fill(0)], hold: false },
+        tick,
+        0,
+      );
       let beat = el.seq({ seq: [1, 1, 1, 0], hold: true }, tick, sync);
 
-      let signal = el.const({ value: 0 });
+      let signal: number | NodeRepr_t = el.const({ value: 0 });
 
       let playheadTrain = el.phasor(bpmAsHz, sync);
       let playheadSignal = el.snapshot(

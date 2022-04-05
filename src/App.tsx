@@ -1,4 +1,6 @@
-import { ElementaryWebAudioRenderer as core } from "@elemaudio/core";
+import WebAudioRenderer from "@elemaudio/web-renderer";
+import SessionContext from "lib/SessionContext";
+import useLife from "lib/useLife";
 import { useSynth } from "lib/useSynth";
 import {
   useCallback,
@@ -7,6 +9,7 @@ import {
   useReducer,
   useState,
 } from "react";
+import "./App.scss";
 import {
   clearUrlState,
   getLocalStorage,
@@ -15,18 +18,15 @@ import {
   patchReducer,
   setLocalStorage,
 } from "./lib/patch";
-
 import { initArray, makeScale, range } from "./lib/utils";
 import Grid from "./ui/Grid";
 import Panel from "./ui/Panel";
 import Splainer from "./ui/Splainer";
 
-import "./App.scss";
-import SessionContext from "lib/SessionContext";
-import useLife from "lib/useLife";
-
 const numTracks = 16;
 const numSteps = 16;
+
+let core = new WebAudioRenderer();
 
 core.on("load", () => {
   core.on("error", (e: unknown) => {
