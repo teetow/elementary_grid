@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Reducer } from "react";
 
 import base64table, { dec3bit, enc3bit } from "./encoding";

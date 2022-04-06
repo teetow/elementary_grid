@@ -2,6 +2,7 @@ import WebAudioRenderer from "@elemaudio/web-renderer";
 import SessionContext from "lib/SessionContext";
 import useLife from "lib/useLife";
 import { useSynth } from "lib/useSynth";
+import getCore from "lib/withWebAudio";
 import {
   useCallback,
   useContext,
@@ -26,11 +27,11 @@ import Splainer from "./ui/Splainer";
 const numTracks = 16;
 const numSteps = 16;
 
-let core = new WebAudioRenderer();
+let core = getCore();
 
 core.on("load", () => {
   core.on("error", (e: unknown) => {
-    console.log(e);
+    console.log("error in Elementary", e);
   });
 });
 

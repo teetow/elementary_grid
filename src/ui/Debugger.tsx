@@ -1,6 +1,8 @@
-import { el, ElementaryWebAudioRenderer as core, Node } from "@elemaudio/core";
-
+import { el, NodeRepr_t } from "@elemaudio/core";
 import { midiToFrequency, noteToMidi } from "../lib/utils";
+import getCore from "../lib/withWebAudio";
+
+const core = getCore();
 
 const drums = [
   [1, 0, 0, 0, 1, 0, 0, 0],
@@ -29,9 +31,13 @@ const freqs = bassNotes
   .map((x) => (x !== "--" ? noteToMidi(x) : 0))
   .map((x) => (x > 0 ? midiToFrequency(x) : 0));
 
-const Bass = (gate: Node) => {
-  let trig = el.seq({ seq: bassTriggers }, gate);
-  let bassSeq = el.seq({ seq: freqs.filter((x) => x > 0), hold: true }, trig);
+const Bass = (gate: NodeRepr_t) => {
+  let trig = el.seq({ seq: bassTriggers }, gate, 0);
+  let bassSeq = el.seq(
+    { seq: freqs.filter((x) => x > 0), hold: true },
+    trig,
+    0,
+  );
 
   let env = el.adsr(0.01, 0.8, 0.6, 0.1, trig);
   let env2 = el.adsr(0.01, 0.5, 0.1, 0.1, trig);
@@ -53,8 +59,8 @@ const Bass = (gate: Node) => {
   return osc;
 };
 
-const kick = (gate: Node) => {
-  const kickSeq = el.seq({ seq: drums[0] }, gate);
+const kick = (gate: NodeRepr_t) => {
+  const kickSeq = el.seq({ seq: drums[0] }, gate, 0);
 
   const slowPitchEnv = el.adsr(0.001, 0.12, 0.1, 0.2, kickSeq);
   const ampEnv = el.adsr(0.003, 0.7, 0.5, 0.2, kickSeq);
@@ -69,8 +75,8 @@ const kick = (gate: Node) => {
   return out;
 };
 
-const snare = (gate: Node, { root = 160 } = {}) => {
-  let seq = el.seq({ seq: drums[1] }, gate);
+const snare = (gate: NodeRepr_t, { root = 160 } = {}) => {
+  let seq = el.seq({ seq: drums[1] }, gate, 0);
 
   let snapPitchEnv = el.adsr(0.001, 0.5, 0.1, 0.1, seq);
   let snapAmpEnv = el.adsr(0.001, 0.05, 0.001, 0.1, seq);

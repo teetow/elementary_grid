@@ -1,16 +1,12 @@
-import WebAudioRenderer from "@elemaudio/web-renderer";
 import { el, NodeRepr_t } from "@elemaudio/core";
+import { MeterEvent } from "@elemaudio/legacy";
+import WebAudioRenderer from "@elemaudio/web-renderer";
 
-// import {
-//   el,
-//   ElementaryWebAudioRenderer as core,
-//   MeterEvent,
-// } from "@elemaudio/core";
 import { useCallback, useContext, useEffect } from "react";
 import { bassSynth, drums, master, pingDelay, synth } from "./modules";
 import PlaybackContext from "./PlaybackContext";
 import { bpmToHz } from "./utils";
-import { MeterEvent } from "@elemaudio/legacy";
+import getCore from "./withWebAudio";
 
 type Props = {
   bassScale: number[];
@@ -22,7 +18,7 @@ type Props = {
   mute?: boolean;
 };
 
-let core = new WebAudioRenderer();
+let core = getCore();
 
 let meterCallback = (e: any) => {};
 
@@ -41,16 +37,16 @@ export const useSynth = ({
   withKick = true,
   mute = false,
 }: Props) => {
-  const playheadCtx = useContext(PlaybackContext);
-  const bpm = playheadCtx.bpm;
+  const playbackCtx = useContext(PlaybackContext);
+  const bpm = playbackCtx.bpm;
 
   const handleSnapshot = useCallback(
     (e: { source: string; data: number }) => {
       if (e.source === "patternPos") {
-        playheadCtx.playheadPos = Math.round(tracks[0].length * e.data);
+        playbackCtx.playheadPos = Math.round(tracks[0].length * e.data);
       }
     },
-    [playheadCtx, tracks],
+    [playbackCtx, tracks],
   );
 
   useEffect(() => {
@@ -62,7 +58,7 @@ export const useSynth = ({
 
   meterCallback = (e: MeterEvent) => {
     if (e.source) {
-      playheadCtx.meters[e.source] = e.max;
+      playbackCtx.meters[e.source] = e.max;
     }
   };
 
@@ -141,15 +137,17 @@ export const useSynth = ({
         el.meter({ name: "master:right" }, right),
       ];
 
+      const sig = el.mul(0.2, el.cycle(el.mul(440, el.cycle(1))));
+      core.render(sig, sig);
+      return;
+
       core.render(left, right);
     } catch (e) {
-      console.log(e);
+      console.log("Elementary render error: ", e);
     }
   }, [bpm, tracks, tone, scale, bassTracks, bassScale, withKick, mute]);
 
   useEffect(() => {
-    if (core.__renderer) {
-      doRender();
-    }
+    doRender();
   }, [tracks, tone, scale, bpm, withKick, doRender]);
 };

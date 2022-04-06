@@ -1,29 +1,27 @@
-import { ElementaryWebAudioRenderer as core } from "@elemaudio/core";
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
+import getCore from "lib/withWebAudio";
 
 import App from "./App";
 import Debugger from "./ui/Debugger";
 import { Splash } from "./ui/Splash";
 
-let ctx = new AudioContext();
-
+const root = createRoot(document.getElementById("root"));
 const runDebugger = false;
 
 const RenderApp = () => {
-  ReactDOM.render(
-    <React.StrictMode>
-      {runDebugger ? <Debugger /> : <App />}
-    </React.StrictMode>,
-    document.getElementById("root")
+  root.render(
+    <React.StrictMode>{runDebugger ? <Debugger /> : <App />}</React.StrictMode>,
   );
 };
 
+let ctx = new AudioContext();
+let core = getCore(ctx);
+
 core.on("load", () => {
   if (ctx.state !== "running") {
-    ReactDOM.render(
+    root.render(
       <Splash onClick={() => ctx.resume().then(() => RenderApp())} />,
-      document.getElementById("root")
     );
   } else {
     RenderApp();

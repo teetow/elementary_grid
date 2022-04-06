@@ -1,14 +1,14 @@
-import { el, Node } from "@elemaudio/core";
+import { el, NodeRepr_t, resolve } from "@elemaudio/core";
 
 export type Tone = ((
-  freqs: Node,
-  trigs: Node,
+  freqs: NodeRepr_t | number,
+  trigs: NodeRepr_t,
   id: string,
   options?: { gain?: number } & any,
-) => Node) & { desc: string };
+) => NodeRepr_t) & { desc: string };
 
 export const DoricoBeep: Tone = (freqs) => {
-  return el.phasor(freqs);
+  return el.phasor(freqs, 0);
 };
 DoricoBeep.desc = "It melts";
 
@@ -26,8 +26,12 @@ export const stab: Tone & {
   id,
   { gain = 1.0, detune = 0.004, sharpness = 1.3, richness = 0.7 } = {},
 ) => {
-  const tone = (osc: Node, detune: number, toneGain: Node) => {
-    const o = el.phasor(el.mul(osc, detune));
+  const tone = (
+    osc: NodeRepr_t | number,
+    detune: number,
+    toneGain: NodeRepr_t | number,
+  ) => {
+    const o = el.phasor(el.mul(osc, detune), 0);
     return el.mul(
       toneGain,
       el.add(
@@ -55,7 +59,7 @@ export const stab: Tone & {
 
   let env = el.adsr(0.01, 0.3, 0.3, 0.8, trigs);
 
-  return el.mul(out, 0.66, gain, env);
+  return resolve(el.mul(out, 0.66, gain, env));
 };
 stab.desc = "Not quite a supersaw, but certainly a stabby little rascal";
 
@@ -86,7 +90,7 @@ export const ding: Tone = (
   out = el.lowpass(el.mul(8.0, freqs), resEnv, out);
 
   let env = el.adsr(0.01, 0.3, 0.1, 0.9, trigs);
-  return el.mul(out, env);
+  return resolve(el.mul(out, env));
 };
 ding.desc = "Pseudo-FM bell-like patch with a sprinkle of unpredictability";
 
@@ -98,31 +102,38 @@ export const bell: Tone & {
     richness: number;
   };
 } = (freqs, trigs, id, { gain = 1.0, detune = 0.0025, richness = 1 }) => {
-  const osc = (freqs: Node, gain: number, env: Node, octave = 1) => {
+  const osc = (
+    freqs: NodeRepr_t,
+    gain: number,
+    env: NodeRepr_t,
+    octave = 1,
+  ) => {
     return el.mul(gain, env, el.sin(el.mul(2.0 * octave * Math.PI, freqs)));
   };
 
-  const phasorDown = el.phasor(el.mul(freqs, 1 - detune));
-  const phasorMid = el.phasor(freqs);
-  const phasorUp = el.phasor(el.mul(freqs, 1 + detune));
+  const phasorDown = el.phasor(el.mul(freqs, 1 - detune), 0);
+  const phasorMid = el.phasor(freqs, 0);
+  const phasorUp = el.phasor(el.mul(freqs, 1 + detune), 0);
 
   const medEnv = el.adsr(0.8, 0.3, 0.1, 0.2, trigs);
   const fastEnv = el.adsr(0.5, 0.4, 0.2, 1.2, trigs);
   const transientEnv = el.adsr(0.001, 0.5, 0.3, 0.9, trigs);
 
-  return el.mul(
-    gain,
-    el.tanh(
-      el.add(
-        // fundamental
-        osc(phasorMid, 0.4, medEnv),
+  return resolve(
+    el.mul(
+      gain,
+      el.tanh(
+        el.add(
+          // fundamental
+          osc(phasorMid, 0.4, medEnv),
 
-        // harmonics
-        osc(phasorDown, 0.25 * richness, fastEnv, 2.0),
-        osc(phasorUp, 0.25 * richness, fastEnv, 2.0),
+          // harmonics
+          osc(phasorDown, 0.25 * richness, fastEnv, 2.0),
+          osc(phasorUp, 0.25 * richness, fastEnv, 2.0),
 
-        osc(phasorDown, 0.12 * richness, transientEnv, 8.0),
-        osc(phasorUp, 0.12 * richness, transientEnv, 8.0),
+          osc(phasorDown, 0.12 * richness, transientEnv, 8.0),
+          osc(phasorUp, 0.12 * richness, transientEnv, 8.0),
+        ),
       ),
     ),
   );
@@ -130,8 +141,8 @@ export const bell: Tone & {
 bell.desc = "Sparkly to a fault";
 
 export const bass: Tone = (
-  freqs: Node,
-  trigs: Node,
+  freqs: NodeRepr_t | number,
+  trigs: NodeRepr_t | number,
   id,
   { gain = 1.0, richness = 1.0 },
 ) => {
@@ -152,13 +163,13 @@ export const bass: Tone = (
 
   osc = el.mul(0.27 * gain, osc);
 
-  return osc;
+  return resolve(osc);
 };
 bass.desc = "BASS";
 
 export const kick: Tone = (
-  freqs: Node,
-  trigs: Node,
+  freqs: NodeRepr_t | number,
+  trigs: NodeRepr_t,
   id,
   { freq = 42, speed = 1.0, pop = 1.0, tail = 1.0, gain = 1.0 },
 ) => {
@@ -168,7 +179,7 @@ export const kick: Tone = (
   let pitchEnv = el.add(1.0, el.mul(3 * pop, fastEnv));
   pitchEnv = el.add(0.0, el.mul(0.5 * pop, slowEnv), pitchEnv);
 
-  let out = el.cycle(el.mul(pitchEnv, freq));
+  let out = el.cycle(el.mul(pitchEnv, freq)) as NodeRepr_t | number;
 
   let ampEnv = el.adsr(0.03, 0.23 * speed, 0.0, 0.0, trigs);
   out = el.mul(ampEnv, out);
@@ -183,7 +194,7 @@ export const kick: Tone = (
 
   out = el.mul(gain, out);
 
-  return out;
+  return resolve(out);
 };
 kick.desc = "A thumper, for sure";
 
