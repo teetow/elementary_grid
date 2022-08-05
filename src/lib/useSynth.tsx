@@ -1,4 +1,4 @@
-import { el, MeterEvent, Node } from "@elemaudio/core";
+import { el, NodeRepr_t } from "@elemaudio/core";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { bassSynth, drums, master, pingDelay, synth } from "./modules";
 import PlaybackContext from "./PlaybackContext";
@@ -20,7 +20,7 @@ let core = getCore();
 let meterCallback = (e: any) => {};
 
 core.on("load", () => {
-  core.on("meter", (e: any) => {
+  core.on("meter", (e) => {
     meterCallback(e);
   });
 });
@@ -35,7 +35,7 @@ export const useSynth = ({
   mute = false,
 }: Props) => {
   const playbackCtx = useContext(PlaybackContext);
-  const [graph, setGraph] = useState<Node[]>();
+  const [graph, setGraph] = useState<(NodeRepr_t | number)[]>();
   const bpm = playbackCtx.bpm;
 
   const handleSnapshot = useCallback(
@@ -58,7 +58,7 @@ export const useSynth = ({
     };
   }, [handleSnapshot]);
 
-  meterCallback = (e: MeterEvent) => {
+  meterCallback = (e) => {
     if (e.source) {
       playbackCtx.meters[e.source] = e.max;
     }
@@ -80,7 +80,7 @@ export const useSynth = ({
       );
       let beat = el.seq({ seq: [1, 1, 1, 0], hold: true }, tick, sync);
 
-      let signal: Node = el.const({ value: 0 });
+      let signal: NodeRepr_t | number = el.const({ value: 0 });
 
       let playheadTrain = el.phasor(bpmAsHz, sync);
       let playheadSignal = el.snapshot(
@@ -91,12 +91,12 @@ export const useSynth = ({
 
       signal = el.add(signal, el.mul(0, playheadSignal));
 
-      return [signal, signal];
-
       signal = el.add(
         signal,
         synth({ tracks, tone, scale, tick, sync, gain: 0.7 }),
       );
+
+      return [signal, signal];
 
       let [left, right] = [signal, signal]; // make stereo
 

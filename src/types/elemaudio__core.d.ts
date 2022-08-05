@@ -1,5 +1,4 @@
-declare module "@elemaudio/core" {
-  import { el, ElementaryWebAudioRenderer, Node } from "@elemaudio/core";
+declare module "@elemaudio/legacy" {
   import { Elementary, NativeNode } from "@nick-thompson/elementary";
   /*
     Available from js:
@@ -11,8 +10,6 @@ declare module "@elemaudio/core" {
     stdlib
     sugar
   */
-  export type Node = NodeRepr_t & number;
-
   const el: Elementary & {
     metro: (props: { name: string; interval: number }) => Node;
     meter: (props: { name: string }, node: Node) => Node;
@@ -26,5 +23,5 @@ declare module "@elemaudio/core" {
     source?: string;
   };
 
-  export { el, Node, MeterEvent, NativeNode, ElementaryWebAudioRenderer };
+  export { el, Node, MeterEvent, NativeNode, resolve };
 }

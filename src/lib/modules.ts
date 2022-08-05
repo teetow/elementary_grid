@@ -2,12 +2,14 @@ import { el, NodeRepr_t, resolve } from "@elemaudio/core";
 import { kick, Tones } from "./tones";
 import { clamp, freqDeltaFromSeq, tempoToMs } from "./utils";
 
+type Node = NodeRepr_t;
+
 type SynthParams = {
   tracks: number[][];
   tone: string;
   scale: number[];
-  tick: NodeRepr_t;
-  sync: NodeRepr_t;
+  tick: Node;
+  sync: Node;
   gain: number;
 };
 export const synth = ({
@@ -27,11 +29,7 @@ export const synth = ({
     return el.seq(seqProps, tick, sync);
   };
 
-  const makeFreqSeq = (
-    track: number[],
-    trackIndex: number,
-    trigSeq: NodeRepr_t,
-  ) => {
+  const makeFreqSeq = (track: number[], trackIndex: number, trigSeq: Node) => {
     const freqs = track
       .map((trig) =>
         trig !== 0 ? freqDeltaFromSeq(trig, scale[trackIndex]) : 0,
@@ -49,10 +47,16 @@ export const synth = ({
     );
   };
 
-  const osc = (seq: NodeRepr_t, trigSeq: NodeRepr_t, i: number) =>
+  const osc = (seq: Node, trigSeq: Node, i: number) =>
     Tones[tone](seq, trigSeq, `synth:voice${i}:freq`, { gain: 0.5 * gain });
 
-  let out = tracks.reduce((stack, track, trackIndex) => {
+  // test seq, works
+  // const t = makeTrigSeq([1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], 2);
+  // const f = makeFreqSeq([3, 3, 4, 4, 1, 1, 4, 4], 2, t);
+  // return osc(f, t, 2);
+
+  // this errors
+  let out = tracks.slice(0, 1).reduce((stack, track, trackIndex) => {
     const trigSeq = makeTrigSeq(track, trackIndex);
     const freqSeq = makeFreqSeq(track, trackIndex, trigSeq);
 
@@ -65,8 +69,8 @@ export const synth = ({
 type BassSynthParams = {
   tracks: number[][];
   scale: number[];
-  tick: NodeRepr_t;
-  sync: NodeRepr_t;
+  tick: Node;
+  sync: Node;
   legato?: boolean;
 };
 
@@ -111,38 +115,30 @@ export const bassSynth = ({
   return out;
 };
 
-export const msDelay = (
-  node: NodeRepr_t | number,
-  time = 210,
-  balance = 1.0,
-) => {
+export const msDelay = (node: Node | number, time = 210, balance = 1.0) => {
   let dly = el.delay({ size: 44100 }, el.ms2samps(time), -0.3, node);
 
   return el.add(el.mul(node, clamp(2 - balance)), el.mul(dly, balance, 0.5));
 };
 
-export const delay = (
-  node: NodeRepr_t | number,
-  bpm = 120,
-  tap = 3,
-  balance = 1.0,
-) => resolve(msDelay(node, tap * tempoToMs(bpm, 16), balance));
+export const delay = (node: Node | number, bpm = 120, tap = 3, balance = 1.0) =>
+  resolve(msDelay(node, tap * tempoToMs(bpm, 16), balance));
 
 export const pingDelay = (
-  left: NodeRepr_t | number,
-  right: NodeRepr_t | number,
+  left: Node | number,
+  right: Node | number,
   bpm = 120,
   balance = 0.8,
 ) => [delay(left, bpm, 2, balance), delay(right, bpm, 3, balance)];
 
-export const drums = (trig: NodeRepr_t) => {
+export const drums = (trig: Node) => {
   return kick(0, trig, "kick", { gain: 0.8, pop: 1.2 });
 };
 
 export const master = (
   gain: number = 1.0,
-  left: NodeRepr_t | number,
-  right: NodeRepr_t | number,
+  left: Node | number,
+  right: Node | number,
   lowcut = 40,
   lowq = 0.9,
   crunch = 0.5,
