@@ -5,11 +5,31 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "pwa-chrome",
+      "name": "Full stack",
+      "type": "node-terminal",
       "request": "launch",
-      "name": "Launch Chrome against localhost",
-      "url": "http://localhost:3000",
+      "command": "yarn dev",
+      "serverReadyAction": {
+        "pattern": ".+?(https?://.+)",
+        "action": "startDebugging",
+        "name": "Client"
+      }
+    },
+    {
+      "name": "Server",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "yarn dev",
+      "env": {
+        "DEBUG": "vps:routing"
+      }
+    },
+    {
+      "name": "Client",
+      "request": "launch",
+      "type": "msedge",
+      "url": "http://localhost:5173",
       "webRoot": "${workspaceFolder}"
-    }
+    },
   ]
 }

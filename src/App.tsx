@@ -1,8 +1,3 @@
-import WebAudioRenderer from "@elemaudio/web-renderer";
-import SessionContext from "lib/SessionContext";
-import useLife from "lib/useLife";
-import { useSynth } from "lib/useSynth";
-import getCore from "lib/withWebAudio";
 import {
   useCallback,
   useContext,
@@ -19,7 +14,11 @@ import {
   patchReducer,
   setLocalStorage,
 } from "./lib/patch";
+import SessionContext from "./lib/SessionContext";
+import useLife from "./lib/useLife";
+import { useSynth } from "./lib/useSynth";
 import { initArray, makeScale, range } from "./lib/utils";
+import getCore from "./lib/withWebAudio";
 import Grid from "./ui/Grid";
 import Panel from "./ui/Panel";
 import Splainer from "./ui/Splainer";
@@ -82,7 +81,7 @@ const App = () => {
     mute: sessionCtx.mute,
   });
 
-  const handleLife = useCallback((field) => {
+  const handleLife = useCallback((field: number[][]) => {
     updatePatch({ type: "setTracks", tracks: field });
   }, []);
 

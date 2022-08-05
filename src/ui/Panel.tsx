@@ -1,11 +1,11 @@
-import Icons from "assets/icons";
+import Icons from "../assets/icons";
 import classNames from "classnames";
-import PlaybackContext from "lib/PlaybackContext";
+import PlaybackContext from "../lib/PlaybackContext";
 
-import SessionContext from "lib/SessionContext";
-import useAnimationFrame from "lib/useAnimationFrame";
-import useClickAway from "lib/useClickAway";
-import { clamp } from "lib/utils";
+import SessionContext from "../lib/SessionContext";
+import useAnimationFrame from "../lib/useAnimationFrame";
+import useClickAway from "../lib/useClickAway";
+import { clamp } from "../lib/utils";
 import {
   MouseEventHandler,
   useCallback,

@@ -1,7 +1,5 @@
 import classnames from "classnames";
 
-import PlaybackContext from "lib/PlaybackContext";
-import useAnimationFrame from "lib/useAnimationFrame";
 import {
   CSSProperties,
   FunctionComponent,
@@ -14,6 +12,8 @@ import {
   useState,
   WheelEvent,
 } from "react";
+import PlaybackContext from "../lib/PlaybackContext";
+import useAnimationFrame from "../lib/useAnimationFrame";
 import { clamp, deepCopy, range, shiftArray } from "../lib/utils";
 
 import "./Grid.scss";

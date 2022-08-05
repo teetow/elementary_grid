@@ -1,12 +1,12 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import getCore from "lib/withWebAudio";
+import getCore from "./lib/withWebAudio";
 
 import App from "./App";
 import Debugger from "./ui/Debugger";
 import { Splash } from "./ui/Splash";
 
-const root = createRoot(document.getElementById("root"));
+const root = createRoot(document.getElementById("root")!);
 const runDebugger = false;
 
 const RenderApp = () => {
@@ -16,7 +16,7 @@ const RenderApp = () => {
 };
 
 let ctx = new AudioContext();
-let core = getCore(ctx);
+let core = getCore();
 
 core.on("load", () => {
   if (ctx.state !== "running") {
