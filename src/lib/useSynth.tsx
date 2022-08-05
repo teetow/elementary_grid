@@ -65,10 +65,6 @@ export const useSynth = ({
   };
 
   const calcGraph = useCallback(() => {
-    // const sig = el.mul(0.02, el.cycle(el.mul(440, el.cycle(1))));
-    // core.render(sig, sig);
-    // return [sig, sig];
-
     try {
       let bpmAsHz = el.const({ key: "bpm:hz", value: bpmToHz(bpm, 1) });
 
@@ -95,8 +91,6 @@ export const useSynth = ({
         signal,
         synth({ tracks, tone, scale, tick, sync, gain: 0.7 }),
       );
-
-      return [signal, signal];
 
       let [left, right] = [signal, signal]; // make stereo
 

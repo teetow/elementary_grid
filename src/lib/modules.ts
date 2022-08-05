@@ -26,6 +26,7 @@ export const synth = ({
       seq: track.map((x) => (x !== 0 ? 1 : 0)),
       loop: false,
     };
+
     return el.seq(seqProps, tick, sync);
   };
 
@@ -35,10 +36,11 @@ export const synth = ({
         trig !== 0 ? freqDeltaFromSeq(trig, scale[trackIndex]) : 0,
       )
       .filter((x) => x !== 0);
+
     return el.seq(
       {
         key: `synth:${trackIndex}:freq`,
-        seq: freqs,
+        seq: freqs.length > 0 ? freqs : [10],
         loop: false,
         hold: true,
       },
@@ -50,13 +52,7 @@ export const synth = ({
   const osc = (seq: Node, trigSeq: Node, i: number) =>
     Tones[tone](seq, trigSeq, `synth:voice${i}:freq`, { gain: 0.5 * gain });
 
-  // test seq, works
-  // const t = makeTrigSeq([1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0], 2);
-  // const f = makeFreqSeq([3, 3, 4, 4, 1, 1, 4, 4], 2, t);
-  // return osc(f, t, 2);
-
-  // this errors
-  let out = tracks.slice(0, 1).reduce((stack, track, trackIndex) => {
+  let out = tracks.reduce((stack, track, trackIndex) => {
     const trigSeq = makeTrigSeq(track, trackIndex);
     const freqSeq = makeFreqSeq(track, trackIndex, trigSeq);
 
@@ -82,8 +78,8 @@ export const bassSynth = ({
   legato = false,
 }: BassSynthParams) => {
   const numSteps = tracks[0].length;
-  const bassTriggers = Array(numSteps).fill(0);
-  let bassFreqs = Array(numSteps).fill(0);
+  const bassTriggers = Array<number>(numSteps).fill(0);
+  let bassFreqs = Array<number>(numSteps).fill(0);
 
   tracks.forEach((track, trackIndex) =>
     track.forEach((step, stepIndex) => {
@@ -104,7 +100,12 @@ export const bassSynth = ({
   const ampEnv = el.adsr(0.03, 0.4, 0.6, 0.5, bassSeq);
 
   const pitchSeq = el.seq(
-    { key: "bass:freq", seq: bassFreqs, hold: true, loop: false },
+    {
+      key: "bass:freq",
+      seq: bassFreqs.length > 0 ? bassFreqs : [10],
+      hold: true,
+      loop: false,
+    },
     bassSeq,
     sync,
   );
