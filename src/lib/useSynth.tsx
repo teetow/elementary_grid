@@ -1,8 +1,5 @@
-import { el, NodeRepr_t } from "@elemaudio/core";
-import { MeterEvent } from "@elemaudio/legacy";
-import WebAudioRenderer from "@elemaudio/web-renderer";
-
-import { useCallback, useContext, useEffect } from "react";
+import { el, MeterEvent, Node } from "@elemaudio/core";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { bassSynth, drums, master, pingDelay, synth } from "./modules";
 import PlaybackContext from "./PlaybackContext";
 import { bpmToHz } from "./utils";
@@ -38,6 +35,7 @@ export const useSynth = ({
   mute = false,
 }: Props) => {
   const playbackCtx = useContext(PlaybackContext);
+  const [graph, setGraph] = useState<Node[]>();
   const bpm = playbackCtx.bpm;
 
   const handleSnapshot = useCallback(
@@ -48,6 +46,10 @@ export const useSynth = ({
     },
     [playbackCtx, tracks],
   );
+
+  useEffect(() => {
+    if (graph) core.render(...graph);
+  }, [graph]);
 
   useEffect(() => {
     core.on("snapshot", handleSnapshot);
@@ -62,7 +64,11 @@ export const useSynth = ({
     }
   };
 
-  const doRender = useCallback(() => {
+  const calcGraph = useCallback(() => {
+    // const sig = el.mul(0.02, el.cycle(el.mul(440, el.cycle(1))));
+    // core.render(sig, sig);
+    // return [sig, sig];
+
     try {
       let bpmAsHz = el.const({ key: "bpm:hz", value: bpmToHz(bpm, 1) });
 
@@ -74,7 +80,7 @@ export const useSynth = ({
       );
       let beat = el.seq({ seq: [1, 1, 1, 0], hold: true }, tick, sync);
 
-      let signal: number | NodeRepr_t = el.const({ value: 0 });
+      let signal: Node = el.const({ value: 0 });
 
       let playheadTrain = el.phasor(bpmAsHz, sync);
       let playheadSignal = el.snapshot(
@@ -84,6 +90,8 @@ export const useSynth = ({
       );
 
       signal = el.add(signal, el.mul(0, playheadSignal));
+
+      return [signal, signal];
 
       signal = el.add(
         signal,
@@ -137,17 +145,13 @@ export const useSynth = ({
         el.meter({ name: "master:right" }, right),
       ];
 
-      const sig = el.mul(0.2, el.cycle(el.mul(440, el.cycle(1))));
-      core.render(sig, sig);
-      return;
-
-      core.render(left, right);
+      return [left, right];
     } catch (e) {
       console.log("Elementary render error: ", e);
     }
   }, [bpm, tracks, tone, scale, bassTracks, bassScale, withKick, mute]);
 
   useEffect(() => {
-    doRender();
-  }, [tracks, tone, scale, bpm, withKick, doRender]);
+    setGraph(calcGraph());
+  }, [tracks, tone, scale, bpm, withKick, calcGraph]);
 };
