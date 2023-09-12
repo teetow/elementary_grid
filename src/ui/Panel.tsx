@@ -1,18 +1,11 @@
-import {
-  MouseEventHandler,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
 import classNames from "classnames";
+import { MouseEventHandler, useCallback, useContext, useEffect, useRef, useState } from "react";
 
-import Icons from "assets/icons";
-import PlaybackContext from "lib/PlaybackContext";
-import useAnimationFrame from "lib/useAnimationFrame";
-import useClickAway from "lib/useClickAway";
-import { clamp } from "lib/utils";
+import PlaybackContext from "../lib/PlaybackContext";
+import useAnimationFrame from "../lib/useAnimationFrame";
+import useClickAway from "../lib/useClickAway";
+import { clamp } from "../lib/utils";
+import Icons from "../assets/icons";
 import { encodeUrlParams, Patch } from "../lib/patch";
 import { Logo } from "./Logo";
 
@@ -31,13 +24,7 @@ const ShareWidget = ({ patch }: { patch: Patch }) => {
     setShowCopyAlert(false);
   });
 
-  const makeUrl = useCallback(
-    () =>
-      globalThis.location.origin +
-      globalThis.location.pathname +
-      encodeUrlParams(patch),
-    [patch],
-  );
+  const makeUrl = useCallback(() => globalThis.location.origin + globalThis.location.pathname + encodeUrlParams(patch), [patch]);
 
   const showPop = () => setShowCopyAlert(true);
   const hidePop = () => setShowCopyAlert(false);
@@ -57,32 +44,18 @@ const ShareWidget = ({ patch }: { patch: Patch }) => {
 
   return (
     <div ref={ref} className="eg-share">
-      <Icons.Share
-        className="eg-share__icon"
-        onClick={() => setShowMenu((prev) => !prev)}
-      />
+      <Icons.Share className="eg-share__icon" onClick={() => setShowMenu((prev) => !prev)} />
       {showMenu && (
         <ul className="eg-menu eg-share__menu">
           <li className="eg-menuitem">
             <a className="eg-text eg-text--link" href={makeUrl()}>
               Link to this track
             </a>
-            <Icons.Copy
-              className="eg-share__clipboardicon"
-              onClick={handleCopyClick}
-            />
-            {showCopyAlert && (
-              <div className="eg-share__copyalert">Copied!</div>
-            )}
+            <Icons.Copy className="eg-share__clipboardicon" onClick={handleCopyClick} />
+            {showCopyAlert && <div className="eg-share__copyalert">Copied!</div>}
           </li>
           <li className="eg-meniutem">
-            <a
-              className="eg-text eg-text--menuitem twitter-share-button"
-              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                `I just made this with Elementary Grid!\n${makeUrl()}`,
-              )}`}
-              data-size="large"
-            >
+            <a className="eg-text eg-text--menuitem twitter-share-button" href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`I just made this with Elementary Grid!\n${makeUrl()}`)}`} data-size="large">
               Tweet track
             </a>
           </li>
@@ -92,24 +65,10 @@ const ShareWidget = ({ patch }: { patch: Patch }) => {
   );
 };
 
-const Switch = ({
-  label,
-  active,
-  setActive,
-}: {
-  label: string;
-  active: boolean;
-  setActive: (active: boolean) => void;
-}) => {
+const Switch = ({ label, active, setActive }: { label: string; active: boolean; setActive: (active: boolean) => void }) => {
   return (
     <div className={`${cls}__option ${cls}__kick-switch`}>
-      <input
-        className={`${cls}__switch`}
-        type="checkbox"
-        id={`${label}`}
-        checked={active}
-        onChange={() => setActive(!active)}
-      />
+      <input className={`${cls}__switch`} type="checkbox" id={`${label}`} checked={active} onChange={() => setActive(!active)} />
       <label htmlFor={`${label}`}>{label}</label>
     </div>
   );
@@ -139,14 +98,7 @@ const TonePicker = ({ currentTone, onSetTone }: TonePickerProps) => {
       {tones.map((tone) => {
         return (
           <div className={`${cls}__option`} key={tone.name}>
-            <input
-              type="radio"
-              className={`${cls}__led`}
-              id={tone.name}
-              value={tone.name}
-              checked={tone.name === currentTone}
-              onChange={() => onSetTone(tone.name)}
-            />
+            <input type="radio" className={`${cls}__led`} id={tone.name} value={tone.name} checked={tone.name === currentTone} onChange={() => onSetTone(tone.name)} />
             <label htmlFor={tone.name}>{tone.label}</label>
           </div>
         );
@@ -166,12 +118,7 @@ const Meter = ({ ids, color = "yellow" }: MeterProps) => {
   useAnimationFrame(1000 / 60, "meter");
 
   return (
-    <div
-      className={classNames([
-        "eg-meter__track",
-        `eg-meter__track--color-${color}`,
-      ])}
-    >
+    <div className={classNames(["eg-meter__track", `eg-meter__track--color-${color}`])}>
       {ids.map((id, i) => (
         <div
           key={`meter:${id}:${i}`}
@@ -216,10 +163,7 @@ function Panel({ patch, onClear, onSetKick, onSetTone, onSetMute }: Props) {
   return (
     <div ref={ref} className={`${cls}`}>
       {fancyLayout && (
-        <div
-          className={`${cls}__logo`}
-          onClick={handleLogoClick}
-        >
+        <div className={`${cls}__logo`} onClick={handleLogoClick}>
           {showMeters ? (
             <div className={`${cls}__meters`}>
               <Meter ids={["synth:left", "synth:right"]} color="yellow" />
@@ -233,11 +177,7 @@ function Panel({ patch, onClear, onSetKick, onSetTone, onSetMute }: Props) {
         </div>
       )}
 
-      <button
-        type="button"
-        className={`eg-button ${cls}__clearbutton`}
-        onClick={onClear}
-      >
+      <button type="button" className={`eg-button ${cls}__clearbutton`} onClick={onClear}>
         Clear
       </button>
 

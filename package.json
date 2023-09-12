@@ -4,26 +4,20 @@
   "private": true,
   "homepage": "https://teetow.github.io/elementary_grid",
   "dependencies": {
-    "@elemaudio/core": "^0.11.0",
-    "@types/nick-thompson__elementary": "^0.9.0",
-    "@types/node": "^17.0.10",
-    "@types/react": "^17.0.34",
-    "@types/react-dom": "^17.0.11",
-    "classnames": "^2.3.1",
-    "gh-pages": "^3.2.3",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-scripts": "5.0.0",
-    "sass": "^1.43.4",
-    "typescript": "^4.4.4"
+    "@elemaudio/core": "^2.1.0",
+    "@elemaudio/web-renderer": "^2.1.0",
+    "@types/node": "^20.6.0",
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
+    "classnames": "^2.3.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "sass": "^1.66.1",
+    "typescript": "^5.2.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "dev": "vite",
+    "build": "vite build"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -39,5 +33,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.4",
+    "vite": "^4.4.9"
   }
 }

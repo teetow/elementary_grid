@@ -1,4 +1,5 @@
-import { el, NativeNode, Node } from "@elemaudio/core";
+import { el } from "@elemaudio/core";
+import { ElemNode } from "../types/elemaudio__core";
 import { kick, Tones } from "./tones";
 import { clamp, freqDeltaFromSeq, tempoToMs } from "./utils";
 
@@ -6,8 +7,8 @@ type SynthParams = {
   tracks: number[][];
   tone: string;
   scale: number[];
-  tick: Node;
-  sync: Node;
+  tick: ElemNode;
+  sync: ElemNode;
   gain: number;
 };
 export const synth = ({
@@ -30,7 +31,7 @@ export const synth = ({
   const makeFreqSeq = (
     track: number[],
     trackIndex: number,
-    trigSeq: NativeNode<"seq">,
+    trigSeq: ElemNode,
   ) => {
     const freqs = track
       .map((trig) =>
@@ -49,7 +50,7 @@ export const synth = ({
     );
   };
 
-  const osc = (seq: Node, trigSeq: Node, i: number) =>
+  const osc = (seq: ElemNode, trigSeq: ElemNode, i: number) =>
     Tones[tone](seq, trigSeq, `synth:voice${i}:freq`, { gain: 0.5 * gain });
 
   let out = tracks.reduce((stack, track, trackIndex) => {
@@ -57,7 +58,7 @@ export const synth = ({
     const freqSeq = makeFreqSeq(track, trackIndex, trigSeq);
 
     return el.add(stack, osc(freqSeq, trigSeq, trackIndex));
-  }, el.const({ value: 0 }));
+  }, el.const({ value: 0 }) as ElemNode);
 
   return out;
 };
@@ -65,8 +66,8 @@ export const synth = ({
 type BassSynthParams = {
   tracks: number[][];
   scale: number[];
-  tick: Node;
-  sync: Node;
+  tick: ElemNode;
+  sync: ElemNode;
   legato?: boolean;
 };
 
@@ -111,30 +112,30 @@ export const bassSynth = ({
   return out;
 };
 
-export const msDelay = (node: Node, time = 210, balance = 1.0) => {
+export const msDelay = (node: ElemNode, time = 210, balance = 1.0) => {
   let dly = el.delay({ size: 44100 }, el.ms2samps(time), -0.3, node);
 
   return el.add(el.mul(node, clamp(2 - balance)), el.mul(dly, balance, 0.5));
 };
 
-export const delay = (node: Node, bpm = 120, tap = 3, balance = 1.0) =>
+export const delay = (node: ElemNode, bpm = 120, tap = 3, balance = 1.0) =>
   msDelay(node, tap * tempoToMs(bpm, 16), balance);
 
 export const pingDelay = (
-  left: Node,
-  right: Node,
+  left: ElemNode,
+  right: ElemNode,
   bpm = 120,
   balance = 0.8,
 ) => [delay(left, bpm, 2, balance), delay(right, bpm, 3, balance)];
 
-export const drums = (trig: Node) => {
+export const drums = (trig: ElemNode) => {
   return kick(null, trig, "kick", { gain: 0.8, pop: 1.2 });
 };
 
 export const master = (
   gain: number = 1.0,
-  left: Node,
-  right: Node,
+  left: ElemNode,
+  right: ElemNode,
   lowcut = 40,
   lowq = 0.9,
   crunch = 0.5,

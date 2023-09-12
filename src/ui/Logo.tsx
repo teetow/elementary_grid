@@ -1,7 +1,7 @@
-import PlaybackContext from "lib/PlaybackContext";
-import useAnimationFrame from "lib/useAnimationFrame";
+import PlaybackContext from "../lib/PlaybackContext";
+import useAnimationFrame from "../lib/useAnimationFrame";
 
-import { clamp } from "lib/utils";
+import { clamp } from "../lib/utils";
 import { CSSProperties, memo, useContext } from "react";
 
 import "./Logo.scss";

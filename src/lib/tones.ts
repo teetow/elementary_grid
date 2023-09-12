@@ -1,14 +1,15 @@
-import { el, Node } from "@elemaudio/core";
+import { el } from "@elemaudio/core";
+import { ElemNode } from "../types/elemaudio__core";
 
 export type Tone = ((
-  freqs: Node,
-  trigs: Node,
+  freqs: ElemNode,
+  trigs: ElemNode,
   id: string,
   options?: { gain?: number } & any,
-) => Node) & { desc: string };
+) => ElemNode) & { desc: string };
 
 export const DoricoBeep: Tone = (freqs) => {
-  return el.phasor(freqs);
+  return el.phasor(freqs, 0);
 };
 DoricoBeep.desc = "It melts";
 
@@ -26,8 +27,8 @@ export const stab: Tone & {
   id,
   { gain = 1.0, detune = 0.004, sharpness = 1.3, richness = 0.7 } = {},
 ) => {
-  const tone = (osc: Node, detune: number, toneGain: Node) => {
-    const o = el.phasor(el.mul(osc, detune));
+  const tone = (osc: ElemNode, detune: number, toneGain: ElemNode) => {
+    const o = el.phasor(el.mul(osc, detune), 0);
     return el.mul(
       toneGain,
       el.add(
@@ -98,13 +99,13 @@ export const bell: Tone & {
     richness: number;
   };
 } = (freqs, trigs, id, { gain = 1.0, detune = 0.0025, richness = 1 }) => {
-  const osc = (freqs: Node, gain: number, env: Node, octave = 1) => {
+  const osc = (freqs: ElemNode, gain: number, env: ElemNode, octave = 1) => {
     return el.mul(gain, env, el.sin(el.mul(2.0 * octave * Math.PI, freqs)));
   };
 
-  const phasorDown = el.phasor(el.mul(freqs, 1 - detune));
-  const phasorMid = el.phasor(freqs);
-  const phasorUp = el.phasor(el.mul(freqs, 1 + detune));
+  const phasorDown = el.phasor(el.mul(freqs, 1 - detune), 0);
+  const phasorMid = el.phasor(freqs, 0);
+  const phasorUp = el.phasor(el.mul(freqs, 1 + detune), 0);
 
   const medEnv = el.adsr(0.8, 0.3, 0.1, 0.2, trigs);
   const fastEnv = el.adsr(0.5, 0.4, 0.2, 1.2, trigs);
@@ -130,8 +131,8 @@ export const bell: Tone & {
 bell.desc = "Sparkly to a fault";
 
 export const bass: Tone = (
-  freqs: Node,
-  trigs: Node,
+  freqs: ElemNode,
+  trigs: ElemNode,
   id,
   { gain = 1.0, richness = 1.0 },
 ) => {
@@ -157,8 +158,8 @@ export const bass: Tone = (
 bass.desc = "BASS";
 
 export const kick: Tone = (
-  freqs: Node,
-  trigs: Node,
+  freqs: ElemNode,
+  trigs: ElemNode,
   id,
   { freq = 42, speed = 1.0, pop = 1.0, tail = 1.0, gain = 1.0 },
 ) => {
@@ -168,7 +169,7 @@ export const kick: Tone = (
   let pitchEnv = el.add(1.0, el.mul(3 * pop, fastEnv));
   pitchEnv = el.add(0.0, el.mul(0.5 * pop, slowEnv), pitchEnv);
 
-  let out = el.cycle(el.mul(pitchEnv, freq));
+  let out = el.cycle(el.mul(pitchEnv, freq)) as ElemNode;
 
   let ampEnv = el.adsr(0.03, 0.23 * speed, 0.0, 0.0, trigs);
   out = el.mul(ampEnv, out);

@@ -1,12 +1,10 @@
-import {
-  el,
-  ElementaryWebAudioRenderer as core,
-  MeterEvent,
-} from "@elemaudio/core";
+import { el } from "@elemaudio/core";
 import { useCallback, useContext, useEffect } from "react";
-import { bassSynth, drums, master, pingDelay, synth } from "./modules";
+import { ElemNode } from "../types/elemaudio__core";
 import PlaybackContext from "./PlaybackContext";
+import { bassSynth, drums, master, pingDelay, synth } from "./modules";
 import { bpmToHz } from "./utils";
+import { core } from "./webRenderer";
 
 type Props = {
   bassScale: number[];
@@ -18,10 +16,12 @@ type Props = {
   mute?: boolean;
 };
 
-let meterCallback = (e: MeterEvent) => {};
+type EventCallbackParams = { source?: string; min: number; max: number };
+
+let meterCallback = (e: EventCallbackParams) => {};
 
 core.on("load", () => {
-  core.on("meter", (e: MeterEvent) => {
+  core.on("meter", (e) => {
     meterCallback(e);
   });
 });
@@ -39,7 +39,7 @@ export const useSynth = ({
   const bpm = playheadCtx.bpm;
 
   const handleSnapshot = useCallback(
-    (e: { source: string; data: number }) => {
+    (e: { source?: string; data: number }) => {
       if (e.source === "patternPos") {
         playheadCtx.playheadPos = Math.round(tracks[0].length * e.data);
       }
@@ -49,7 +49,9 @@ export const useSynth = ({
 
   useEffect(() => {
     core.on("snapshot", handleSnapshot);
-    return () => core.off("snapshot", handleSnapshot);
+    return () => {
+      core.off("snapshot", handleSnapshot);
+    };
   }, [handleSnapshot]);
 
   meterCallback = (e) => {
@@ -62,16 +64,20 @@ export const useSynth = ({
     try {
       let bpmAsHz = el.const({ key: "bpm:hz", value: bpmToHz(bpm, 1) });
 
-      let tick = el.train(el.mul(bpmAsHz, 16));
-      let sync = el.seq({ seq: [1, ...Array(15).fill(0)], hold: false }, tick);
-      let beat = el.seq({ seq: [1, 1, 1, 0], hold: true }, tick, sync);
+      let subdiv = el.train(el.mul(bpmAsHz, 16));
+      let sync = el.seq2(
+        { seq: [1, ...Array(15).fill(0)], hold: false },
+        subdiv,
+        0,
+      );
+      let beat = el.seq2({ seq: [1, 1, 1, 0], hold: true }, subdiv, sync);
 
-      let signal = el.const({ value: 0 });
+      let signal = el.const({ value: 0 }) as ElemNode;
 
       let playheadTrain = el.phasor(bpmAsHz, sync);
       let playheadSignal = el.snapshot(
         { name: "patternPos" },
-        tick,
+        subdiv,
         playheadTrain,
       );
 
@@ -79,7 +85,7 @@ export const useSynth = ({
 
       signal = el.add(
         signal,
-        synth({ tracks, tone, scale, tick, sync, gain: 0.7 }),
+        synth({ tracks, tone, scale, tick: subdiv, sync, gain: 0.7 }),
       );
 
       let [left, right] = [signal, signal]; // make stereo
@@ -99,7 +105,7 @@ export const useSynth = ({
       let bassNodes = bassSynth({
         tracks: bassTracks,
         scale: bassScale,
-        tick,
+        tick: subdiv,
         sync,
       });
       [left, right] = [
@@ -121,7 +127,7 @@ export const useSynth = ({
 
       left = el.add(
         left,
-        el.mul(el.const({ value: 0 }), el.add(tick, sync, beat)),
+        el.mul(el.const({ value: 0 }), el.add(subdiv, sync, beat)),
       );
 
       [left, right] = [
@@ -130,14 +136,13 @@ export const useSynth = ({
       ];
 
       const stats = core.render(left, right);
-      console.log(stats);
     } catch (e) {
       console.log(e);
     }
   }, [bpm, tracks, tone, scale, bassTracks, bassScale, withKick, mute]);
 
   useEffect(() => {
-    if (core.__renderer) {
+    if (core) {
       doRender();
     }
   }, [tracks, tone, scale, bpm, withKick, doRender]);

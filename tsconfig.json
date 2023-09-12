@@ -22,11 +22,10 @@
     "jsx": "react-jsx",
     "typeRoots": [
       "node_modules/@types",
-      "src/types"
     ]
   },
   "include": [
     "src",
-    "src/types"
+    "index.tsx"
   ],
 }

@@ -1,3 +1,5 @@
+import WebAudioRenderer from "@elemaudio/web-renderer";
+
 import { createContext } from "react";
 
 type PlaybackContextProps = {
@@ -5,6 +7,7 @@ type PlaybackContextProps = {
   playheadPos: number;
   bpm: number;
   meters: Record<string, number>;
+  renderer: WebAudioRenderer | undefined;
 };
 
 const PlaybackContext = createContext<PlaybackContextProps>({
@@ -12,6 +15,7 @@ const PlaybackContext = createContext<PlaybackContextProps>({
   playheadPos: 0,
   bpm: 120,
   meters: {},
+  renderer: undefined,
 });
 
 export default PlaybackContext;

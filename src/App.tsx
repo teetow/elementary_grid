@@ -1,14 +1,13 @@
-import { ElementaryWebAudioRenderer as core } from "@elemaudio/core";
-import { useSynth } from "lib/useSynth";
 import { useCallback, useEffect, useReducer } from "react";
 import {
+  Patch,
   clearUrlState,
   getLocalStorage,
   getUrlState,
-  Patch,
   patchReducer,
   setLocalStorage,
 } from "./lib/patch";
+import { useSynth } from "./lib/useSynth";
 
 import { initArray, makeScale, range } from "./lib/utils";
 import Grid from "./ui/Grid";
@@ -16,6 +15,7 @@ import Panel from "./ui/Panel";
 import Splainer from "./ui/Splainer";
 
 import "./App.scss";
+import { core } from "./lib/webRenderer";
 
 const numTracks = 16;
 const numSteps = 16;
