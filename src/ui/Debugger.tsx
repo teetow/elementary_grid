@@ -31,8 +31,8 @@ const freqs = bassNotes
   .map((x) => (x > 0 ? midiToFrequency(x) : 0));
 
 const Bass = (gate: ElemNode) => {
-  let trig = el.seq({ seq: bassTriggers }, gate, 0);
-  let bassSeq = el.seq(
+  let trig = el.seq2({ seq: bassTriggers }, gate, 0);
+  let bassSeq = el.seq2(
     { seq: freqs.filter((x) => x > 0), hold: true },
     trig,
     0,
@@ -59,7 +59,7 @@ const Bass = (gate: ElemNode) => {
 };
 
 const kick = (gate: ElemNode) => {
-  const kickSeq = el.seq({ seq: drums[0] }, gate, 0);
+  const kickSeq = el.seq2({ seq: drums[0] }, gate, 0);
 
   const slowPitchEnv = el.adsr(0.001, 0.12, 0.1, 0.2, kickSeq);
   const ampEnv = el.adsr(0.003, 0.7, 0.5, 0.2, kickSeq);
@@ -75,7 +75,7 @@ const kick = (gate: ElemNode) => {
 };
 
 const snare = (gate: ElemNode, { root = 160 } = {}) => {
-  let seq = el.seq({ seq: drums[1] }, gate, 0);
+  let seq = el.seq2({ seq: drums[1] }, gate, 0);
 
   let snapPitchEnv = el.adsr(0.001, 0.5, 0.1, 0.1, seq);
   let snapAmpEnv = el.adsr(0.001, 0.05, 0.001, 0.1, seq);
