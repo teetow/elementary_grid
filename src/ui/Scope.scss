@@ -1,0 +1,26 @@
+@use "sass:color";
+@use "../style/theme";
+
+$cls: ".eg-scope";
+
+#{$cls} {
+  position: relative;
+}
+
+#{$cls}__scope {
+  background-color: theme.$color-gray-200;
+}
+
+#{$cls}__label {
+  position: absolute;
+  font-size: smaller;
+  bottom: 4px;
+  right: 4px;
+}
+
+#{$cls}__scopepath {
+  stroke: theme.$color-brand-600;
+  fill: none;
+  stroke-width: 1;
+  stroke-linejoin: round;
+}

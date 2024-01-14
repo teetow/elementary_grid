@@ -20,11 +20,14 @@ import { core } from "./lib/webRenderer";
 const numTracks = 16;
 const numSteps = 16;
 
-core.on("load", () => {
+const handleLoad = () => {
   core.on("error", (e: unknown) => {
     console.log(e);
   });
-});
+};
+
+core.off("load", handleLoad);
+core.on("load", handleLoad);
 
 const initTracks = (height: number = numTracks) => {
   return initArray(height, numSteps);
