@@ -106,7 +106,7 @@ export const shiftArray = (array: any[], shift: number) => {
     const lastElem = array.pop();
     array = [lastElem, ...array];
   }
-  return deepCopy(array) as typeof array[];
+  return deepCopy(array) as (typeof array)[];
 };
 
 export const bitsToNumber = (bits: number[]) => {
@@ -127,5 +127,19 @@ export const countNodes = (node: any) => {
   return node._children.reduce(
     (acc: number, n: any) => acc + countNodes(n) + 1,
     0,
+  );
+};
+
+export const mapRange = (
+  input: number,
+  input_start = 0,
+  input_end = 1,
+  output_start = 0,
+  output_end = 1,
+) => {
+  return (
+    output_start +
+    ((output_end - output_start) / (input_end - input_start)) *
+      (input - input_start)
   );
 };

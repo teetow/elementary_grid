@@ -5,7 +5,6 @@ const useAnimationFrame = (
   id: string,
   callback?: (time: number, delta: number) => void,
 ) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, forceUpdate] = useReducer((x) => x + 1, 0);
   const lastSeens = useRef<Record<string, number>>({});
   const handles = useRef<Record<string, number>>({});
@@ -14,12 +13,12 @@ const useAnimationFrame = (
     (time: number) => {
       const now = Date.now();
       if (!lastSeens.current[id]) {
-        console.log("setting", id);
         lastSeens.current[id] = now;
       }
 
       if (now - lastSeens.current[id] > minInterval) {
         forceUpdate();
+        callback?.(now, now - lastSeens.current[id]);
         lastSeens.current[id] = now;
       }
       handles.current[id] = requestAnimationFrame(update);

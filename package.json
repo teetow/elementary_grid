@@ -4,19 +4,19 @@
   "private": true,
   "homepage": "https://teetow.github.io/elementary_grid",
   "dependencies": {
-    "@elemaudio/core": "^2.1.0",
-    "@elemaudio/web-renderer": "^2.1.0",
-    "@types/node": "^20.6.0",
-    "@types/react": "^18.2.21",
-    "@types/react-dom": "^18.2.7",
-    "classnames": "^2.3.2",
+    "@elemaudio/core": "^3.0.0",
+    "@elemaudio/web-renderer": "^3.0.1",
+    "@types/node": "^20.10.8",
+    "@types/react": "^18.2.47",
+    "@types/react-dom": "^18.2.18",
+    "classnames": "^2.5.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "sass": "^1.66.1",
-    "typescript": "^5.2.2"
+    "sass": "^1.69.7",
+    "typescript": "^5.3.3"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build"
   },
   "eslintConfig": {
@@ -35,7 +35,7 @@
     ]
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.0.4",
-    "vite": "^4.4.9"
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.11"
   }
 }

@@ -8,8 +8,8 @@ export type Tone = ((
   options?: { gain?: number } & any,
 ) => ElemNode) & { desc: string };
 
-export const DoricoBeep: Tone = (freqs) => {
-  return el.phasor(freqs, 0);
+export const DoricoBeep: Tone = (freqs: number) => {
+  return el.mul(0.04, el.phasor(freqs));
 };
 DoricoBeep.desc = "It melts";
 
@@ -28,7 +28,7 @@ export const stab: Tone & {
   { gain = 1.0, detune = 0.004, sharpness = 1.3, richness = 0.7 } = {},
 ) => {
   const tone = (osc: ElemNode, detune: number, toneGain: ElemNode) => {
-    const o = el.phasor(el.mul(osc, detune), 0);
+    const o = el.phasor(el.mul(osc, detune));
     return el.mul(
       toneGain,
       el.add(
@@ -103,9 +103,9 @@ export const bell: Tone & {
     return el.mul(gain, env, el.sin(el.mul(2.0 * octave * Math.PI, freqs)));
   };
 
-  const phasorDown = el.phasor(el.mul(freqs, 1 - detune), 0);
+  const phasorDown = el.phasor(el.mul(freqs, 1 - detune));
   const phasorMid = el.phasor(freqs, 0);
-  const phasorUp = el.phasor(el.mul(freqs, 1 + detune), 0);
+  const phasorUp = el.phasor(el.mul(freqs, 1 + detune));
 
   const medEnv = el.adsr(0.8, 0.3, 0.1, 0.2, trigs);
   const fastEnv = el.adsr(0.5, 0.4, 0.2, 1.2, trigs);
@@ -171,16 +171,16 @@ export const kick: Tone = (
 
   let out = el.cycle(el.mul(pitchEnv, freq)) as ElemNode;
 
-  let ampEnv = el.adsr(0.03, 0.23 * speed, 0.0, 0.0, trigs);
+  let ampEnv = el.adsr(0.03, 0.23 * speed, 0.3, 0.2, trigs);
   out = el.mul(ampEnv, out);
 
   let snapEnv = el.adsr(0.001, 0.01, 0.0, 0.0, trigs);
   let snap = el.cycle(el.mul(snapEnv, 3000));
   let snapFltEnv = el.adsr(0.005, 0.1, 0, 0, trigs);
-  snap = el.lowpass(el.add(110, el.mul(1200, snapFltEnv)), 1, snap);
+  snap = el.lowpass(el.add(110, el.mul(1100, snapFltEnv)), 1, snap);
   out = el.add(el.mul(0.4, snap), out);
 
-  out = el.highpass(freq + 14, tail * 6.0, out);
+  out = el.highpass(freq + 14, tail * 2.0, out);
 
   out = el.mul(gain, out);
 

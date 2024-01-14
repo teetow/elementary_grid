@@ -1,7 +1,10 @@
 import { el } from "@elemaudio/core";
 import { useCallback, useContext, useEffect } from "react";
 import { ElemNode } from "../types/elemaudio__core";
-import PlaybackContext from "./PlaybackContext";
+import PlaybackContext, {
+  SCOPE_BUF_SIZE,
+  SCOPE_NUM_BUFS,
+} from "./PlaybackContext";
 import { bassSynth, drums, master, pingDelay, synth } from "./modules";
 import { bpmToHz } from "./utils";
 import { core } from "./webRenderer";
@@ -16,16 +19,6 @@ type Props = {
   mute?: boolean;
 };
 
-type EventCallbackParams = { source?: string; min: number; max: number };
-
-let meterCallback = (e: EventCallbackParams) => {};
-
-core.on("load", () => {
-  core.on("meter", (e) => {
-    meterCallback(e);
-  });
-});
-
 export const useSynth = ({
   bassScale,
   bassTracks,
@@ -35,16 +28,44 @@ export const useSynth = ({
   withKick = true,
   mute = false,
 }: Props) => {
-  const playheadCtx = useContext(PlaybackContext);
-  const bpm = playheadCtx.bpm;
+  const pbCtx = useContext(PlaybackContext);
+  const bpm = pbCtx.bpm;
+
+  const handleScope = useCallback(
+    (e: { source?: string; data: Float32Array[] }) => {
+      if (!e.source) {
+        return;
+      }
+
+      if (!pbCtx.scope[e.source]) {
+        pbCtx.scope[e.source] = [];
+      } else {
+        if (pbCtx.scope[e.source].length >= SCOPE_NUM_BUFS) {
+          pbCtx.scope[e.source] = [];
+        }
+      }
+
+      pbCtx.scope[e.source].push(e.data[0]);
+    },
+    [],
+  );
+
+  useEffect(() => {
+    core.on("scope", handleScope);
+    return () => {
+      core.off("scope", handleScope);
+    };
+  }, [handleScope]);
 
   const handleSnapshot = useCallback(
     (e: { source?: string; data: number }) => {
-      if (e.source === "patternPos") {
-        playheadCtx.playheadPos = Math.round(tracks[0].length * e.data);
+      if (e.source === "snapshot:patternpos") {
+        pbCtx.playheadPos = tracks[0].length * e.data;
+      } else if (e.source === "reset") {
+        Object.keys(pbCtx.scope).forEach((key) => (pbCtx.scope[key] = []));
       }
     },
-    [playheadCtx, tracks],
+    [pbCtx, tracks],
   );
 
   useEffect(() => {
@@ -54,30 +75,51 @@ export const useSynth = ({
     };
   }, [handleSnapshot]);
 
-  meterCallback = (e) => {
+  const handleMeter = (e: { source?: string; min: number; max: number }) => {
     if (e.source) {
-      playheadCtx.meters[e.source] = e.max;
+      pbCtx.meters[e.source] = e.max;
     }
   };
 
+  useEffect(() => {
+    core.on("meter", handleMeter);
+    return () => {
+      core.off("meter", handleMeter);
+    };
+  }, [handleMeter]);
+
   const doRender = useCallback(() => {
     try {
-      let bpmAsHz = el.const({ key: "bpm:hz", value: bpmToHz(bpm, 1) });
+      let bpmAsHz = el.const({
+        key: "bpm:hz",
+        value: bpmToHz(bpm, 1),
+      }) as ElemNode;
 
-      let subdiv = el.train(el.mul(bpmAsHz, 16));
+      let tick = el.train(el.mul(bpmAsHz, 16));
+      tick = el.scope({ name: "debug:tick", size: SCOPE_BUF_SIZE }, tick);
+
       let sync = el.seq2(
-        { seq: [1, ...Array(15).fill(0)], hold: false },
-        subdiv,
+        { seq: [1, ...Array(15).fill(0)], hold: true },
+        tick,
         0,
       );
-      let beat = el.seq2({ seq: [1, 1, 1, 0], hold: true }, subdiv, sync);
+      sync = el.scope({ name: "debug:sync", size: SCOPE_BUF_SIZE }, sync);
+      sync = el.snapshot({ name: "reset" }, sync, sync);
+
+      let beat = el.seq2({ seq: [1, 0, 0, 0], hold: true }, tick, sync);
+      beat = el.scope({ name: "debug:beat", size: SCOPE_BUF_SIZE }, beat);
 
       let signal = el.const({ value: 0 }) as ElemNode;
 
-      let playheadTrain = el.phasor(bpmAsHz, sync);
+      let playheadTrain = el.syncphasor(bpmAsHz, sync);
+      playheadTrain = el.scope(
+        { name: "debug:playhead", size: SCOPE_BUF_SIZE },
+        playheadTrain,
+      );
+
       let playheadSignal = el.snapshot(
-        { name: "patternPos" },
-        subdiv,
+        { name: "snapshot:patternpos" },
+        tick,
         playheadTrain,
       );
 
@@ -85,7 +127,7 @@ export const useSynth = ({
 
       signal = el.add(
         signal,
-        synth({ tracks, tone, scale, tick: subdiv, sync, gain: 0.7 }),
+        synth({ tracks, tone, scale, tick, sync, gain: 0.7 }),
       );
 
       let [left, right] = [signal, signal]; // make stereo
@@ -105,7 +147,7 @@ export const useSynth = ({
       let bassNodes = bassSynth({
         tracks: bassTracks,
         scale: bassScale,
-        tick: subdiv,
+        tick,
         sync,
       });
       [left, right] = [
@@ -127,12 +169,17 @@ export const useSynth = ({
 
       left = el.add(
         left,
-        el.mul(el.const({ value: 0 }), el.add(subdiv, sync, beat)),
+        el.mul(el.const({ value: 0 }), el.add(tick, sync, beat)),
       );
 
       [left, right] = [
         el.meter({ name: "master:left" }, left),
         el.meter({ name: "master:right" }, right),
+      ];
+
+      [left, right] = [
+        el.scope({ name: "master:left", size: SCOPE_BUF_SIZE }, left),
+        el.scope({ name: "master:right", size: SCOPE_BUF_SIZE }, right),
       ];
 
       const stats = core.render(left, right);
