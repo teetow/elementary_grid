@@ -14,14 +14,6 @@ type Icon = ForwardRefExoticComponent<
   IconProps & React.RefAttributes<SVGSVGElement>
 >;
 
-export const Blah = forwardRef<HTMLDivElement, IconProps>(
-  ({ children }, ref) => {
-    return <div ref={ref}>{children}</div>;
-  },
-);
-
-<Blah ref={null} />;
-
 const Icons: Record<string, Icon> = {
   Share: forwardRef<SVGSVGElement, IconProps>(({ onClick, className }, ref) => (
     <svg

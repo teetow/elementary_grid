@@ -139,7 +139,7 @@ export const bassSynth = ({
 };
 
 export const msDelay = (node: ElemNode, time = 210, balance = 1.0) => {
-  let dly = el.delay({ size: 44100 }, el.ms2samps(time), -0.3, node);
+  let dly = el.delay({ size: 88200 }, el.ms2samps(time), -0.3, node);
 
   return el.add(el.mul(node, clamp(2 - balance)), el.mul(dly, balance, 0.5));
 };

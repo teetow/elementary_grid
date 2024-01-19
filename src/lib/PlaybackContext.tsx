@@ -1,11 +1,26 @@
 import WebAudioRenderer from "@elemaudio/web-renderer";
 
-import { createContext } from "react";
+import { PropsWithChildren, createContext, useState } from "react";
+
+export const DEFAULTS_BPM = 123;
+
+export type BpmContextProps = {
+  bpm: number;
+  setBpm?: React.Dispatch<React.SetStateAction<number>>;
+};
+export const BpmContext = createContext<BpmContextProps>({ bpm: 120 });
+export const BpmContextProvider = ({ children }: PropsWithChildren) => {
+  const [bpm, setBpm] = useState(99);
+  return (
+    <BpmContext.Provider value={{ bpm, setBpm }}>
+      {children}
+    </BpmContext.Provider>
+  );
+};
 
 type PlaybackContextProps = {
   state: "playing" | "stopped";
   playheadPos: number;
-  bpm: number;
   meters: Record<string, number>;
   scope: Record<string, Float32Array[]>;
   renderer: WebAudioRenderer | undefined;
@@ -14,7 +29,6 @@ type PlaybackContextProps = {
 const PlaybackContext = createContext<PlaybackContextProps>({
   state: "playing",
   playheadPos: 0,
-  bpm: 120,
   meters: {},
   scope: {},
   renderer: undefined,

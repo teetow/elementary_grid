@@ -2,6 +2,7 @@ import React from "react";
 
 import { createRoot } from "react-dom/client";
 import App from "./App";
+import { BpmContextProvider } from "./lib/PlaybackContext";
 import { core, initRenderer } from "./lib/webRenderer";
 import Debugger from "./ui/Debugger";
 import { Splash } from "./ui/Splash";
@@ -15,7 +16,15 @@ const runDebugger = false;
 
 const RenderApp = () => {
   root.render(
-    <React.StrictMode>{runDebugger ? <Debugger /> : <App />}</React.StrictMode>,
+    <React.StrictMode>
+      {runDebugger ? (
+        <Debugger />
+      ) : (
+        <BpmContextProvider>
+          <App />
+        </BpmContextProvider>
+      )}
+    </React.StrictMode>,
   );
 };
 

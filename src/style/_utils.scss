@@ -1,0 +1,13 @@
+@use "sass:string";
+
+@mixin per-char($chars, $prefix) {
+  $selectors: ();
+
+  @each $char in $chars {
+    $selectors: append($selectors, unquote("##{$char}#{$prefix}"), comma);
+  }
+
+  #{join($selectors, " ")} {
+    @content;
+  }
+}

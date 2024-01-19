@@ -18,6 +18,7 @@ import { Logo } from "./Logo";
 
 import "./Panel.scss";
 import Scope from "./Scope";
+import BpmInput from "./BpmInput";
 
 const cls = "eg-panel";
 
@@ -34,9 +35,7 @@ const ShareWidget = ({ patch }: { patch: Patch }) => {
 
   const makeUrl = useCallback(
     () =>
-      globalThis.location.origin +
-      globalThis.location.pathname +
-      encodeUrlParams(patch),
+      globalThis.location.origin + globalThis.location.pathname + encodeUrlParams(patch),
     [patch],
   );
 
@@ -68,13 +67,8 @@ const ShareWidget = ({ patch }: { patch: Patch }) => {
             <a className="eg-text eg-text--link" href={makeUrl()}>
               Link to this track
             </a>
-            <Icons.Copy
-              className="eg-share__clipboardicon"
-              onClick={handleCopyClick}
-            />
-            {showCopyAlert && (
-              <div className="eg-share__copyalert">Copied!</div>
-            )}
+            <Icons.Copy className="eg-share__clipboardicon" onClick={handleCopyClick} />
+            {showCopyAlert && <div className="eg-share__copyalert">Copied!</div>}
           </li>
           <li className="eg-meniutem">
             <a
@@ -167,12 +161,7 @@ const Meter = ({ ids, color = "yellow" }: MeterProps) => {
   useAnimationFrame(1000 / 30, "meter");
 
   return (
-    <div
-      className={classNames([
-        "eg-meter__track",
-        `eg-meter__track--color-${color}`,
-      ])}
-    >
+    <div className={classNames(["eg-meter__track", `eg-meter__track--color-${color}`])}>
       {ids.map((id, i) => (
         <div
           key={`meter:${id}:${i}`}
@@ -194,8 +183,7 @@ type Props = {
   onSetMute: (mute: boolean) => void;
 };
 
-const getUseFancyLayout = () =>
-  window.matchMedia("(min-width: 35.001em)").matches;
+const getUseFancyLayout = () => window.matchMedia("(min-width: 35.001em)").matches;
 
 function Panel({ patch, onClear, onSetKick, onSetTone, onSetMute }: Props) {
   const [skip, setSkip] = useState(1);
@@ -242,20 +230,15 @@ function Panel({ patch, onClear, onSetKick, onSetTone, onSetMute }: Props) {
           Clear
         </button>
 
-        <TonePicker
-          currentTone={patch.tone as ToneName}
-          onSetTone={onSetTone}
-        />
+        <BpmInput />
+
+        <TonePicker currentTone={patch.tone as ToneName} onSetTone={onSetTone} />
 
         <Switch label="Kick" active={patch.useKick} setActive={onSetKick} />
 
-        <Switch
-          label="Mute"
-          active={patch.mute || false}
-          setActive={onSetMute}
-        />
+        <Switch label="Mute" active={patch.mute || false} setActive={onSetMute} />
 
-        <ShareWidget patch={patch} />
+        {fancyLayout && <ShareWidget patch={patch} />}
       </div>
       {showMeters && (
         <div className="scopes">

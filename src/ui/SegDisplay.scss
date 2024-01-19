@@ -1,0 +1,71 @@
+@use "sass:color";
+@use "../style/theme";
+@use "../style/utils";
+
+@property --fill {
+  syntax: "<color>";
+  initial-value: #333;
+  inherits: true;
+}
+
+@property --fade {
+  syntax: "<time>";
+  initial-value: 0;
+  inherits: true;
+}
+
+$cls: ".eg-segdisplay";
+$digit: ".eg-segdigit";
+$p: #{$digit}__path;
+
+$fg: theme.$color-brand-600;
+$bg: rgba(132, 117, 41, 0.378);
+
+#{$digit}__template {
+  width: 0;
+  height: 0;
+}
+
+#{$cls} {
+  --fill: #{$bg};
+  --fade: 0.08s;
+  display: grid;
+  grid-auto-flow: column;
+}
+
+#{$digit} {
+  display: block;
+  width: 1.2rem;
+
+  @mixin segments($digit, $segments) {
+    &.d-#{$digit} {
+      @include utils.per-char($segments, "#{$p}") {
+        --fade: 0.01s;
+        --fill: #{$fg};
+      }
+    }
+  }
+
+  @include segments(1, (b c));
+  @include segments(2, (a b d e g));
+  @include segments(3, (a b c d g));
+  @include segments(4, (b c f g));
+  @include segments(5, (a c d f g));
+  @include segments(6, (a c d e f g));
+  @include segments(7, (a b c));
+  @include segments(8, (a b c d e f g));
+  @include segments(9, (a b c d f g));
+  @include segments(0, (a b c d e f));
+
+  &.dot {
+    #p#{$p} {
+      --fill: #{$fg};
+    }
+  }
+}
+
+#{$p} {
+  fill: var(--fill);
+  filter: url(#glow);
+  transition: --fill var(--fade) linear;
+}

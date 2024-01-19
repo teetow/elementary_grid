@@ -2,6 +2,7 @@ import { el } from "@elemaudio/core";
 import { useCallback, useContext, useEffect } from "react";
 import { ElemNode } from "../types/elemaudio__core";
 import PlaybackContext, {
+  DEFAULTS_BPM,
   SCOPE_BUF_SIZE,
   SCOPE_NUM_BUFS,
 } from "./PlaybackContext";
@@ -17,6 +18,7 @@ type Props = {
   tone?: string;
   withKick?: boolean;
   mute?: boolean;
+  bpm?: number;
 };
 
 export const useSynth = ({
@@ -27,9 +29,9 @@ export const useSynth = ({
   tone = "ding",
   withKick = true,
   mute = false,
+  bpm = DEFAULTS_BPM,
 }: Props) => {
   const pbCtx = useContext(PlaybackContext);
-  const bpm = pbCtx.bpm;
 
   const handleScope = useCallback(
     (e: { source?: string; data: Float32Array[] }) => {
@@ -95,7 +97,7 @@ export const useSynth = ({
         value: bpmToHz(bpm, 1),
       }) as ElemNode;
 
-      let tick = el.train(el.mul(bpmAsHz, 16));
+      let tick = el.train({ key: "bpm:tick" }, el.mul(bpmAsHz, 16));
       tick = el.scope({ name: "debug:tick", size: SCOPE_BUF_SIZE }, tick);
 
       let sync = el.seq2(

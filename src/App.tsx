@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useReducer } from "react";
+import { useCallback, useContext, useEffect, useReducer } from "react";
 import {
   Patch,
   clearUrlState,
@@ -15,6 +15,7 @@ import Panel from "./ui/Panel";
 import Splainer from "./ui/Splainer";
 
 import "./App.scss";
+import { BpmContext } from "./lib/PlaybackContext";
 import { core } from "./lib/webRenderer";
 
 const numTracks = 16;
@@ -61,6 +62,7 @@ const initialPatch = getInitialPatch();
 
 const App = () => {
   const [patch, updatePatch] = useReducer(patchReducer, initialPatch);
+  const { bpm } = useContext(BpmContext);
 
   useSynth({
     scale: patch.scale,
@@ -70,6 +72,7 @@ const App = () => {
     bassTracks: patch.bassTracks,
     withKick: patch.useKick,
     mute: patch.mute,
+    bpm: bpm,
   });
 
   const toggleNote = useCallback(
@@ -100,47 +103,49 @@ const App = () => {
   }, [patch]);
 
   return (
-    <div className="eg-app">
-      <Panel
-        patch={patch}
-        onClear={useCallback(() => {
-          updatePatch({ type: "setTracks", tracks: initTracks() });
-          updatePatch({ type: "setBassTracks", tracks: initTracks(7) });
-        }, [])}
-        onSetKick={useCallback(
-          (useKick) => updatePatch({ type: "setUseKick", useKick }),
-          [],
-        )}
-        onSetTone={useCallback(
-          (tone) => updatePatch({ type: "setTone", tone }),
-          [],
-        )}
-        onSetMute={useCallback(
-          (mute) => updatePatch({ type: "setMute", mute }),
-          [],
-        )}
-      />
-      <Grid
-        canTranspose={true}
-        notes={patch.tracks}
-        onSetNotes={useCallback((notes) => {
-          updatePatch({ type: "setTracks", tracks: notes });
-        }, [])}
-        onToggleNote={toggleNote}
-      ></Grid>
+    <>
+      <div className="eg-app">
+        <Panel
+          patch={patch}
+          onClear={useCallback(() => {
+            updatePatch({ type: "setTracks", tracks: initTracks() });
+            updatePatch({ type: "setBassTracks", tracks: initTracks(7) });
+          }, [])}
+          onSetKick={useCallback(
+            (useKick) => updatePatch({ type: "setUseKick", useKick }),
+            [],
+          )}
+          onSetTone={useCallback(
+            (tone) => updatePatch({ type: "setTone", tone }),
+            [],
+          )}
+          onSetMute={useCallback(
+            (mute) => updatePatch({ type: "setMute", mute }),
+            [],
+          )}
+        />
+        <Grid
+          canTranspose={true}
+          notes={patch.tracks}
+          onSetNotes={useCallback((notes) => {
+            updatePatch({ type: "setTracks", tracks: notes });
+          }, [])}
+          onToggleNote={toggleNote}
+        ></Grid>
 
-      <Grid
-        canTranspose={true}
-        color="blue"
-        notes={patch.bassTracks}
-        onSetNotes={useCallback(
-          (notes) => updatePatch({ type: "setBassTracks", tracks: notes }),
-          [],
-        )}
-        onToggleNote={toggleBassNote}
-      />
-      <Splainer />
-    </div>
+        <Grid
+          canTranspose={true}
+          color="blue"
+          notes={patch.bassTracks}
+          onSetNotes={useCallback(
+            (notes) => updatePatch({ type: "setBassTracks", tracks: notes }),
+            [],
+          )}
+          onToggleNote={toggleBassNote}
+        />
+        <Splainer />
+      </div>
+    </>
   );
 };
 

@@ -1,0 +1,31 @@
+@use "sass:color";
+@use "../style/theme";
+
+$cls: ".eg-bpm";
+
+#{$cls} {
+  position: relative;
+  display: grid;
+  grid-template-areas: "main";
+  justify-items: start;
+  min-width: 4em;
+
+  & > * {
+    grid-area: main;
+  }
+}
+
+#{$cls}__input {
+  appearance: none;
+  background-color: theme.$color-gray-50;
+  border-radius: 0.25rem;
+  border: none;
+  color: theme.$color-brand-600;
+  font-size: 1.3em;
+  margin: -8px;
+  max-width: 3.8rem;
+  outline: none;
+  padding: 0.25rem 0.5rem;
+  text-align: left;
+  transform: skew(-5deg);
+}

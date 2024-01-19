@@ -6,13 +6,13 @@ $cls: ".eg-panel";
 #{$cls} {
   align-items: center;
   display: grid;
-  gap: 1.5em;
-  grid-template-areas: "logo clear share tone kick mute";
+  gap: 1em;
+  grid-template-areas: "logo clear share bpm tone kick mute";
   grid-template-columns: 1fr auto auto auto auto;
   justify-self: stretch;
 
   @media all and (max-width: theme.$bp-compact) {
-    grid-template-areas: "clear share tone kick mute";
+    grid-template-areas: "clear bpm tone kick mute";
     grid-template-columns: auto auto 1fr;
     justify-self: end;
   }
@@ -86,7 +86,7 @@ $curve-bounce: cubic-bezier(0.57, 1.87, 0.34, -0.05);
   & + label {
     --size: 0.6em;
 
-    column-gap: 0.5em;
+    column-gap: 0.66em;
     display: inline-grid;
     grid-template-areas: "led label";
     grid-template-columns: var(--size);
